@@ -176,30 +176,6 @@
 /processorParam:TextureFormat=Color
 /build:grass.png
 
-#begin H:/PICTURES/assets/test_sprite_atlas.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:H:/PICTURES/assets/test_sprite_atlas.png;test_sprite_atlas.png
-
-#begin H:/PICTURES/assets/tileset.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:H:/PICTURES/assets/tileset.png;tileset.png
-
 #begin LightShadow_pipo.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -245,6 +221,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:test_sprite.png
+
+#begin test_sprite_atlas.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:test_sprite_atlas.png
 
 #begin test_sprite_atlas.png
 /importer:TextureImporter
