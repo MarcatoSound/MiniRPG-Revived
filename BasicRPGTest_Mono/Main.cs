@@ -39,7 +39,7 @@ namespace BasicRPGTest_Mono
 
                 if (activeScreen is ScreenGame)
                 {
-                    if (args.Key == Keys.Escape) Exit();
+                    if (args.Key == Keys.Escape) mainMenu();
                 }
             };
 
@@ -65,12 +65,12 @@ namespace BasicRPGTest_Mono
         private void mainMenu()
         {
             activeScreen = new ScreenMainMenu(this);
-            screenManager.LoadScreen(activeScreen, new FadeTransition(_graphics.GraphicsDevice, Color.Black));
+            screenManager.LoadScreen(activeScreen);
         }
         private void startGame()
         {
             activeScreen = new ScreenGame(this);
-            screenManager.LoadScreen(activeScreen, new FadeTransition(_graphics.GraphicsDevice, Color.Black));
+            screenManager.LoadScreen(activeScreen, new WipeTransition(_graphics.GraphicsDevice, Color.Black, 0.7F));
         }
 
     }
