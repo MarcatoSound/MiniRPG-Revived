@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using MonoGame.Extended.Input.InputListeners;
+using BasicRPGTest_Mono.Engine.Menus;
 
 namespace BasicRPGTest_Mono
 {
@@ -18,6 +19,8 @@ namespace BasicRPGTest_Mono
         private SpriteBatch _spriteBatch;
         private SpriteFont font;
 
+        private Menu mainMenu;
+
         public override void LoadContent()
         {
 
@@ -26,7 +29,34 @@ namespace BasicRPGTest_Mono
 
             font = Content.Load<SpriteFont>("arial");
 
+            mainMenu = new Menu("mainmenu");
+            mainMenu.add(new MenuItem("Test 1")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("Menu option 0 selected!");
+                    }
+            });
+            mainMenu.add(new MenuItem("Test 2")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("This time menu option 1 is selected!");
+                    }
+            });
+
             base.LoadContent();
+        }
+
+        public void down()
+        {
+            mainMenu.index++;
+        }
+        public void up()
+        {
+            mainMenu.index--;
+        }
+        public void select()
+        {
+            mainMenu.select();
         }
 
         public override void Update(GameTime gameTime)

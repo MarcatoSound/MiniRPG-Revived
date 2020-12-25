@@ -38,6 +38,9 @@ namespace BasicRPGTest_Mono
                 {
                     if (args.Key == Keys.Space) worldMenu();
                     if (args.Key == Keys.Escape) Exit();
+                    if (args.Key == Keys.Down) ((ScreenMainMenu)activeScreen).down();
+                    if (args.Key == Keys.Up) ((ScreenMainMenu)activeScreen).up();
+                    if (args.Key == Keys.Enter) ((ScreenMainMenu)activeScreen).select();
                     return;
                 }
 
