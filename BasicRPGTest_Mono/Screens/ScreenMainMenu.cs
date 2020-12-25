@@ -48,6 +48,18 @@ namespace BasicRPGTest_Mono
                     System.Diagnostics.Debug.WriteLine("This is a longer string test! Entry 2");
                     }
             });
+            mainMenu.add(new MenuItem("Long Test 4")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("This is a longer string test! Entry 3");
+                    }
+            });
+            mainMenu.add(new MenuItem("Test 5")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
+                    }
+            });
 
             base.LoadContent();
         }
