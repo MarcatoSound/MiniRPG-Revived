@@ -9,21 +9,20 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class Save
     {
-        public static string world { get; set; }
         public static string path { get; set; }
         public static TextWriter writer { get; set; }
         static Save()
         {
-            world = "world";
+        }
+        public static void save(TiledMap map, string world)
+        {
             path = $"save\\{world}";
-            
+
             if (!Directory.Exists(path))
             {
                 DirectoryInfo dInfo = Directory.CreateDirectory(path);
             }
-        }
-        public static void save(TiledMap map)
-        {
+
             writer = new StreamWriter(path + "\\map.json", false);
             JObject json = new JObject();
 

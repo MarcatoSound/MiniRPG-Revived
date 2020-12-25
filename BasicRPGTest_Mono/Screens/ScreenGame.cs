@@ -18,10 +18,10 @@ namespace BasicRPGTest_Mono
     public class ScreenGame : GameScreen
     {
         private new Main Game => (Main)base.Game;
-        public ScreenGame(Main game) : base(game) { }
 
         Player player;
         LivingEntity entity;
+        string worldName;
 
         private SpriteFont font;
 
@@ -32,6 +32,10 @@ namespace BasicRPGTest_Mono
         TiledMapRenderer _tiledMapRenderer;
 
         private FrameCounter _frameCounter = new FrameCounter();
+        public ScreenGame(Main game, string worldName) : base(game)
+        {
+            this.worldName = worldName;
+        }
 
         public override void LoadContent()
         {
@@ -50,8 +54,6 @@ namespace BasicRPGTest_Mono
 
             generateMap();
 
-            System.Diagnostics.Debug.WriteLine("Map: " + MapManager.get(0));
-
             _tiledMapRenderer = new TiledMapRenderer(GraphicsDevice, MapManager.activeMap.tiledMap);
 
             Texture2D texture = Content.Load<Texture2D>("test_sprite_atlas");
@@ -61,6 +63,19 @@ namespace BasicRPGTest_Mono
             entity = new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics, position: new Vector2(500, 240));
 
             base.LoadContent();
+            System.Diagnostics.Debug.WriteLine("## Loaded game content!");
+        }
+        public override void UnloadContent()
+        {
+            Save.save(MapManager.activeMap.tiledMap, worldName);
+            Camera.reset();
+
+            worldName = "";
+            player = null;
+            entity = null;
+            MapManager.clear();
+
+            base.UnloadContent();
         }
 
         private void buildTileset()
@@ -78,12 +93,11 @@ namespace BasicRPGTest_Mono
 
         private void generateMap()
         {
-            string world = "world";
-            string path = $"save\\{world}";
+            string path = $"save\\{worldName}";
 
             if (Directory.Exists(path))
             {
-                MapManager.add(new Map(Load.loadMap(masterTileset)));
+                MapManager.add(new Map(Load.loadMap(masterTileset, worldName)));
                 return;
             }
 
@@ -94,7 +108,7 @@ namespace BasicRPGTest_Mono
             MapManager.activeMap.tiledMap.AddTileset(masterTileset, 0);
 
             // Saving world functionality
-            Save.save(MapManager.activeMap.tiledMap);
+            Save.save(MapManager.activeMap.tiledMap, worldName);
 
 
         }

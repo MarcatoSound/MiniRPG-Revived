@@ -11,18 +11,16 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class Load
     {
-        public static string world { get; set; }
         public static string path { get; set; }
         public static StreamReader reader { get; set; }
 
         static Load()
         {
-            world = "world";
-            path = $"save\\{world}";
         }
 
-        public static TiledMap loadMap(TiledMapTileset tileset)
+        public static TiledMap loadMap(TiledMapTileset tileset, string world)
         {
+            path = $"save\\{world}";
             reader = new StreamReader(path + "\\map.json");
 
             JObject mapJson = JObject.Parse(reader.ReadToEnd());
@@ -43,6 +41,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 map.AddLayer(layer);
             }
+
+            reader.Close();
 
 
             return map;

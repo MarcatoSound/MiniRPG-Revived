@@ -24,5 +24,11 @@ namespace BasicRPGTest_Mono.Engine
         static Camera()
         {
         }
+
+        public static void reset()
+        {
+            _camPos = new Vector2();
+            camera.Position = _camPos;
+        }
     }
 }

@@ -14,6 +14,8 @@ using BasicRPGTest_Mono.Engine;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
 using MonoGame.Extended.Input.InputListeners;
+using BasicRPGTest_Mono.Screens;
+using BasicRPGTest_Mono.Engine.Utility;
 
 namespace BasicRPGTest_Mono
 {
@@ -34,14 +36,27 @@ namespace BasicRPGTest_Mono
             {
                 if (activeScreen is ScreenMainMenu)
                 {
-                    if (args.Key == Keys.Space) startGame();
+                    if (args.Key == Keys.Space) worldMenu();
                     if (args.Key == Keys.Escape) Exit();
+                }
+
+                if (activeScreen is ScreenGenerate)
+                {
+                    if (args.Key == Keys.Back)
+                        ((ScreenGenerate)activeScreen).delChar();
+                    else if (args.Key == Keys.Enter)
+                        ((ScreenGenerate)activeScreen).generate();
+                    else
+                        ((ScreenGenerate)activeScreen).enterChar(Util.getCharacter(Keyboard.GetState(), args.Key));
+                    
                 }
 
                 if (activeScreen is ScreenGame)
                 {
                     if (args.Key == Keys.Escape) mainMenu();
                 }
+
+
             };
 
             screenManager = new ScreenManager();
@@ -68,9 +83,14 @@ namespace BasicRPGTest_Mono
             activeScreen = new ScreenMainMenu(this);
             screenManager.LoadScreen(activeScreen);
         }
-        private void startGame()
+        private void worldMenu()
         {
-            activeScreen = new ScreenGame(this);
+            activeScreen = new ScreenGenerate(this);
+            screenManager.LoadScreen(activeScreen);
+        }
+        public void startGame(string worldName)
+        {
+            activeScreen = new ScreenGame(this, worldName);
             screenManager.LoadScreen(activeScreen, new WipeTransition(_graphics.GraphicsDevice, Color.Black, 0.7F));
         }
 

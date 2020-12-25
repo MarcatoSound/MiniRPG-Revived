@@ -23,5 +23,11 @@ namespace BasicRPGTest_Mono.Engine
             return maps[i];
         }
 
+        public static void clear()
+        {
+            maps.Clear();
+            activeMap = null;
+        }
+
     }
 }
