@@ -38,6 +38,7 @@ namespace BasicRPGTest_Mono
                 {
                     if (args.Key == Keys.Space) worldMenu();
                     if (args.Key == Keys.Escape) Exit();
+                    return;
                 }
 
                 if (activeScreen is ScreenGenerate)
@@ -48,12 +49,13 @@ namespace BasicRPGTest_Mono
                         ((ScreenGenerate)activeScreen).generate();
                     else
                         ((ScreenGenerate)activeScreen).enterChar(Util.getCharacter(Keyboard.GetState(), args.Key));
-                    
+                    return;
                 }
 
                 if (activeScreen is ScreenGame)
                 {
                     if (args.Key == Keys.Escape) mainMenu();
+                    return;
                 }
 
 

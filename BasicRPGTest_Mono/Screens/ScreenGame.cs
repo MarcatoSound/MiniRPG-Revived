@@ -125,7 +125,6 @@ namespace BasicRPGTest_Mono
                 System.Diagnostics.Debug.WriteLine("Player map position: " + player.position);
             }
 
-            // TODO: Add your update logic here
             var kstate = Keyboard.GetState();
 
             if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
