@@ -27,7 +27,7 @@ namespace BasicRPGTest_Mono
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            font = Content.Load<SpriteFont>("arial");
+            font = Content.Load<SpriteFont>("main_font");
 
             mainMenu = new Menu("mainmenu");
             mainMenu.add(new MenuItem("Test 1")
@@ -40,6 +40,12 @@ namespace BasicRPGTest_Mono
             {
                 run = () => {
                     System.Diagnostics.Debug.WriteLine("This time menu option 1 is selected!");
+                    }
+            });
+            mainMenu.add(new MenuItem("Long Test 3")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("This is a longer string test! Entry 2");
                     }
             });
 
@@ -66,10 +72,10 @@ namespace BasicRPGTest_Mono
 
         public override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(font, "Press [Space] to play!", new Vector2(25, 25), Color.Black);
+            mainMenu.Draw(_spriteBatch, font, new Rectangle(200, 120, 400, 240), Color.Gray, Color.White, Alignment.Center, Alignment.Center);
             _spriteBatch.End();
         }
     }
