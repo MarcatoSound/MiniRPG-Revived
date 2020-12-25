@@ -22,7 +22,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public void move(GameTime gameTime)
         {
-            Vector2 _cameraPosition = Core.camera.Position;
+            Vector2 _cameraPosition = Camera.camera.Position;
 
             var kstate = Keyboard.GetState();
             Vector2 newPlayerPos = position;
@@ -62,8 +62,8 @@ namespace BasicRPGTest_Mono.Engine
                 if (!(newPlayerPos.Y <= graphicsManager.PreferredBackBufferHeight / 2))
                     newCameraPos.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                if (newCameraPos.Y >= (MapManager.activeMap.tiledMap.HeightInPixels - Core.camera.BoundingRectangle.Height))
-                    newCameraPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - Core.camera.BoundingRectangle.Height;
+                if (newCameraPos.Y >= (MapManager.activeMap.tiledMap.HeightInPixels - Camera.camera.BoundingRectangle.Height))
+                    newCameraPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - Camera.camera.BoundingRectangle.Height;
 
 
                 if (isColliding(getBox(newPlayerPos)))
@@ -109,8 +109,8 @@ namespace BasicRPGTest_Mono.Engine
                 if (!(newPlayerPos.X <= graphicsManager.PreferredBackBufferWidth / 2))
                     newCameraPos.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-                if (newCameraPos.X >= (MapManager.activeMap.tiledMap.WidthInPixels - Core.camera.BoundingRectangle.Width))
-                    newCameraPos.X = MapManager.activeMap.tiledMap.WidthInPixels - Core.camera.BoundingRectangle.Width;
+                if (newCameraPos.X >= (MapManager.activeMap.tiledMap.WidthInPixels - Camera.camera.BoundingRectangle.Width))
+                    newCameraPos.X = MapManager.activeMap.tiledMap.WidthInPixels - Camera.camera.BoundingRectangle.Width;
 
 
                 if (isColliding(getBox(newPlayerPos)))
@@ -122,7 +122,7 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
-            Core.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
+            Camera.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
 
         }
 

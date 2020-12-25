@@ -35,6 +35,7 @@ namespace BasicRPGTest_Mono
                 if (activeScreen is ScreenMainMenu)
                 {
                     if (args.Key == Keys.Space) startGame();
+                    if (args.Key == Keys.Escape) Exit();
                 }
 
                 if (activeScreen is ScreenGame)
@@ -54,7 +55,7 @@ namespace BasicRPGTest_Mono
         protected override void Initialize()
         {
             var viewportadapter = new BoxingViewportAdapter(Window, GraphicsDevice, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
-            Core.camera = new OrthographicCamera(viewportadapter);
+            Camera.camera = new OrthographicCamera(viewportadapter);
 
             base.Initialize();
 

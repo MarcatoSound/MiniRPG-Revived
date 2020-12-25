@@ -141,7 +141,7 @@ namespace BasicRPGTest_Mono
             else player.speed = 100f;
 
             player.update();
-            Core.camera.Position = Core.camPos;
+            Camera.camera.Position = Camera.camPos;
             _tiledMapRenderer.Update(gameTime);
 
         }
@@ -157,7 +157,7 @@ namespace BasicRPGTest_Mono
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.End();
 
-            _tiledMapRenderer.Draw(Core.camera.GetViewMatrix());
+            _tiledMapRenderer.Draw(Camera.camera.GetViewMatrix());
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Color.Black);

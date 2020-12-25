@@ -47,7 +47,7 @@ namespace BasicRPGTest_Mono.Engine
         }
         public virtual void draw(SpriteBatch batch)
         {
-            if (!Core.camera.BoundingRectangle.Intersects(boundingBox)) return;
+            if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
             Vector2 screenPos = getScreenPosition();
             graphic.draw(batch, screenPos);
         }
@@ -56,8 +56,8 @@ namespace BasicRPGTest_Mono.Engine
         {
             Vector2 pos = new Vector2(position.X, position.Y);
 
-            pos.X = pos.X - Core.camPos.X;
-            pos.Y = pos.Y - Core.camPos.Y;
+            pos.X = pos.X - Camera.camPos.X;
+            pos.Y = pos.Y - Camera.camPos.Y;
 
             return pos;
         }

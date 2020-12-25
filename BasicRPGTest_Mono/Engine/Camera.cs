@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Engine
 {
-    public static class Core
+    public static class Camera
     {
         public static OrthographicCamera camera;
 
@@ -21,7 +21,7 @@ namespace BasicRPGTest_Mono.Engine
             }
         }
 
-        static Core()
+        static Camera()
         {
         }
     }
