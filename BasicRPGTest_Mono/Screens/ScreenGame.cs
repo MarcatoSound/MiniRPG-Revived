@@ -143,24 +143,6 @@ namespace BasicRPGTest_Mono
             if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
                 player.move(gameTime);
 
-            // Test entity movement
-            /*if (kstate.IsKeyDown(Keys.W))
-            {
-                entity.move(gameTime, Direction.Up);
-            }
-            if (kstate.IsKeyDown(Keys.S))
-            {
-                entity.move(gameTime, Direction.Down);
-            }
-            if (kstate.IsKeyDown(Keys.A))
-            {
-                entity.move(gameTime, Direction.Left);
-            }
-            if (kstate.IsKeyDown(Keys.D))
-            {
-                entity.move(gameTime, Direction.Right);
-            }*/
-
 
             if (kstate.IsKeyDown(Keys.LeftShift))
                 player.speed = 200f;
@@ -191,7 +173,8 @@ namespace BasicRPGTest_Mono
 
             player.draw(_spriteBatch);
 
-            foreach (LivingEntity entity in MapManager.activeMap.livingEntities)
+            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities);
+            foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);
                 _spriteBatch.Begin();

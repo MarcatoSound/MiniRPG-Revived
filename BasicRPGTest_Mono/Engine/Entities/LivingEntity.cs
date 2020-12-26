@@ -17,7 +17,7 @@ namespace BasicRPGTest_Mono.Engine
         private int moveCount;
         private Direction direction = Direction.None;
 
-        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 80f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
+        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 75f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.speed = speed;
@@ -26,7 +26,7 @@ namespace BasicRPGTest_Mono.Engine
 
             EntityManager.add(this);
         }
-        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 80f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
+        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 75f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.speed = speed;
@@ -74,7 +74,7 @@ namespace BasicRPGTest_Mono.Engine
             if (moveCount > 0) return;
 
             if (ticksSinceMove < ticksToMove) return;
-            //if (rand.Next(0, 100) < 50) return;
+            if (rand.Next(0, 100) < 40) return;
 
             randomizeDirection();
 
@@ -83,8 +83,10 @@ namespace BasicRPGTest_Mono.Engine
         public void randomizeDirection()
         {
             Random rand = new Random();
+            int selection = rand.Next(0, 4);
+            System.Diagnostics.Debug.WriteLine("Selected " + selection);
 
-            switch (rand.Next(0, 3))
+            switch (selection)
             {
                 case 0:
                     direction = Direction.Up;
