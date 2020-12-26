@@ -140,8 +140,8 @@ namespace BasicRPGTest_Mono
 
             var kstate = Keyboard.GetState();
 
-            if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
-                player.move(gameTime);
+            /*if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
+                player.move(gameTime);*/
 
 
             if (kstate.IsKeyDown(Keys.LeftShift))

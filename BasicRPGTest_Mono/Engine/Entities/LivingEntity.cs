@@ -10,12 +10,14 @@ namespace BasicRPGTest_Mono.Engine
     public class LivingEntity : Entity
     {
         public float speed { get; set; }
+        public Vector2 velocity { get; set; }
+        public Vector2 maxVelocity { get; set; }
 
         private Timer tickTimer { get; set; }
         private int ticksSinceMove { get; set; }
         private int ticksToMove = 30;
         private int moveCount;
-        private Direction direction = Direction.None;
+        public Direction direction = Direction.None;
 
         public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
@@ -44,11 +46,83 @@ namespace BasicRPGTest_Mono.Engine
             tickTimer.Start();
 
             moveCount = 0;
+
+            maxVelocity = new Vector2(speed, speed);
         }
 
         public override void update()
         {
-            move(Core.globalTime, direction);
+            
+            Vector2 newVel = velocity;
+            if (direction == Direction.Up)
+            {
+                newVel = new Vector2(velocity.X, velocity.Y - 10f);
+                if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
+                velocity = newVel;
+            }
+            else
+            {
+                if (newVel.Y < 0)
+                {
+                    newVel = new Vector2(velocity.X, velocity.Y + 20f);
+                    if (newVel.Y > 0)
+                        newVel = new Vector2(velocity.X, 0);
+                }
+                velocity = newVel;
+            }
+
+            if (direction == Direction.Down)
+            {
+                newVel = new Vector2(velocity.X, velocity.Y + 10f);
+                if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
+                velocity = newVel;
+            }
+            else
+            {
+                if (newVel.Y > 0)
+                {
+                    newVel = new Vector2(velocity.X, velocity.Y - 20f);
+                    if (newVel.Y < 0)
+                        newVel = new Vector2(velocity.X, 0);
+                }
+                velocity = newVel;
+            }
+
+            if (direction == Direction.Left)
+            {
+                newVel = new Vector2(velocity.X - 10f, velocity.Y);
+                if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
+                velocity = newVel;
+            }
+            else
+            {
+                if (newVel.X < 0)
+                {
+                    newVel = new Vector2(velocity.X + 20f, velocity.Y);
+                    if (newVel.X > 0)
+                        newVel = new Vector2(0, velocity.X);
+                }
+                velocity = newVel;
+            }
+
+            if (direction == Direction.Right)
+            {
+                newVel = new Vector2(velocity.X + 10f, velocity.Y);
+                if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
+                velocity = newVel;
+            }
+            else
+            {
+                if (newVel.X > 0)
+                {
+                    newVel = new Vector2(velocity.X - 20f, velocity.Y);
+                    if (newVel.X < 0)
+                        newVel = new Vector2(0, velocity.X);
+                }
+                velocity = newVel;
+            }
+
+            move();
             base.update();
         }
         public void tryMove(Object source, ElapsedEventArgs args)
@@ -100,6 +174,82 @@ namespace BasicRPGTest_Mono.Engine
                     direction = Direction.Right;
                     break;
             }
+        }
+        public virtual void move()
+        {
+            Vector2 newPos = position;
+            Rectangle newBox = boundingBox;
+
+            // Right
+            if (velocity.X > 0)
+            {
+                newPos.X += (float)(velocity.X / 1.5) * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
+                if (newPos.X < 0 + (graphic.height / 2))
+                    newPos.X = 0 + (graphic.height / 2);
+
+
+                newBox = getBox(newPos);
+
+                if (isColliding(newBox))
+                {
+                    newPos.X = position.X;
+                    newBox.X = boundingBox.X;
+                }
+            }
+            // Left
+            else if (velocity.X < 0)
+            {
+                newPos.X += (float)(velocity.X / 1.5) * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
+
+                if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
+                    newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
+
+
+                newBox = getBox(newPos);
+
+                if (isColliding(newBox))
+                {
+                    newPos.X = position.X;
+                    newBox.X = boundingBox.X;
+                }
+            }
+            // Down
+            if (velocity.Y > 0)
+            {
+                newPos.Y += (float)(velocity.Y / 1.5) * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
+                if (newPos.Y < 0 + (graphic.height / 2))
+                    newPos.Y = 0 + (graphic.height / 2);
+
+
+                newBox = getBox(newPos);
+
+                if (isColliding(newBox))
+                {
+                    newPos.Y = position.Y;
+                    newBox.Y = boundingBox.Y;
+                }
+            }
+            // Up
+            else if (velocity.Y < 0)
+            {
+                newPos.Y += (float)(velocity.Y / 1.5) * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
+
+                if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
+                    newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
+
+
+                newBox = getBox(newPos);
+
+                if (isColliding(newBox))
+                {
+                    newPos.Y = position.Y;
+                    newBox.Y = boundingBox.Y;
+                }
+            }
+
+            position = new Vector2(newPos.X, newPos.Y);
+            boundingBox = new Rectangle(newBox.X, newBox.Y, newBox.Width, newBox.Height);
+
         }
         public virtual void move(GameTime gameTime, Direction direction)
         {
