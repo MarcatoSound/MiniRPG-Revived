@@ -109,7 +109,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         pos = new Vector2(0, vertOffset - padding);
                     }
 
-                    for (int z = start; z < entries.Count; z++)
+                    for (int z = start; z < maxDisplay+start; z++)
                     {
                         MenuItem entry = entries[z];
 
@@ -128,8 +128,6 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         else
                             pos = new Vector2(box.Left + (box.Width / 2) - textAnchor.X, pos.Y);
 
-                        if (vertAlign != Alignment.Center && pos.Y + (lineHeight / 2) > box.Bottom)
-                            break;
                         batch.DrawString(font, entry.label, pos, textColor);
 
                         i++;
@@ -157,8 +155,9 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         pos = new Vector2(box.Left + padding, vertOffset - padding);
                     }
 
-                    foreach (MenuItem entry in entries)
+                    for (int z = start; z < maxDisplay + start; z++)
                     {
+                        MenuItem entry = entries[z];
 
                         if (entry.label == entries[index].label)
                             textColor = highlightColor;
@@ -168,8 +167,6 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         if (i != 0)
                             pos = new Vector2(pos.X, pos.Y + lineHeight);
 
-                        if (vertAlign != Alignment.Center && pos.Y + (lineHeight / 2) > box.Bottom)
-                            break;
                         batch.DrawString(font, entry.label, pos, textColor);
                         i++;
                     }
@@ -197,7 +194,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                     }
 
                     newPos = pos;
-                    for (int z = start; z < entries.Count; z++)
+                    for (int z = start; z < maxDisplay + start; z++)
                     {
                         MenuItem entry = entries[z];
 
@@ -210,8 +207,6 @@ namespace BasicRPGTest_Mono.Engine.Menus
                             newPos = new Vector2(pos.X, (newPos.Y + lineHeight));
                         newPos = new Vector2(pos.X - (font.MeasureString(entry.label).X), newPos.Y);
 
-                        if (vertAlign != Alignment.Center && pos.Y + (lineHeight / 2) > box.Bottom)
-                            break;
                         batch.DrawString(font, entry.label, newPos, textColor);
                         i++;
                     }
