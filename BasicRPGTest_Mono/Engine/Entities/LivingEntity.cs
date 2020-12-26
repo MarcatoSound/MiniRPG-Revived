@@ -84,7 +84,6 @@ namespace BasicRPGTest_Mono.Engine
         {
             Random rand = new Random();
             int selection = rand.Next(0, 4);
-            System.Diagnostics.Debug.WriteLine("Selected " + selection);
 
             switch (selection)
             {

@@ -13,10 +13,12 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Player : LivingEntity
     {
-        public Player(Texture2D texture, GraphicsDeviceManager graphics) : base(new GraphicAnimated(texture, 3, 4), new Rectangle(400, 240, 28, 26), graphics, 100f)
+        public Player(Texture2D texture, GraphicsDeviceManager graphics) : base(new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 100f)
         {
             graphicsManager = graphics;
-            position = new Vector2(400, 240);
+            position = new Vector2(MapManager.activeMap.tiledMap.WidthInPixels / 2, MapManager.activeMap.tiledMap.HeightInPixels / 2);
+            boundingBox = new Rectangle((int)position.X, (int)position.Y, 28, 26);
+            Camera.camPos = new Vector2(position.X - (Camera.camera.BoundingRectangle.Width / 2), position.Y - (Camera.camera.BoundingRectangle.Height / 2));
         }
 
 
@@ -179,8 +181,8 @@ namespace BasicRPGTest_Mono.Engine
         }
         public override Rectangle getBox(Vector2 pos)
         {
-            int x = Convert.ToInt32(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
-            int y = Convert.ToInt32(pos.Y - (boundingBox.Height - (graphic.height / 2)));
+            int x = (int)(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
+            int y = (int)(pos.Y - (boundingBox.Height - (graphic.height / 2)));
 
             Rectangle box = new Rectangle(x, y, boundingBox.Width, boundingBox.Height);
 
