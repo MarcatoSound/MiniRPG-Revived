@@ -48,6 +48,7 @@ namespace BasicRPGTest_Mono
 
             // Load the general game objects
             //loadTiles();
+            loadEntities();
 
             // Load the map data
             buildTileset();
@@ -59,8 +60,6 @@ namespace BasicRPGTest_Mono
             Texture2D texture = Content.Load<Texture2D>("test_sprite_atlas");
             player = new Player(texture, _graphics);
 
-            texture = Content.Load<Texture2D>("enemy");
-            entity = new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics, position: new Vector2(500, 240));
 
             base.LoadContent();
             System.Diagnostics.Debug.WriteLine("## Loaded game content!");
@@ -72,7 +71,6 @@ namespace BasicRPGTest_Mono
 
             worldName = "";
             player = null;
-            entity = null;
             MapManager.clear();
 
             base.UnloadContent();
@@ -101,7 +99,7 @@ namespace BasicRPGTest_Mono
                 return;
             }
 
-            int size = 40;
+            int size = 128;
 
             // Generate the actual map contents
             MapManager.add(new Map(Generator.generateOverworld(size)));
@@ -113,11 +111,26 @@ namespace BasicRPGTest_Mono
 
         }
 
+        private void loadEntities()
+        {
+            Texture2D texture = Content.Load<Texture2D>("enemy1");
+            EntityManager.add(new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics));
+            texture = Content.Load<Texture2D>("enemy2");
+            EntityManager.add(new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics));
+            texture = Content.Load<Texture2D>("enemy3");
+            EntityManager.add(new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics));
+        }
+
 
         public override void Update(GameTime gameTime)
         {
+            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities);
+            foreach (LivingEntity entity in entities)
+            {
+                entity.update();
+            }
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
                 // Logic for converting camera position and player position to player TILE position
                 Vector2 playerMapPos = player.getPlayerTilePositionPrecise();
@@ -131,7 +144,7 @@ namespace BasicRPGTest_Mono
                 player.move(gameTime);
 
             // Test entity movement
-            if (kstate.IsKeyDown(Keys.W))
+            /*if (kstate.IsKeyDown(Keys.W))
             {
                 entity.move(gameTime, Direction.Up);
             }
@@ -146,7 +159,7 @@ namespace BasicRPGTest_Mono
             if (kstate.IsKeyDown(Keys.D))
             {
                 entity.move(gameTime, Direction.Right);
-            }
+            }*/
 
 
             if (kstate.IsKeyDown(Keys.LeftShift))
@@ -177,16 +190,20 @@ namespace BasicRPGTest_Mono
             _spriteBatch.End();
 
             player.draw(_spriteBatch);
-            entity.draw(_spriteBatch);
 
-            _spriteBatch.Begin();
-            _spriteBatch.DrawRectangle(entity.getScreenBox(), Color.White);
+            foreach (LivingEntity entity in MapManager.activeMap.livingEntities)
+            {
+                entity.draw(_spriteBatch);
+                _spriteBatch.Begin();
+                _spriteBatch.DrawRectangle(entity.getScreenBox(), Color.White);
+                _spriteBatch.End();
+            }
+
 
             /*foreach (Rectangle tileBox in MapManager.activeMap.collidables)
             {
                 _spriteBatch.DrawRectangle(tileBox, Color.White);
             }*/
-            _spriteBatch.End();
 
         }
 

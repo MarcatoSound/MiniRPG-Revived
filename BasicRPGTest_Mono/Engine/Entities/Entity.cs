@@ -30,7 +30,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public bool isColliding(Rectangle box)
         {
-
+            if (MapManager.activeMap == null) return true;
             foreach (Rectangle tileBox in MapManager.activeMap.collidables)
             {
                 if (box.Intersects(tileBox))
@@ -83,6 +83,7 @@ namespace BasicRPGTest_Mono.Engine
         Up,
         Down,
         Left,
-        Right
+        Right,
+        None
     }
 }

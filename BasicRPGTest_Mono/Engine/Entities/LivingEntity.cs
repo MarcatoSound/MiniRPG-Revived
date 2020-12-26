@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -10,7 +11,13 @@ namespace BasicRPGTest_Mono.Engine
     {
         public float speed { get; set; }
 
-        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 100f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
+        private Timer tickTimer { get; set; }
+        private int ticksSinceMove { get; set; }
+        private int ticksToMove = 30;
+        private int moveCount;
+        private Direction direction = Direction.None;
+
+        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 80f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.speed = speed;
@@ -19,7 +26,7 @@ namespace BasicRPGTest_Mono.Engine
 
             EntityManager.add(this);
         }
-        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 100f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
+        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 80f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.speed = speed;
@@ -27,16 +34,78 @@ namespace BasicRPGTest_Mono.Engine
 
             EntityManager.add(this);
         }
+        public LivingEntity(LivingEntity entity, Vector2 pos) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
+        {
+            this.speed = entity.speed;
+            this.position = pos;
+
+            tickTimer = new Timer(50);
+            tickTimer.Elapsed += tryMove;
+            tickTimer.Start();
+
+            moveCount = 0;
+        }
 
         public override void update()
         {
+            move(Core.globalTime, direction);
             base.update();
+        }
+        public void tryMove(Object source, ElapsedEventArgs args)
+        {
+            ticksSinceMove++;
+            Random rand = new Random();
+            if (ticksSinceMove > ticksToMove * (moveCount+1))
+            {
+
+                if (rand.Next(0, 100) < 50)
+                {
+                    moveCount = 0;
+                    ticksSinceMove = 0;
+                    direction = Direction.None;
+                    return;
+                }
+                moveCount++;
+
+                randomizeDirection();
+
+                return;
+            }
+            if (moveCount > 0) return;
+
+            if (ticksSinceMove < ticksToMove) return;
+            //if (rand.Next(0, 100) < 50) return;
+
+            randomizeDirection();
+
+            moveCount++;
+        }
+        public void randomizeDirection()
+        {
+            Random rand = new Random();
+
+            switch (rand.Next(0, 3))
+            {
+                case 0:
+                    direction = Direction.Up;
+                    break;
+                case 1:
+                    direction = Direction.Down;
+                    break;
+                case 2:
+                    direction = Direction.Left;
+                    break;
+                case 3:
+                    direction = Direction.Right;
+                    break;
+            }
         }
         public virtual void move(GameTime gameTime, Direction direction)
         {
             Vector2 newPos = position;
             Rectangle newBox = boundingBox;
 
+            if (MapManager.activeMap == null) return;
             switch (direction)
             {
                 case Direction.Up:

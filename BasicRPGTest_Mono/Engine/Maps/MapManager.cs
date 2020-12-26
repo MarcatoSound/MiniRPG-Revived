@@ -26,6 +26,7 @@ namespace BasicRPGTest_Mono.Engine
         public static void clear()
         {
             maps.Clear();
+            activeMap.Clear();
             activeMap = null;
         }
 
