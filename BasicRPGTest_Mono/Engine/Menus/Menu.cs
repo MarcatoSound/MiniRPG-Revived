@@ -40,7 +40,10 @@ namespace BasicRPGTest_Mono.Engine.Menus
                 _index = value;
             }
         }
-
+        ///<summary>
+        ///A menu with a selectable list of strings. USE { run = () => /* CODE HERE */ }
+        ///To add unique code to the menu selection.
+        ///</summary>
         public Menu(string label, Rectangle rect, Color textColor, Color highlightColor, SpriteFont font, int padding = 5)
         {
             menuLabel = label;
@@ -111,6 +114,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
 
                     for (int z = start; z < maxDisplay+start; z++)
                     {
+                        if (entries.Count-1 < z) break;
                         MenuItem entry = entries[z];
 
                         if (textAnchor.X == -1 && textAnchor.Y == -1)
@@ -157,6 +161,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
 
                     for (int z = start; z < maxDisplay + start; z++)
                     {
+                        if (entries.Count - 1 < z) break;
                         MenuItem entry = entries[z];
 
                         if (entry.label == entries[index].label)
@@ -196,6 +201,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                     newPos = pos;
                     for (int z = start; z < maxDisplay + start; z++)
                     {
+                        if (entries.Count - 1 < z) break;
                         MenuItem entry = entries[z];
 
                         if (entry.label == entries[index].label)

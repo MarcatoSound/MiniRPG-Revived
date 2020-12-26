@@ -9,17 +9,17 @@ using BasicRPGTest_Mono.Engine.Menus;
 
 namespace BasicRPGTest_Mono
 {
-    public class ScreenMainMenu : GameScreen
+    public class ScreenStartMenu : GameScreen
     {
         private new Main Game => (Main)base.Game;
-        public ScreenMainMenu(Main game) : base(game) { }
+        public ScreenStartMenu(Main game) : base(game) { }
 
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private SpriteFont font;
 
-        private Menu mainMenu;
+        public Menu mainMenu;
 
         public override void LoadContent()
         {
@@ -30,16 +30,16 @@ namespace BasicRPGTest_Mono
             font = Content.Load<SpriteFont>("main_font");
 
             mainMenu = new Menu("mainmenu", new Rectangle(200, 120, 400, 240), Color.Gray, Color.White, font);
-            mainMenu.add(new MenuItem("Test 1")
+            mainMenu.add(new MenuItem("New World")
             {
                 run = () => {
-                    System.Diagnostics.Debug.WriteLine("Menu option 0 selected!");
+                    Game.newWorldMenu();
                     }
             });
-            mainMenu.add(new MenuItem("Test 2")
+            mainMenu.add(new MenuItem("Load World")
             {
                 run = () => {
-                    System.Diagnostics.Debug.WriteLine("This time menu option 1 is selected!");
+                    Game.loadWorldMenu();
                     }
             });
             mainMenu.add(new MenuItem("Long Test 3")
@@ -52,36 +52,6 @@ namespace BasicRPGTest_Mono
             {
                 run = () => {
                     System.Diagnostics.Debug.WriteLine("This is a longer string test! Entry 3");
-                    }
-            });
-            mainMenu.add(new MenuItem("Test 5")
-            {
-                run = () => {
-                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
-                    }
-            });
-            mainMenu.add(new MenuItem("Test 6")
-            {
-                run = () => {
-                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
-                    }
-            });
-            mainMenu.add(new MenuItem("Test 7")
-            {
-                run = () => {
-                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
-                    }
-            });
-            mainMenu.add(new MenuItem("Test 8")
-            {
-                run = () => {
-                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
-                    }
-            });
-            mainMenu.add(new MenuItem("Test 9")
-            {
-                run = () => {
-                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
                     }
             });
 
