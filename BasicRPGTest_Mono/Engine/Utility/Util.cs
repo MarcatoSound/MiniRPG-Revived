@@ -1,4 +1,7 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using BasicRPGTest_Mono.Engine.Menus;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -173,6 +176,137 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             key = (char)0;
             return key;
+        }
+
+        public static void drawAlignedText(List<string> str, Color color, SpriteBatch batch, SpriteFont font, Rectangle box, Alignment horAlign = Alignment.Left, Alignment vertAlign = Alignment.Top, int padding = 5)
+        {
+
+            int lineHeight = (int)font.MeasureString(str[0]).Y;
+
+            Vector2 pos;
+            Vector2 newPos;
+            Vector2 textAnchor = new Vector2(-1, -1);
+
+            int i;
+            int vertOffset = 0;
+
+            switch (horAlign)
+            {
+                case Alignment.Center:
+                    i = 0;
+
+                    pos = new Vector2(0, vertOffset + padding);
+
+                    if (vertAlign == Alignment.Top)
+                    {
+                        vertOffset = box.Top;
+                        pos = new Vector2(0, vertOffset + padding);
+                    }
+                    if (vertAlign == Alignment.Center)
+                    {
+                        vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (str.Count / 2.0)));
+                        pos = new Vector2(0, vertOffset);
+                    }
+                    // TODO Bottom align is broken.
+                    if (vertAlign == Alignment.Bottom)
+                    {
+                        vertOffset = (int)(box.Bottom - (lineHeight * str.Count));
+                        pos = new Vector2(0, vertOffset - padding);
+                    }
+
+                    foreach (string entry in str)
+                    {
+
+                        //System.Diagnostics.Debug.WriteLine("Text box height: " + ((lineHeight + lineSpacing) * ((entries.Count - 1) / 2.0)));
+
+                        if (textAnchor.X == -1 && textAnchor.Y == -1)
+                            textAnchor = new Vector2(font.MeasureString(entry).X / 2, (font.MeasureString(entry).Y / 2));
+                        else
+                            textAnchor = new Vector2(font.MeasureString(entry).X / 2, lineHeight);
+
+
+                        if (i != 0)
+                            pos = new Vector2(box.Left + (box.Width / 2) - textAnchor.X, pos.Y + textAnchor.Y);
+                        else
+                            pos = new Vector2(box.Left + (box.Width / 2) - textAnchor.X, pos.Y);
+                        batch.DrawString(font, entry, pos, color);
+
+                        i++;
+                    }
+                    break;
+                case Alignment.Left:
+                    i = 0;
+
+                    pos = new Vector2(0, vertOffset + padding);
+
+                    if (vertAlign == Alignment.Top)
+                    {
+                        vertOffset = box.Top;
+                        pos = new Vector2(box.Left + padding, vertOffset + padding);
+                    }
+                    if (vertAlign == Alignment.Center)
+                    {
+                        vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (str.Count / 2.0)));
+                        pos = new Vector2(box.Left + padding, vertOffset);
+                    }
+                    // TODO Bottom align is broken.
+                    if (vertAlign == Alignment.Bottom)
+                    {
+                        vertOffset = (int)(box.Bottom - (lineHeight * str.Count));
+                        pos = new Vector2(box.Left + padding, vertOffset - padding);
+                    }
+
+                    foreach (string entry in str)
+                    {
+
+                        if (i != 0)
+                            pos = new Vector2(pos.X, pos.Y + lineHeight);
+
+                        batch.DrawString(font, entry, pos, color);
+                        i++;
+                    }
+                    break;
+                case Alignment.Right:
+                    i = 0;
+
+                    pos = new Vector2(0, vertOffset + padding);
+
+                    if (vertAlign == Alignment.Top)
+                    {
+                        vertOffset = box.Top;
+                        pos = new Vector2(box.Right - padding, vertOffset + padding);
+                    }
+                    if (vertAlign == Alignment.Center)
+                    {
+                        vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (str.Count / 2.0)));
+                        pos = new Vector2(box.Right - padding, vertOffset);
+                    }
+                    // TODO Bottom align is broken.
+                    if (vertAlign == Alignment.Bottom)
+                    {
+                        vertOffset = (int)(box.Bottom - (lineHeight * str.Count));
+                        pos = new Vector2(box.Right - padding, vertOffset - padding);
+                    }
+
+                    newPos = pos;
+                    foreach (string entry in str)
+                    {
+
+                        if (i != 0)
+                            newPos = new Vector2(pos.X, (newPos.Y + lineHeight));
+                        newPos = new Vector2(pos.X - (font.MeasureString(entry).X), newPos.Y);
+
+                        batch.DrawString(font, entry, newPos, color);
+                        i++;
+                    }
+                    break;
+            }
+        }
+        public static void drawAlignedText(string str, Color color, SpriteBatch batch, SpriteFont font, Rectangle box, Alignment horAlign = Alignment.Left, Alignment vertAlign = Alignment.Top, int padding = 5)
+        {
+            List<string> strings = new List<string>();
+            strings.Add(str);
+            drawAlignedText(strings, color, batch, font, box, horAlign, vertAlign, padding);
         }
     }
 }

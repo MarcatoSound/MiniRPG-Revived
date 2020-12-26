@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.ViewportAdapters;
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +11,14 @@ namespace BasicRPGTest_Mono.Engine.Menus
     {
         public string menuLabel;
         public List<MenuItem> entries;
+        public Rectangle box;
+        public SpriteFont font;
+        public Color textColor;
+        public Color highlightColor;
+        public float lineHeight;
+        public int padding;
+        public int start;
+        public int maxDisplay;
 
         private int _index;
         public int index
@@ -22,14 +31,28 @@ namespace BasicRPGTest_Mono.Engine.Menus
             {
                 if (value >= entries.Count) return;
                 if (value < 0) return;
+
+                if (value + 1 > maxDisplay && value > _index)
+                    start++;
+                if (value < start)
+                    start = value;
+
                 _index = value;
             }
         }
 
-        public Menu(string label)
+        public Menu(string label, Rectangle rect, Color textColor, Color highlightColor, SpriteFont font, int padding = 5)
         {
             menuLabel = label;
             entries = new List<MenuItem>();
+            box = rect;
+            this.textColor = textColor;
+            this.highlightColor = highlightColor;
+            this.font = font;
+            this.padding = padding;
+            lineHeight = font.MeasureString("?").Y;
+            start = 0;
+            maxDisplay = (int)(box.Height / lineHeight);
         }
 
         public void add(MenuItem entry)
@@ -45,13 +68,13 @@ namespace BasicRPGTest_Mono.Engine.Menus
             entries[index].run();
         }
 
-        public void Draw(SpriteBatch batch, SpriteFont font, Rectangle area, Color color, Color highlightColor, Alignment textAlign = Alignment.Left, Alignment vertAlign = Alignment.Top, int padding = 5)
+        public void Draw(SpriteBatch batch, Alignment textAlign = Alignment.Left, Alignment vertAlign = Alignment.Top)
         {
+            
+
             if (entries.Count == 0) return;
 
-            batch.DrawRectangle(area, Color.White);
-
-            int lineHeight = (int)font.MeasureString(entries[0].label).Y;
+            batch.DrawRectangle(box, Color.White);
 
             Vector2 pos;
             Vector2 newPos;
@@ -69,28 +92,26 @@ namespace BasicRPGTest_Mono.Engine.Menus
 
                     pos = new Vector2(0, vertOffset + padding);
 
-                    vertOffset = 0;
                     if (vertAlign == Alignment.Top)
                     {
-                        vertOffset = area.Top;
+                        vertOffset = box.Top;
                         pos = new Vector2(0, vertOffset + padding);
                     }
                     if (vertAlign == Alignment.Center)
                     {
-                        vertOffset = (int)(area.Top + (area.Height / 2) - (lineHeight * (entries.Count / 2.0)));
+                        vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (entries.Count / 2.0)));
                         pos = new Vector2(0, vertOffset);
                     }
                     // TODO Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
-                        vertOffset = (int)(area.Bottom - (lineHeight * entries.Count));
+                        vertOffset = (int)(box.Bottom - (lineHeight * entries.Count));
                         pos = new Vector2(0, vertOffset - padding);
                     }
 
-                    foreach (MenuItem entry in entries)
+                    for (int z = start; z < entries.Count; z++)
                     {
-
-                        //System.Diagnostics.Debug.WriteLine("Text area height: " + ((lineHeight + lineSpacing) * ((entries.Count - 1) / 2.0)));
+                        MenuItem entry = entries[z];
 
                         if (textAnchor.X == -1 && textAnchor.Y == -1)
                             textAnchor = new Vector2(font.MeasureString(entry.label).X / 2, (font.MeasureString(entry.label).Y / 2));
@@ -100,12 +121,15 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         if (entry == entries[index])
                             textColor = highlightColor;
                         else
-                            textColor = color;
+                            textColor = this.textColor;
 
                         if (i != 0)
-                            pos = new Vector2(area.Left + (area.Width / 2) - textAnchor.X, pos.Y + textAnchor.Y);
+                            pos = new Vector2(box.Left + (box.Width / 2) - textAnchor.X, pos.Y + textAnchor.Y);
                         else
-                            pos = new Vector2(area.Left + (area.Width / 2) - textAnchor.X, pos.Y);
+                            pos = new Vector2(box.Left + (box.Width / 2) - textAnchor.X, pos.Y);
+
+                        if (vertAlign != Alignment.Center && pos.Y + (lineHeight / 2) > box.Bottom)
+                            break;
                         batch.DrawString(font, entry.label, pos, textColor);
 
                         i++;
@@ -116,22 +140,21 @@ namespace BasicRPGTest_Mono.Engine.Menus
 
                     pos = new Vector2(0, vertOffset + padding);
 
-                    vertOffset = 0;
                     if (vertAlign == Alignment.Top)
                     {
-                        vertOffset = area.Top;
-                        pos = new Vector2(area.Left + padding, vertOffset + padding);
+                        vertOffset = box.Top;
+                        pos = new Vector2(box.Left + padding, vertOffset + padding);
                     }
                     if (vertAlign == Alignment.Center)
                     {
-                        vertOffset = (int)(area.Top + (area.Height / 2) - (lineHeight * (entries.Count / 2.0)));
-                        pos = new Vector2(area.Left + padding, vertOffset);
+                        vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (entries.Count / 2.0)));
+                        pos = new Vector2(box.Left + padding, vertOffset);
                     }
                     // TODO Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
-                        vertOffset = (int)(area.Bottom - (lineHeight * entries.Count));
-                        pos = new Vector2(area.Left + padding, vertOffset - padding);
+                        vertOffset = (int)(box.Bottom - (lineHeight * entries.Count));
+                        pos = new Vector2(box.Left + padding, vertOffset - padding);
                     }
 
                     foreach (MenuItem entry in entries)
@@ -140,11 +163,13 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         if (entry.label == entries[index].label)
                             textColor = highlightColor;
                         else
-                            textColor = color;
+                            textColor = this.textColor;
 
                         if (i != 0)
                             pos = new Vector2(pos.X, pos.Y + lineHeight);
 
+                        if (vertAlign != Alignment.Center && pos.Y + (lineHeight / 2) > box.Bottom)
+                            break;
                         batch.DrawString(font, entry.label, pos, textColor);
                         i++;
                     }
@@ -154,37 +179,39 @@ namespace BasicRPGTest_Mono.Engine.Menus
 
                     pos = new Vector2(0, vertOffset + padding);
 
-                    vertOffset = 0;
                     if (vertAlign == Alignment.Top)
                     {
-                        vertOffset = area.Top;
-                        pos = new Vector2(area.Right - padding, vertOffset + padding);
+                        vertOffset = box.Top;
+                        pos = new Vector2(box.Right - padding, vertOffset + padding);
                     }
                     if (vertAlign == Alignment.Center)
                     {
-                        vertOffset = (int)(area.Top + (area.Height / 2) - (lineHeight * (entries.Count / 2.0)));
-                        pos = new Vector2(area.Right - padding, vertOffset);
+                        vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (entries.Count / 2.0)));
+                        pos = new Vector2(box.Right - padding, vertOffset);
                     }
                     // TODO Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
-                        vertOffset = (int)(area.Bottom - (lineHeight * entries.Count));
-                        pos = new Vector2(area.Right - padding, vertOffset - padding);
+                        vertOffset = (int)(box.Bottom - (lineHeight * entries.Count));
+                        pos = new Vector2(box.Right - padding, vertOffset - padding);
                     }
 
                     newPos = pos;
-                    foreach (MenuItem entry in entries)
+                    for (int z = start; z < entries.Count; z++)
                     {
+                        MenuItem entry = entries[z];
 
                         if (entry.label == entries[index].label)
                             textColor = highlightColor;
                         else
-                            textColor = color;
+                            textColor = this.textColor;
 
                         if (i != 0)
                             newPos = new Vector2(pos.X, (newPos.Y + lineHeight));
                         newPos = new Vector2(pos.X - (font.MeasureString(entry.label).X), newPos.Y);
 
+                        if (vertAlign != Alignment.Center && pos.Y + (lineHeight / 2) > box.Bottom)
+                            break;
                         batch.DrawString(font, entry.label, newPos, textColor);
                         i++;
                     }

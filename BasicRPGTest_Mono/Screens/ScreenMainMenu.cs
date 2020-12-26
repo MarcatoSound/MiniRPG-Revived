@@ -29,7 +29,7 @@ namespace BasicRPGTest_Mono
 
             font = Content.Load<SpriteFont>("main_font");
 
-            mainMenu = new Menu("mainmenu");
+            mainMenu = new Menu("mainmenu", new Rectangle(200, 120, 400, 240), Color.Gray, Color.White, font);
             mainMenu.add(new MenuItem("Test 1")
             {
                 run = () => {
@@ -55,6 +55,30 @@ namespace BasicRPGTest_Mono
                     }
             });
             mainMenu.add(new MenuItem("Test 5")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
+                    }
+            });
+            mainMenu.add(new MenuItem("Test 6")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
+                    }
+            });
+            mainMenu.add(new MenuItem("Test 7")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
+                    }
+            });
+            mainMenu.add(new MenuItem("Test 8")
+            {
+                run = () => {
+                    System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
+                    }
+            });
+            mainMenu.add(new MenuItem("Test 9")
             {
                 run = () => {
                     System.Diagnostics.Debug.WriteLine("Menu option 4 selected!");
@@ -87,7 +111,7 @@ namespace BasicRPGTest_Mono
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            mainMenu.Draw(_spriteBatch, font, new Rectangle(200, 120, 400, 240), Color.Gray, Color.White, Alignment.Center, Alignment.Center);
+            mainMenu.Draw(_spriteBatch, Alignment.Center, Alignment.Top);
             _spriteBatch.End();
         }
     }
