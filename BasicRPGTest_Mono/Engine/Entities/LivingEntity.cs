@@ -17,7 +17,7 @@ namespace BasicRPGTest_Mono.Engine
         private int moveCount;
         private Direction direction = Direction.None;
 
-        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 75f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
+        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.speed = speed;
@@ -26,7 +26,7 @@ namespace BasicRPGTest_Mono.Engine
 
             EntityManager.add(this);
         }
-        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 75f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
+        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.speed = speed;
@@ -110,7 +110,7 @@ namespace BasicRPGTest_Mono.Engine
             switch (direction)
             {
                 case Direction.Up:
-                    newPos.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    newPos.Y -= (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
                     if (newPos.Y < 0 + (graphic.height / 2))
                         newPos.Y = 0 + (graphic.height / 2);
 
@@ -125,7 +125,7 @@ namespace BasicRPGTest_Mono.Engine
 
                     break;
                 case Direction.Down:
-                    newPos.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    newPos.Y += (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                     if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
                         newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
@@ -142,7 +142,7 @@ namespace BasicRPGTest_Mono.Engine
                     break;
 
                 case Direction.Left:
-                    newPos.X -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    newPos.X -= (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
                     if (newPos.X < 0 + (graphic.height / 2))
                         newPos.X = 0 + (graphic.height / 2);
 
@@ -158,7 +158,7 @@ namespace BasicRPGTest_Mono.Engine
                     break;
 
                 case Direction.Right:
-                    newPos.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    newPos.X += (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
 
                     if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
                         newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
