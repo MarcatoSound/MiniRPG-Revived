@@ -77,6 +77,16 @@ namespace BasicRPGTest_Mono
                 if (activeScreen is ScreenGame)
                 {
                     if (args.Key == Keys.Escape) mainMenu();
+                    if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
+                    {
+                        ((ScreenGame)activeScreen).player.Dash();
+                    }
+
+                    if (args.Key == Keys.Up) ((ScreenGame)activeScreen).player.attack(Direction.Up);
+                    if (args.Key == Keys.Left) ((ScreenGame)activeScreen).player.attack(Direction.Left);
+                    if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
+                    if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
+
                     return;
                 }
 

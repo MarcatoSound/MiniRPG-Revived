@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BasicRPGTest_Mono.Engine.Entities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -8,20 +9,49 @@ using RPGEngine;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine
 {
     public class Player : LivingEntity
     {
-        public Player(Texture2D texture, GraphicsDeviceManager graphics) : base(new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 100f)
+        public bool isDashing;
+        public Timer dashTimer;
+
+        public SwordSwing swordSwing;
+        public bool isAttacking;
+        public Timer attackTimer;
+        public Player(Texture2D texture, GraphicsDeviceManager graphics) : base(new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
         {
             graphicsManager = graphics;
             position = new Vector2(MapManager.activeMap.tiledMap.WidthInPixels / 2, MapManager.activeMap.tiledMap.HeightInPixels / 2);
             boundingBox = new Rectangle((int)position.X, (int)position.Y, 28, 26);
             Camera.camPos = new Vector2(position.X - (Camera.camera.BoundingRectangle.Width / 2), position.Y - (Camera.camera.BoundingRectangle.Height / 2));
-            maxVelocity = new Vector2(100, 100);
+            maxVelocity = new Vector2(speed, speed);
+            dashTimer = new Timer(300);
+            dashTimer.Elapsed += (sender, args) =>
+            {
+                isDashing = false;
+                dashTimer.Stop();
+                maxVelocity = new Vector2(speed, speed);
+            };
         }
+        public void attack(Direction direction)
+        {
+            if (isAttacking) return;
 
+            isAttacking = true;
+            swordSwing = new SwordSwing(direction, 200, this);
+            attackTimer = new Timer(200);
+            attackTimer.Elapsed += (sender, args) =>
+            {
+                isAttacking = false;
+                attackTimer.Stop();
+                attackTimer = null;
+            };
+            attackTimer.Start();
+            
+        }
         public override void move()
         {
             Vector2 _cameraPosition = Camera.camera.Position;
@@ -123,111 +153,6 @@ namespace BasicRPGTest_Mono.Engine
             Camera.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
 
         }
-        /*public void move(GameTime gameTime)
-        {
-            Vector2 _cameraPosition = Camera.camera.Position;
-
-            var kstate = Keyboard.GetState();
-            Vector2 newPlayerPos = position;
-            Vector2 newCameraPos = _cameraPosition;
-
-            if (kstate.IsKeyDown(Keys.Up))
-            {
-
-                newPlayerPos.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newPlayerPos.Y < 0 + (graphic.height / 2))
-                    newPlayerPos.Y = 0 + (graphic.height / 2);
-
-                if (!(newPlayerPos.Y >= MapManager.activeMap.tiledMap.HeightInPixels - (graphicsManager.PreferredBackBufferHeight / 2)))
-                    newCameraPos.Y -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.Y <= 0)
-                    newCameraPos.Y = 0;
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.Y = position.Y;
-                    newCameraPos.Y = _cameraPosition.Y;
-                }
-
-            }
-
-            if (kstate.IsKeyDown(Keys.Down))
-            {
-
-                newPlayerPos.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newPlayerPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
-                    newPlayerPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
-
-                if (!(newPlayerPos.Y <= graphicsManager.PreferredBackBufferHeight / 2))
-                    newCameraPos.Y += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.Y >= (MapManager.activeMap.tiledMap.HeightInPixels - Camera.camera.BoundingRectangle.Height))
-                    newCameraPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - Camera.camera.BoundingRectangle.Height;
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.Y = position.Y;
-                    newCameraPos.Y = _cameraPosition.Y;
-                }
-
-            }
-
-            if (kstate.IsKeyDown(Keys.Left))
-            {
-
-                newPlayerPos.X -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newPlayerPos.X < 0 + (graphic.width / 2))
-                    newPlayerPos.X = 0 + (graphic.width / 2);
-
-                if (!(newPlayerPos.X >= MapManager.activeMap.tiledMap.WidthInPixels - (graphicsManager.PreferredBackBufferWidth / 2)))
-                    newCameraPos.X -= speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.X <= 0)
-                    newCameraPos.X = 0;
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.X = position.X;
-                    newCameraPos.X = _cameraPosition.X;
-                }
-
-            }
-
-            if (kstate.IsKeyDown(Keys.Right))
-            {
-
-
-                newPlayerPos.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newPlayerPos.X > (MapManager.activeMap.tiledMap.WidthInPixels - (graphic.width / 2)))
-                    newPlayerPos.X = MapManager.activeMap.tiledMap.WidthInPixels - (graphic.width / 2);
-
-                if (!(newPlayerPos.X <= graphicsManager.PreferredBackBufferWidth / 2))
-                    newCameraPos.X += speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.X >= (MapManager.activeMap.tiledMap.WidthInPixels - Camera.camera.BoundingRectangle.Width))
-                    newCameraPos.X = MapManager.activeMap.tiledMap.WidthInPixels - Camera.camera.BoundingRectangle.Width;
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.X = position.X;
-                    newCameraPos.X = _cameraPosition.X;
-                }
-
-            }
-
-            position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
-            Camera.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
-
-        }*/
 
 
 
@@ -296,9 +221,9 @@ namespace BasicRPGTest_Mono.Engine
 
             var kstate = Keyboard.GetState();
             Vector2 newVel = velocity;
-            if (kstate.IsKeyDown(Keys.Up))
+            if (kstate.IsKeyDown(Keys.W))
             {
-                newVel = new Vector2(velocity.X, velocity.Y - 10f);
+                newVel = new Vector2(velocity.X, velocity.Y - (float)(maxVelocity.Y / 5));
                 if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
                 velocity = newVel;
             }
@@ -306,16 +231,16 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (newVel.Y < 0)
                 {
-                    newVel = new Vector2(velocity.X, velocity.Y + 20f);
+                    newVel = new Vector2(velocity.X, velocity.Y + (float)(maxVelocity.Y / 5));
                     if (newVel.Y > 0)
                         newVel = new Vector2(velocity.X, 0);
                 }
                 velocity = newVel;
             }
 
-            if (kstate.IsKeyDown(Keys.Down))
+            if (kstate.IsKeyDown(Keys.S))
             {
-                newVel = new Vector2(velocity.X, velocity.Y + 10f);
+                newVel = new Vector2(velocity.X, velocity.Y + (float)(maxVelocity.Y / 5));
                 if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
                 velocity = newVel;
             }
@@ -323,16 +248,16 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (newVel.Y > 0)
                 {
-                    newVel = new Vector2(velocity.X, velocity.Y - 20f);
+                    newVel = new Vector2(velocity.X, velocity.Y - (float)(maxVelocity.Y / 5));
                     if (newVel.Y < 0)
                         newVel = new Vector2(velocity.X, 0);
                 }
                 velocity = newVel;
             }
 
-            if (kstate.IsKeyDown(Keys.Left))
+            if (kstate.IsKeyDown(Keys.A))
             {
-                newVel = new Vector2(velocity.X - 10f, velocity.Y);
+                newVel = new Vector2(velocity.X - (float)(maxVelocity.X / 5), velocity.Y);
                 if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
                 velocity = newVel;
             }
@@ -340,16 +265,16 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (newVel.X < 0)
                 {
-                    newVel = new Vector2(velocity.X + 20f, velocity.Y);
+                    newVel = new Vector2(velocity.X + (float)(maxVelocity.X / 5), velocity.Y);
                     if (newVel.X > 0)
                         newVel = new Vector2(0, velocity.X);
                 }
                 velocity = newVel;
             }
 
-            if(kstate.IsKeyDown(Keys.Right))
+            if(kstate.IsKeyDown(Keys.D))
             {
-                newVel = new Vector2(velocity.X + 10f, velocity.Y);
+                newVel = new Vector2(velocity.X + (float)(maxVelocity.X / 5), velocity.Y);
                 if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
                 velocity = newVel;
             }
@@ -357,7 +282,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (newVel.X > 0)
                 {
-                    newVel = new Vector2(velocity.X - 20f, velocity.Y);
+                    newVel = new Vector2(velocity.X - (float)(maxVelocity.X / 5), velocity.Y);
                     if (newVel.X < 0)
                         newVel = new Vector2(0, velocity.X);
                 }
@@ -367,6 +292,15 @@ namespace BasicRPGTest_Mono.Engine
             move();
 
         }
+        public void Dash()
+        {
+            if (!isDashing)
+            {
+                isDashing = true;
+                maxVelocity = new Vector2(Convert.ToInt32(speed * 3), Convert.ToInt32(speed * 3));
+                dashTimer.Start();
+            }
+        }
         public override void draw(SpriteBatch batch)
         {
             Vector2 screenPos = getPlayerScreenPosition();
@@ -375,6 +309,11 @@ namespace BasicRPGTest_Mono.Engine
             batch.Begin();
             batch.DrawRectangle(getScreenBox(), Color.White);
             batch.End();
+
+            if (swordSwing != null)
+            {
+                swordSwing.Draw(batch, getPlayerScreenPosition());
+            }
         }
 
     }

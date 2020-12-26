@@ -12,7 +12,7 @@ namespace RPGEngine
     {
         public int rows { get; set; }
         public int columns { get; set; }
-        private int currentFrame;
+        public int currentFrame;
         private int totalFrames;
 
 
@@ -23,6 +23,14 @@ namespace RPGEngine
             this.columns = columns;
             currentFrame = 0;
             totalFrames = this.rows * this.columns;
+        }
+        public GraphicAnimated(GraphicAnimated graphic) : base (graphic.texture)
+        {
+            texture = graphic.texture;
+            rows = graphic.rows;
+            columns = graphic.columns;
+            currentFrame = 0;
+            totalFrames = rows * columns;
         }
 
 

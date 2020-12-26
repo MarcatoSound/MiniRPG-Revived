@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,6 +13,7 @@ using MonoGame.Extended.Screens.Transitions;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.ViewportAdapters;
+using RPGEngine;
 
 namespace BasicRPGTest_Mono
 {
@@ -19,7 +21,7 @@ namespace BasicRPGTest_Mono
     {
         private new Main Game => (Main)base.Game;
 
-        Player player;
+        public Player player;
         LivingEntity entity;
         string worldName;
 
@@ -57,7 +59,17 @@ namespace BasicRPGTest_Mono
 
             _tiledMapRenderer = new TiledMapRenderer(GraphicsDevice, MapManager.activeMap.tiledMap);
 
-            Texture2D texture = Content.Load<Texture2D>("test_sprite_atlas");
+            Texture2D texture;
+            texture = Content.Load<Texture2D>("sword_swing_north");
+            SwingData.swings.Add(Direction.Up, new GraphicAnimated(texture, 1, 7));
+            texture = Content.Load<Texture2D>("sword_swing_west");
+            SwingData.swings.Add(Direction.Left, new GraphicAnimated(texture, 1, 7));
+            texture = Content.Load<Texture2D>("sword_swing_south");
+            SwingData.swings.Add(Direction.Down, new GraphicAnimated(texture, 1, 7));
+            texture = Content.Load<Texture2D>("sword_swing_east");
+            SwingData.swings.Add(Direction.Right, new GraphicAnimated(texture, 1, 7));
+
+            texture = Content.Load<Texture2D>("test_sprite_atlas");
             player = new Player(texture, _graphics);
 
 
@@ -144,9 +156,6 @@ namespace BasicRPGTest_Mono
                 player.move(gameTime);*/
 
 
-            if (kstate.IsKeyDown(Keys.LeftShift))
-                player.speed = 200f;
-            else player.speed = 100f;
 
             player.update();
             Camera.camera.Position = Camera.camPos;
