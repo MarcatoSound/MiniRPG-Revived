@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
@@ -23,6 +24,8 @@ namespace BasicRPGTest_Mono.Engine.Entities
         public Direction direction;
         public GraphicAnimated graphic;
         public Timer swingTimer;
+        public Vector2 swordPos;
+        public Rectangle hitBox;
 
         public SwordSwing(Direction direction, int swingTime, Player player)
         {
@@ -49,22 +52,31 @@ namespace BasicRPGTest_Mono.Engine.Entities
         }
         public void Draw(SpriteBatch batch, Vector2 position)
         {
-            Vector2 swordPos = new Vector2(position.X, position.Y);
+            swordPos = new Vector2(position.X, position.Y);
             switch (direction)
             {
                 case Direction.Up:
                     swordPos.Y -= 28;
+                    hitBox = new Rectangle((int)swordPos.X - 24, (int)swordPos.Y - 16, 48, 32);
                     break;
                 case Direction.Left:
                     swordPos.X -= 28;
+                    hitBox = new Rectangle((int)swordPos.X - 16, (int)swordPos.Y - 24, 32, 48);
                     break;
                 case Direction.Down:
                     swordPos.Y += 28;
+                    hitBox = new Rectangle((int)swordPos.X - 24, (int)swordPos.Y - 16, 48, 32);
                     break;
                 case Direction.Right:
                     swordPos.X += 28;
+                    hitBox = new Rectangle((int)swordPos.X - 16, (int)swordPos.Y - 24, 32, 48);
                     break;
             }
+            batch.Begin();
+            batch.DrawRectangle(hitBox, Color.White);
+            batch.End();
+
+
             graphic.draw(batch, swordPos);
         }
         public void Stop()

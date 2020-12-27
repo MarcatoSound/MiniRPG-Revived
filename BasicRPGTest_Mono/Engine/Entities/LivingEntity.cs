@@ -21,6 +21,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public Timer knockbackTimer { get; set; }
         private bool isGettingKnockedBack { get; set; }
+        public float kbResist = 0.2f;
 
         public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
@@ -262,91 +263,11 @@ namespace BasicRPGTest_Mono.Engine
             boundingBox = new Rectangle(newBox.X, newBox.Y, newBox.Width, newBox.Height);
 
         }
-        public virtual void move(GameTime gameTime, Direction direction)
+
+
+        public void hurt(Vector2 sourcePos)
         {
-            Vector2 newPos = position;
-            Rectangle newBox = boundingBox;
-
-            if (MapManager.activeMap == null) return;
-
-            switch (direction)
-            {
-                case Direction.Up:
-                    newPos.Y -= (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (newPos.Y < 0 + (graphic.height / 2))
-                        newPos.Y = 0 + (graphic.height / 2);
-
-
-                    newBox = getBox(newPos);
-
-                    if (isColliding(newBox))
-                    {
-                        newPos.Y = position.Y;
-                        newBox.Y = boundingBox.Y;
-                    }
-
-                    break;
-                case Direction.Down:
-                    newPos.Y += (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                    if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
-                        newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
-
-
-                    newBox = getBox(newPos);
-
-                    if (isColliding(newBox))
-                    {
-                        newPos.Y = position.Y;
-                        newBox.Y = boundingBox.Y;
-                    }
-
-                    break;
-
-                case Direction.Left:
-                    newPos.X -= (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    if (newPos.X < 0 + (graphic.height / 2))
-                        newPos.X = 0 + (graphic.height / 2);
-
-
-                    newBox = getBox(newPos);
-
-                    if (isColliding(newBox))
-                    {
-                        newPos.X = position.X;
-                        newBox.X = boundingBox.X;
-                    }
-
-                    break;
-
-                case Direction.Right:
-                    newPos.X += (float)(speed / 1.5) * (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-                    if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
-                        newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
-
-
-                    newBox = getBox(newPos);
-
-                    if (isColliding(newBox))
-                    {
-                        newPos.X = position.X;
-                        newBox.X = boundingBox.X;
-                    }
-
-                    break;
-
-            }
-
-            position = new Vector2(newPos.X, newPos.Y);
-            boundingBox = new Rectangle(newBox.X, newBox.Y, newBox.Width, newBox.Height);
-
-        }
-
-
-        public void hurt()
-        {
-
+            knockback(sourcePos);
         }
 
         public void knockback(Vector2 sourcePos)
@@ -357,19 +278,23 @@ namespace BasicRPGTest_Mono.Engine
             knockbackTimer = new Timer(100);
             knockbackTimer.Elapsed += (sender, args) =>
             {
+                isGettingKnockedBack = false;
                 knockbackTimer.Stop();
                 knockbackTimer.Dispose();
                 knockbackTimer = null;
-                isGettingKnockedBack = false;
             };
+            knockbackTimer.Start();
 
             // TODO Finish this by using the source position (source of the hit)
             //  to calculate the direction the living entity is being knocked
+            Vector2 screenPos = getScreenPosition();
             Vector2 enemyDist = new Vector2();
-            enemyDist.X = sourcePos.X - position.X;
-            enemyDist.Y = sourcePos.Y - position.Y;
+            enemyDist.X = screenPos.X - sourcePos.X;
+            enemyDist.Y = screenPos.Y - sourcePos.Y;
 
-            velocity = new Vector2(enemyDist.X * 4, enemyDist.Y * 4);
+            int knockbackStrX = (int)enemyDist.X * 4;
+            int knockbackStrY = (int)enemyDist.Y * 4;
+            velocity = new Vector2(knockbackStrX + (knockbackStrX * -kbResist), knockbackStrY + (knockbackStrY * -kbResist));
 
         }
 

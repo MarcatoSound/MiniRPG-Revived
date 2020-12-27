@@ -60,14 +60,6 @@ namespace BasicRPGTest_Mono
             _tiledMapRenderer = new TiledMapRenderer(GraphicsDevice, MapManager.activeMap.tiledMap);
 
             Texture2D texture;
-            texture = Content.Load<Texture2D>("sword_swing_north");
-            SwingData.swings.Add(Direction.Up, new GraphicAnimated(texture, 1, 7));
-            texture = Content.Load<Texture2D>("sword_swing_west");
-            SwingData.swings.Add(Direction.Left, new GraphicAnimated(texture, 1, 7));
-            texture = Content.Load<Texture2D>("sword_swing_south");
-            SwingData.swings.Add(Direction.Down, new GraphicAnimated(texture, 1, 7));
-            texture = Content.Load<Texture2D>("sword_swing_east");
-            SwingData.swings.Add(Direction.Right, new GraphicAnimated(texture, 1, 7));
 
             texture = Content.Load<Texture2D>("test_sprite_atlas");
             player = new Player(texture, _graphics);

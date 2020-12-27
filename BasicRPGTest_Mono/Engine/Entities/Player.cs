@@ -219,6 +219,14 @@ namespace BasicRPGTest_Mono.Engine
         {
             boundingBox = getBox(position);
 
+            foreach (LivingEntity entity in MapManager.activeMap.livingEntities)
+            {
+                if (swordSwing != null && swordSwing.hitBox.Intersects(entity.getScreenBox()))
+                {
+                    entity.hurt(getPlayerScreenPosition());
+                }
+            }
+
             var kstate = Keyboard.GetState();
             Vector2 newVel = velocity;
             if (kstate.IsKeyDown(Keys.W))
