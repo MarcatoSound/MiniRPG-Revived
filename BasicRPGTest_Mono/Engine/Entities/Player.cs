@@ -41,8 +41,8 @@ namespace BasicRPGTest_Mono.Engine
             if (isAttacking) return;
 
             isAttacking = true;
-            swordSwing = new SwordSwing(direction, 200, this);
-            attackTimer = new Timer(200);
+            swordSwing = new SwordSwing(direction, 150, this);
+            attackTimer = new Timer(150);
             attackTimer.Elapsed += (sender, args) =>
             {
                 isAttacking = false;

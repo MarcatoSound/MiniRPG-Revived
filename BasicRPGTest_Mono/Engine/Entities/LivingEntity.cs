@@ -19,6 +19,9 @@ namespace BasicRPGTest_Mono.Engine
         private int moveCount;
         public Direction direction = Direction.None;
 
+        public Timer knockbackTimer { get; set; }
+        private bool isGettingKnockedBack { get; set; }
+
         public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
@@ -45,6 +48,7 @@ namespace BasicRPGTest_Mono.Engine
             tickTimer.Elapsed += tryMove;
             tickTimer.Start();
 
+
             moveCount = 0;
 
             maxVelocity = new Vector2(speed, speed);
@@ -54,73 +58,80 @@ namespace BasicRPGTest_Mono.Engine
         {
             
             Vector2 newVel = velocity;
-            if (direction == Direction.Up)
-            {
-                newVel = new Vector2(velocity.X, velocity.Y - 10f);
-                if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
-                velocity = newVel;
-            }
-            else
-            {
-                if (newVel.Y < 0)
-                {
-                    newVel = new Vector2(velocity.X, velocity.Y + 20f);
-                    if (newVel.Y > 0)
-                        newVel = new Vector2(velocity.X, 0);
-                }
-                velocity = newVel;
-            }
 
-            if (direction == Direction.Down)
+            if (!isGettingKnockedBack)
             {
-                newVel = new Vector2(velocity.X, velocity.Y + 10f);
-                if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
-                velocity = newVel;
-            }
-            else
-            {
-                if (newVel.Y > 0)
+
+                if (direction == Direction.Up)
                 {
-                    newVel = new Vector2(velocity.X, velocity.Y - 20f);
+                    newVel = new Vector2(velocity.X, velocity.Y - 10f);
+                    if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
+                    velocity = newVel;
+                }
+                else
+                {
                     if (newVel.Y < 0)
-                        newVel = new Vector2(velocity.X, 0);
+                    {
+                        newVel = new Vector2(velocity.X, velocity.Y + 20f);
+                        if (newVel.Y > 0)
+                            newVel = new Vector2(velocity.X, 0);
+                    }
+                    velocity = newVel;
                 }
-                velocity = newVel;
-            }
 
-            if (direction == Direction.Left)
-            {
-                newVel = new Vector2(velocity.X - 10f, velocity.Y);
-                if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
-                velocity = newVel;
-            }
-            else
-            {
-                if (newVel.X < 0)
+                if (direction == Direction.Down)
                 {
-                    newVel = new Vector2(velocity.X + 20f, velocity.Y);
-                    if (newVel.X > 0)
-                        newVel = new Vector2(0, velocity.X);
+                    newVel = new Vector2(velocity.X, velocity.Y + 10f);
+                    if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
+                    velocity = newVel;
                 }
-                velocity = newVel;
-            }
-
-            if (direction == Direction.Right)
-            {
-                newVel = new Vector2(velocity.X + 10f, velocity.Y);
-                if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
-                velocity = newVel;
-            }
-            else
-            {
-                if (newVel.X > 0)
+                else
                 {
-                    newVel = new Vector2(velocity.X - 20f, velocity.Y);
+                    if (newVel.Y > 0)
+                    {
+                        newVel = new Vector2(velocity.X, velocity.Y - 20f);
+                        if (newVel.Y < 0)
+                            newVel = new Vector2(velocity.X, 0);
+                    }
+                    velocity = newVel;
+                }
+
+                if (direction == Direction.Left)
+                {
+                    newVel = new Vector2(velocity.X - 10f, velocity.Y);
+                    if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
+                    velocity = newVel;
+                }
+                else
+                {
                     if (newVel.X < 0)
-                        newVel = new Vector2(0, velocity.X);
+                    {
+                        newVel = new Vector2(velocity.X + 20f, velocity.Y);
+                        if (newVel.X > 0)
+                            newVel = new Vector2(0, velocity.X);
+                    }
+                    velocity = newVel;
                 }
-                velocity = newVel;
+
+                if (direction == Direction.Right)
+                {
+                    newVel = new Vector2(velocity.X + 10f, velocity.Y);
+                    if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
+                    velocity = newVel;
+                }
+                else
+                {
+                    if (newVel.X > 0)
+                    {
+                        newVel = new Vector2(velocity.X - 20f, velocity.Y);
+                        if (newVel.X < 0)
+                            newVel = new Vector2(0, velocity.X);
+                    }
+                    velocity = newVel;
+                }
+
             }
+
 
             move();
             base.update();
@@ -257,6 +268,7 @@ namespace BasicRPGTest_Mono.Engine
             Rectangle newBox = boundingBox;
 
             if (MapManager.activeMap == null) return;
+
             switch (direction)
             {
                 case Direction.Up:
@@ -331,6 +343,40 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
+
+        public void hurt()
+        {
+
+        }
+
+        public void knockback(Vector2 sourcePos)
+        {
+            if (isGettingKnockedBack) return;
+            isGettingKnockedBack = true;
+
+            knockbackTimer = new Timer(100);
+            knockbackTimer.Elapsed += (sender, args) =>
+            {
+                knockbackTimer.Stop();
+                knockbackTimer.Dispose();
+                knockbackTimer = null;
+                isGettingKnockedBack = false;
+            };
+
+            // TODO Finish this by using the source position (source of the hit)
+            //  to calculate the direction the living entity is being knocked
+            Vector2 enemyDist = new Vector2();
+            enemyDist.X = sourcePos.X - position.X;
+            enemyDist.Y = sourcePos.Y - position.Y;
+
+            velocity = new Vector2(enemyDist.X * 4, enemyDist.Y * 4);
+
+        }
+
+        public void kill()
+        {
+            MapManager.activeMap.entities.Remove(this);
+        }
 
     }
 }
