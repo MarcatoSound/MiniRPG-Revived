@@ -223,6 +223,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (swordSwing != null && swordSwing.hitBox.Intersects(entity.getScreenBox()))
                 {
+                    if (entity.isImmunity) continue;
                     entity.hurt(getPlayerScreenPosition());
                 }
             }

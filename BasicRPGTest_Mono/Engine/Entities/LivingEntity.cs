@@ -19,8 +19,12 @@ namespace BasicRPGTest_Mono.Engine
         private int moveCount;
         public Direction direction = Direction.None;
 
+        public Timer immunityTimer;
+        public bool isImmunity;
+        public int immunityTime = 150;
+
         public Timer knockbackTimer { get; set; }
-        private bool isGettingKnockedBack { get; set; }
+        public bool isGettingKnockedBack { get; set; }
         public float kbResist = 0.2f;
 
         public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
@@ -267,6 +271,18 @@ namespace BasicRPGTest_Mono.Engine
 
         public void hurt(Vector2 sourcePos)
         {
+            isImmunity = true;
+
+            immunityTimer = new Timer(immunityTime);
+            immunityTimer.Elapsed += (sender, args) =>
+            {
+                isImmunity = false;
+                immunityTimer.Stop();
+                immunityTimer.Dispose();
+                immunityTimer = null;
+            };
+            immunityTimer.Start();
+
             knockback(sourcePos);
         }
 
@@ -275,7 +291,23 @@ namespace BasicRPGTest_Mono.Engine
             if (isGettingKnockedBack) return;
             isGettingKnockedBack = true;
 
-            knockbackTimer = new Timer(100);
+            Vector2 screenPos = getScreenPosition();
+            Vector2 enemyDist = new Vector2();
+            enemyDist.X = screenPos.X - sourcePos.X;
+            enemyDist.Y = screenPos.Y - sourcePos.Y;
+
+            int knockbackStrX = (int)enemyDist.X * 5;
+            int knockbackStrY = (int)enemyDist.Y * 5;
+            int knockbackStr = knockbackStrX + knockbackStrY;
+            velocity = new Vector2(knockbackStrX + (knockbackStrX * -kbResist), knockbackStrY + (knockbackStrY * -kbResist));
+
+
+            // TODO Investigate NORTH and WEST knockback being stronger than SOUTH and EAST knockback;
+            //   Probably has to do with the player or entity position anchor?
+            int maxKbTime = 125;
+            int kbTime = Math.Max(maxKbTime - (maxKbTime * Math.Min(knockbackStr / 100, 1)), 50);
+            System.Diagnostics.Debug.WriteLine("KB Time: " + kbTime);
+            knockbackTimer = new Timer(kbTime);
             knockbackTimer.Elapsed += (sender, args) =>
             {
                 isGettingKnockedBack = false;
@@ -284,17 +316,6 @@ namespace BasicRPGTest_Mono.Engine
                 knockbackTimer = null;
             };
             knockbackTimer.Start();
-
-            // TODO Finish this by using the source position (source of the hit)
-            //  to calculate the direction the living entity is being knocked
-            Vector2 screenPos = getScreenPosition();
-            Vector2 enemyDist = new Vector2();
-            enemyDist.X = screenPos.X - sourcePos.X;
-            enemyDist.Y = screenPos.Y - sourcePos.Y;
-
-            int knockbackStrX = (int)enemyDist.X * 4;
-            int knockbackStrY = (int)enemyDist.Y * 4;
-            velocity = new Vector2(knockbackStrX + (knockbackStrX * -kbResist), knockbackStrY + (knockbackStrY * -kbResist));
 
         }
 
