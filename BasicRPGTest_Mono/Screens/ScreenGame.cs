@@ -99,15 +99,16 @@ namespace BasicRPGTest_Mono
         private void loadMap()
         {
             // TODO Replace the loading functionality.
-            /*string path = $"save\\{worldName}";
+            string path = $"save\\{worldName}";
+
+            int size = 128;
 
             if (Directory.Exists(path))
             {
-                MapManager.add(new Map(Load.loadMap(masterTileset, worldName)));
+                MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
                 return;
-            }*/
+            }
 
-            int size = 128;
 
             // Generate the actual map contents
             MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));

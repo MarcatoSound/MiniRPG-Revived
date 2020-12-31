@@ -38,7 +38,7 @@ namespace BasicRPGTest_Mono.Engine
             json.Add("height", height);
             json.Add("width", width);
 
-            JObject layers = new JObject();
+            JArray layers = new JArray();
             JArray layerTiles = new JArray();
 
             JObject tileData;
@@ -65,7 +65,7 @@ namespace BasicRPGTest_Mono.Engine
                 layerTiles.Add(tileData);
             }
             //}
-            layers.Add("ground", layerTiles);
+            layers.Add(layerTiles);
 
             json.Add("layers", layers);
 

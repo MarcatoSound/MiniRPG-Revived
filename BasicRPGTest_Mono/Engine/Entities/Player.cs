@@ -29,7 +29,7 @@ namespace BasicRPGTest_Mono.Engine
             boundingBox = new Rectangle((int)position.X, (int)position.Y, 28, 26);
             Camera.camPos = new Vector2(position.X - (Camera.camera.BoundingRectangle.Width / 2), position.Y - (Camera.camera.BoundingRectangle.Height / 2));
             maxVelocity = new Vector2(speed, speed);
-            dashTimer = new Timer(300);
+            dashTimer = new Timer(200);
             dashTimer.Elapsed += (sender, args) =>
             {
                 isDashing = false;
@@ -164,6 +164,7 @@ namespace BasicRPGTest_Mono.Engine
             Vector2 pos = new Vector2(position.X, position.Y);
 
             pos.X = (int)pos.X / TileManager.dimensions;
+            pos.Y = (int)pos.Y / TileManager.dimensions;
             pos.Y = (int)pos.Y / TileManager.dimensions;
 
             return pos;
@@ -367,7 +368,7 @@ namespace BasicRPGTest_Mono.Engine
             if (!isDashing)
             {
                 isDashing = true;
-                maxVelocity = new Vector2(Convert.ToInt32(speed * 3), Convert.ToInt32(speed * 3));
+                maxVelocity = new Vector2(Convert.ToInt32(speed * 5), Convert.ToInt32(speed * 5));
                 dashTimer.Start();
             }
         }
