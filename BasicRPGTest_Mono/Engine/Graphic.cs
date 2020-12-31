@@ -17,17 +17,19 @@ namespace BasicRPGTest_Mono.Engine
             this.texture = texture;
         }
 
-        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, Color tintColor)
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, bool newBatch = true)
         {
-            spriteBatch.Begin();
-            spriteBatch.Draw(texture, location, tintColor);
-            spriteBatch.End();
+            draw(spriteBatch, location, Color.White, newBatch);
         }
-        public virtual void draw(SpriteBatch spriteBatch, Vector2 location)
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, Color tintColor, bool newBatch = true)
         {
-            spriteBatch.Begin();
-            spriteBatch.Draw(texture, location, Color.White);
-            spriteBatch.End();
+            if (newBatch)
+                spriteBatch.Begin();
+
+            spriteBatch.Draw(texture, location, tintColor);
+
+            if (newBatch)
+                spriteBatch.End();
         }
     }
 }

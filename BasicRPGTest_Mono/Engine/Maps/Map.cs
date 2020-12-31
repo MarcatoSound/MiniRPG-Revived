@@ -18,6 +18,7 @@ namespace BasicRPGTest_Mono.Engine
         [Obsolete("The TiledMap object is being abandoned. Replace references with appropriate replacements in the Map object.")]
         public TiledMap tiledMap { get; set; }
         public Dictionary<Vector3, Tile> tiles { get; set; }
+        // TODO implement regions so we loop through regions for rendering instead of all tiles.
         public int width { get; set; }
         public int height { get; set; }
         public int widthInPixels { get; set; }
@@ -81,7 +82,7 @@ namespace BasicRPGTest_Mono.Engine
                 if (pos.Z != 1) continue;
                 Tile tile = pair.Value;
 
-                collidables.Add(new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), 32, 32));
+                collidables.Add(new Rectangle(Convert.ToInt32(pos.X*32), Convert.ToInt32(pos.Y*32), 32, 32));
             }
 
             System.Diagnostics.Debug.WriteLine("Width: " + width);
@@ -138,7 +139,10 @@ namespace BasicRPGTest_Mono.Engine
             {
                 Tile tile = pair.Value;
                 if (!camera.BoundingRectangle.Intersects(tile.box)) continue;
+                var transformMatrix = camera.GetViewMatrix();
+                batch.Begin(transformMatrix: transformMatrix);
                 tile.draw(batch);
+                batch.End();
             }
         }
 

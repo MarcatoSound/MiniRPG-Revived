@@ -77,7 +77,11 @@ namespace BasicRPGTest_Mono
 
                 if (activeScreen is ScreenGame)
                 {
-                    if (args.Key == Keys.Space) System.Diagnostics.Debug.WriteLine(MapManager.activeMap.createNoise());
+                    if (args.Key == Keys.Space)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Camera position: " + Camera.camPos);
+                        System.Diagnostics.Debug.WriteLine("Camera box: " + Camera.camera.BoundingRectangle);
+                    }
                     if (args.Key == Keys.Escape) mainMenu();
                     if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
                     {

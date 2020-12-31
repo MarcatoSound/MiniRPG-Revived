@@ -2,6 +2,7 @@
 using BasicRPGTest_Mono.Engine.Maps;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -54,7 +55,7 @@ namespace RPGEngine
         public void draw(SpriteBatch spriteBatch)
         {
             if (!isInstance) return;
-            graphic.draw(spriteBatch, pos);
+            graphic.draw(spriteBatch, pos, false);
         }
 
     }

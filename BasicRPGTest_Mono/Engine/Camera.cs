@@ -25,6 +25,10 @@ namespace BasicRPGTest_Mono.Engine
         {
         }
 
+        public static void Update()
+        {
+        }
+
         public static void reset()
         {
             _camPos = new Vector2();

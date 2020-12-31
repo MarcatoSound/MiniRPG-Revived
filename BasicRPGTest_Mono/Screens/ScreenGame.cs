@@ -148,13 +148,13 @@ namespace BasicRPGTest_Mono
                 entity.update();
             }
 
-                if (Keyboard.GetState().IsKeyDown(Keys.Space))
+            /*if (Keyboard.GetState().IsKeyDown(Keys.Space))
             {
                 // Logic for converting camera position and player position to player TILE position
                 Vector2 playerMapPos = player.getPlayerTilePositionPrecise();
                 System.Diagnostics.Debug.WriteLine("Player tile position: " + playerMapPos);
                 System.Diagnostics.Debug.WriteLine("Player map position: " + player.position);
-            }
+            }*/
 
             /*if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
                 player.move(gameTime);*/
