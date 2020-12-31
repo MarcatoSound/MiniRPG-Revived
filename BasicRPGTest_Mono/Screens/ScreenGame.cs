@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -43,21 +45,22 @@ namespace BasicRPGTest_Mono
         {
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
+            Core.graphics = _graphics.GraphicsDevice;
 
             // TODO: use this.Content to load your game content here
             font = Content.Load<SpriteFont>("arial");
 
 
             // Load the general game objects
-            //loadTiles();
+            loadTiles();
             loadEntities();
 
             // Load the map data
             buildTileset();
 
-            generateMap();
+            loadMap();
 
-            _tiledMapRenderer = new TiledMapRenderer(GraphicsDevice, MapManager.activeMap.tiledMap);
+            //_tiledMapRenderer = new TiledMapRenderer(GraphicsDevice, MapManager.activeMap.tiledMap);
 
             Texture2D texture;
 
@@ -70,7 +73,7 @@ namespace BasicRPGTest_Mono
         }
         public override void UnloadContent()
         {
-            Save.save(MapManager.activeMap.tiledMap, worldName);
+            Save.save(MapManager.activeMap, worldName);
             Camera.reset();
 
             worldName = "";
@@ -93,41 +96,52 @@ namespace BasicRPGTest_Mono
 
         }
 
-        private void generateMap()
+        private void loadMap()
         {
-            string path = $"save\\{worldName}";
+            // TODO Replace the loading functionality.
+            /*string path = $"save\\{worldName}";
 
             if (Directory.Exists(path))
             {
                 MapManager.add(new Map(Load.loadMap(masterTileset, worldName)));
                 return;
-            }
+            }*/
 
             int size = 128;
 
             // Generate the actual map contents
-            MapManager.add(new Map(Generator.generateOverworld(size)));
-            MapManager.activeMap.tiledMap.AddTileset(masterTileset, 0);
+            MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
+            //MapManager.activeMap.tiledMap.AddTileset(masterTileset, 0);
 
             // Saving world functionality
-            Save.save(MapManager.activeMap.tiledMap, worldName);
+            Save.save(MapManager.activeMap, worldName);
 
 
         }
 
+        private void loadTiles()
+        {
+            Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
+            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, 0, 0), false, false));
+            TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false));
+            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false));
+            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false));
+            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false));
+        }
         private void loadEntities()
         {
             Texture2D texture = Content.Load<Texture2D>("enemy1");
-            EntityManager.add(new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26), _graphics));
             texture = Content.Load<Texture2D>("enemy2");
-            EntityManager.add(new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26), _graphics));
             texture = Content.Load<Texture2D>("enemy3");
-            EntityManager.add(new LivingEntity(texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26), _graphics));
         }
 
 
         public override void Update(GameTime gameTime)
         {
+            if (MapManager.activeMap == null) return;
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities);
             foreach (LivingEntity entity in entities)
             {
@@ -142,8 +156,6 @@ namespace BasicRPGTest_Mono
                 System.Diagnostics.Debug.WriteLine("Player map position: " + player.position);
             }
 
-            var kstate = Keyboard.GetState();
-
             /*if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
                 player.move(gameTime);*/
 
@@ -151,7 +163,7 @@ namespace BasicRPGTest_Mono
 
             player.update();
             Camera.camera.Position = Camera.camPos;
-            _tiledMapRenderer.Update(gameTime);
+            //_tiledMapRenderer.Update(gameTime);
 
         }
 
@@ -166,7 +178,8 @@ namespace BasicRPGTest_Mono
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.End();
 
-            _tiledMapRenderer.Draw(Camera.camera.GetViewMatrix());
+            //_tiledMapRenderer.Draw(Camera.camera.GetViewMatrix());
+            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Color.Black);

@@ -77,7 +77,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
             batch.End();
 
 
-            graphic.draw(batch, swordPos);
+            graphic.draw(batch, swordPos, Color.White);
         }
         public void Stop()
         {

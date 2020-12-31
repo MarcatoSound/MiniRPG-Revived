@@ -1,4 +1,5 @@
-﻿using BasicRPGTest_Mono.Engine.Menus;
+﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -307,6 +308,66 @@ namespace BasicRPGTest_Mono.Engine.Utility
             List<string> strings = new List<string>();
             strings.Add(str);
             drawAlignedText(strings, color, batch, font, box, horAlign, vertAlign, padding);
+        }
+
+
+        public static int weightedRandom(List<int> chances)
+        {
+            int totalRatio = 0;
+
+            foreach (int c in chances)
+                totalRatio += c;
+
+            Random random = new Random();
+            int x = random.Next(0, totalRatio);
+
+            int iteration = 0; // so you know what to do next
+            foreach (int c in chances)
+            {
+                iteration++;
+                if ((x -= c) < 0)
+                    break;
+            }
+
+            return iteration;
+
+        }
+        public static Spawn randomizeSpawn(List<Spawn> spawns)
+        {
+            int totalRatio = 0;
+
+            foreach (Spawn s in spawns)
+                totalRatio += s.weight;
+
+            Random random = new Random();
+            int x = random.Next(0, totalRatio);
+
+            int iteration = 0; // so you know what to do next
+            foreach (Spawn s in spawns)
+            {
+                if ((x -= s.weight) < 0)
+                    break;
+                iteration++;
+            }
+
+            return spawns[iteration];
+
+        }
+
+        public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int dimensions = 32)
+        {
+
+            int x = column * dimensions;
+            int y = row * dimensions;
+
+            Rectangle sourceRectangle = new Rectangle(x, y, dimensions, dimensions);
+
+            Texture2D cropTexture = new Texture2D(Core.graphics, sourceRectangle.Width, sourceRectangle.Height);
+            Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
+            spriteset.GetData(0, sourceRectangle, data, 0, data.Length);
+            cropTexture.SetData(data);
+
+            return cropTexture;
         }
     }
 }

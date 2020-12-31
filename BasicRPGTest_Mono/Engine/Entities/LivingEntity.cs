@@ -25,20 +25,22 @@ namespace BasicRPGTest_Mono.Engine
 
         public Timer knockbackTimer { get; set; }
         public bool isGettingKnockedBack { get; set; }
-        public float kbResist = 0.2f;
+        public float kbResist = 0f;
 
-        public LivingEntity(Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
+        public LivingEntity(string name, Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
+            this.name = name;
             this.speed = speed;
             this.position = position;
             boundingBox = getBox(position);
 
             EntityManager.add(this);
         }
-        public LivingEntity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
+        public LivingEntity(string name, Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
+            this.name = name;
             this.speed = speed;
             this.position = position;
 
@@ -217,8 +219,8 @@ namespace BasicRPGTest_Mono.Engine
             {
                 newPos.X += (float)(velocity.X / 1.5) * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
 
-                if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
-                    newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
+                if (newPos.Y > (MapManager.activeMap.heightInPixels - (graphic.width / 2)))
+                    newPos.Y = MapManager.activeMap.heightInPixels - (graphic.width / 2);
 
 
                 newBox = getBox(newPos);
@@ -250,8 +252,8 @@ namespace BasicRPGTest_Mono.Engine
             {
                 newPos.Y += (float)(velocity.Y / 1.5) * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
 
-                if (newPos.Y > (MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2)))
-                    newPos.Y = MapManager.activeMap.tiledMap.HeightInPixels - (graphic.width / 2);
+                if (newPos.Y > (MapManager.activeMap.heightInPixels - (graphic.width / 2)))
+                    newPos.Y = MapManager.activeMap.heightInPixels - (graphic.width / 2);
 
 
                 newBox = getBox(newPos);
@@ -269,14 +271,17 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public void hurt(Vector2 sourcePos)
+        public virtual void hurt(Vector2 sourcePos)
         {
+            if (isImmunity) return;
             isImmunity = true;
+            tintColor = Color.LightCoral;
 
             immunityTimer = new Timer(immunityTime);
             immunityTimer.Elapsed += (sender, args) =>
             {
                 isImmunity = false;
+                tintColor = Color.White;
                 immunityTimer.Stop();
                 immunityTimer.Dispose();
                 immunityTimer = null;
@@ -286,27 +291,29 @@ namespace BasicRPGTest_Mono.Engine
             knockback(sourcePos);
         }
 
-        public void knockback(Vector2 sourcePos)
+        public virtual void knockback(Vector2 sourcePos)
         {
             if (isGettingKnockedBack) return;
             isGettingKnockedBack = true;
 
             Vector2 screenPos = getScreenPosition();
-            Vector2 enemyDist = new Vector2();
-            enemyDist.X = screenPos.X - sourcePos.X;
-            enemyDist.Y = screenPos.Y - sourcePos.Y;
+            screenPos.X = screenPos.X + (graphic.texture.Width / 2);
+            screenPos.Y = screenPos.Y + (graphic.texture.Height / 2);
+            Vector2 targetDist = new Vector2();
+            targetDist.X = screenPos.X - sourcePos.X;
+            targetDist.Y = screenPos.Y - sourcePos.Y;
 
-            int knockbackStrX = (int)enemyDist.X * 5;
-            int knockbackStrY = (int)enemyDist.Y * 5;
-            int knockbackStr = knockbackStrX + knockbackStrY;
-            velocity = new Vector2(knockbackStrX + (knockbackStrX * -kbResist), knockbackStrY + (knockbackStrY * -kbResist));
+            double z = Math.Sqrt((Math.Pow(targetDist.X, 2)) + (Math.Pow(targetDist.Y, 2)));
+            float maxKbVel = 600f;
+            int knockbackStr = (int)targetDist.X + (int)targetDist.Y;
+            Vector2 kbRatio = new Vector2((float)(targetDist.X / z), (float)(targetDist.Y / z));
+            velocity = new Vector2(maxKbVel / 2 * kbRatio.X, maxKbVel / 2 * kbRatio.Y);
 
 
-            // TODO Investigate NORTH and WEST knockback being stronger than SOUTH and EAST knockback;
-            //   Probably has to do with the player or entity position anchor?
-            int maxKbTime = 125;
-            int kbTime = Math.Max(maxKbTime - (maxKbTime * Math.Min(knockbackStr / 100, 1)), 50);
-            System.Diagnostics.Debug.WriteLine("KB Time: " + kbTime);
+            int maxKbTime = 200;
+            double zOut = Math.Pow(z, -1) * 10 + 0.3;
+            int kbTime = Convert.ToInt32(Math.Min(Math.Max(1000 * zOut - 400, 25), maxKbTime));
+            kbTime = Convert.ToInt32(kbTime - (kbTime * kbResist));
             knockbackTimer = new Timer(kbTime);
             knockbackTimer.Elapsed += (sender, args) =>
             {

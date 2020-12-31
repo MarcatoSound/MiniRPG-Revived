@@ -24,10 +24,12 @@ namespace BasicRPGTest_Mono.Engine
 
         public static Entity get(int i)
         {
+            if (i > entities.Count - 1) return null;
             return entities[i];
         }
         public static T get<T>(int i) where T : Entity
         {
+            if (i > entities.Count - 1) return null;
             if (typeof(T) == typeof(Entity)) return entities[i] as T;
             if (typeof(T) == typeof(LivingEntity)) return livingEntities[i] as T;
 

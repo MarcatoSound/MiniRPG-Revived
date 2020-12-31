@@ -17,6 +17,12 @@ namespace BasicRPGTest_Mono.Engine
             this.texture = texture;
         }
 
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, Color tintColor)
+        {
+            spriteBatch.Begin();
+            spriteBatch.Draw(texture, location, tintColor);
+            spriteBatch.End();
+        }
         public virtual void draw(SpriteBatch spriteBatch, Vector2 location)
         {
             spriteBatch.Begin();

@@ -77,6 +77,7 @@ namespace BasicRPGTest_Mono
 
                 if (activeScreen is ScreenGame)
                 {
+                    if (args.Key == Keys.Space) System.Diagnostics.Debug.WriteLine(MapManager.activeMap.createNoise());
                     if (args.Key == Keys.Escape) mainMenu();
                     if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
                     {
@@ -126,6 +127,8 @@ namespace BasicRPGTest_Mono
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            Core.game = this;
+            Core.graphics = _graphics.GraphicsDevice;
 
             Window.AllowUserResizing = true;
             

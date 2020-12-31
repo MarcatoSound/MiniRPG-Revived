@@ -41,7 +41,7 @@ namespace RPGEngine
                 currentFrame = 0;
         }
 
-        public override void draw(SpriteBatch spriteBatch, Vector2 location)
+        public override void draw(SpriteBatch spriteBatch, Vector2 location, Color tintColor)
         {
             width = texture.Width / columns;
             height = texture.Height / rows;
@@ -52,7 +52,7 @@ namespace RPGEngine
             Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, width, height);
 
             spriteBatch.Begin();
-            spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, Color.White, 0f, new Vector2(width / 2, height / 2), SpriteEffects.None, 0f);
+            spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, tintColor, 0f, new Vector2(width / 2, height / 2), SpriteEffects.None, 0f);
             spriteBatch.End();
         }
 
