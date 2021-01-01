@@ -24,16 +24,12 @@ namespace BasicRPGTest_Mono
         private new Main Game => (Main)base.Game;
 
         public Player player;
-        LivingEntity entity;
         string worldName;
 
         private SpriteFont font;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
-        TiledMapTileset masterTileset;
-        TiledMapRenderer _tiledMapRenderer;
 
         private FrameCounter _frameCounter = new FrameCounter();
         public ScreenGame(Main game, string worldName) : base(game)
@@ -55,8 +51,6 @@ namespace BasicRPGTest_Mono
             loadTiles();
             loadEntities();
 
-            // Load the map data
-            buildTileset();
 
             loadMap();
 
@@ -83,18 +77,6 @@ namespace BasicRPGTest_Mono
             base.UnloadContent();
         }
 
-        private void buildTileset()
-        {
-
-            masterTileset = new TiledMapTileset(Content.Load<Texture2D>("[Base]BaseChip_pipo"), 32, 32, 96, 0, 0, 8);
-            TiledMapTilesetTile tile;
-            for (int i = 0; i < masterTileset.TileCount; i++)
-            {
-                tile = new TiledMapTilesetTile(i);
-                masterTileset.Tiles.Add(tile);
-            }
-
-        }
 
         private void loadMap()
         {
@@ -112,7 +94,6 @@ namespace BasicRPGTest_Mono
 
             // Generate the actual map contents
             MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
-            //MapManager.activeMap.tiledMap.AddTileset(masterTileset, 0);
 
             // Saving world functionality
             Save.save(MapManager.activeMap, worldName);
@@ -151,7 +132,6 @@ namespace BasicRPGTest_Mono
 
             player.update();
             Camera.camera.Position = Camera.camPos;
-            //_tiledMapRenderer.Update(gameTime);
 
         }
 
@@ -166,7 +146,6 @@ namespace BasicRPGTest_Mono
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.End();
 
-            //_tiledMapRenderer.Draw(Camera.camera.GetViewMatrix());
             MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -183,12 +162,6 @@ namespace BasicRPGTest_Mono
                 _spriteBatch.DrawRectangle(entity.getScreenBox(), Color.White);
                 _spriteBatch.End();
             }
-
-
-            /*foreach (Rectangle tileBox in MapManager.activeMap.collidables)
-            {
-                _spriteBatch.DrawRectangle(tileBox, Color.White);
-            }*/
 
         }
 

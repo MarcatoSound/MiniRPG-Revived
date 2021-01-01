@@ -15,8 +15,6 @@ namespace BasicRPGTest_Mono.Engine
     public class Map
     {
         public string name { get; set; }
-        [Obsolete("The TiledMap object is being abandoned. Replace references with appropriate replacements in the Map object.")]
-        public TiledMap tiledMap { get; set; }
         public List<TileLayer> layers { get; set; }
         public Dictionary<Vector2, Region> regions { get; set; }
         // TODO implement regions so we loop through regions for rendering instead of all tiles.
@@ -34,31 +32,6 @@ namespace BasicRPGTest_Mono.Engine
         //public int totalSpawnWeights { get; set; }
         public int livingEntityCap = 50;
         public Timer spawnTimer;
-
-        [Obsolete("The TiledMap object is being abandoned. Replace references with appropriate replacements in the Map object.")]
-        public Map(TiledMap tiledMap)
-        {
-            this.tiledMap = tiledMap;
-            name = tiledMap.Name;
-            collidables = new List<Rectangle>();
-
-            this.entities = new List<Entity>();
-            this.livingEntities = new List<LivingEntity>();
-            this.spawns = new List<Spawn>();
-            initSpawns();
-            spawnTimer = new Timer(1000);
-            spawnTimer.Elapsed += trySpawn;
-            //spawnTimer.Start();
-
-            TiledMapTileLayer collideLayer = tiledMap.GetLayer<TiledMapTileLayer>("collide");
-            foreach (TiledMapTile tile in collideLayer.Tiles)
-            {
-                if (tile.GlobalIdentifier != 95) continue;
-
-                collidables.Add(new Rectangle(tile.X * tiledMap.TileWidth, tile.Y * tiledMap.TileHeight, tiledMap.TileWidth, tiledMap.TileHeight));
-            }
-
-        }
         public Map(string name, int size, List<TileLayer> layers) 
         {
             this.name = name;
@@ -76,7 +49,7 @@ namespace BasicRPGTest_Mono.Engine
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
-            //spawnTimer.Start();
+            spawnTimer.Start();
 
             for (int x = 0; x < width / 8; x++)
             {
@@ -117,10 +90,9 @@ namespace BasicRPGTest_Mono.Engine
 
         public void initSpawns()
         {
-            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(3), 10));
-            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(1), 30));
-            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(2), 60));
-
+            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(3), 1));
+            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(1), 2));
+            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(2), 3));
         }
 
         public void Update()
