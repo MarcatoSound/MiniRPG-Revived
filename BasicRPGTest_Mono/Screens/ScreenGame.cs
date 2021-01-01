@@ -135,9 +135,8 @@ namespace BasicRPGTest_Mono
         {
             Texture2D sprite;
             sprite = Content.Load<Texture2D>("hollysong");
+            ItemManager.add(new Tool("Hollysong Wide", sprite, new Rectangle(0, 0, 48, 32), 10, swingDist: 1.57f));
             ItemManager.add(new Tool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 10));
-            sprite = Content.Load<Texture2D>("crystal_sword");
-            ItemManager.add(new Tool("Crystal Sword", sprite, new Rectangle(0, 0, 48, 32), 10));
             sprite = Content.Load<Texture2D>("arctic_fox_tail");
             ItemManager.add(new Item("Arctic Fox Tail", sprite));
         }

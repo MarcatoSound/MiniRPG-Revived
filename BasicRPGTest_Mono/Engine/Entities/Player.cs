@@ -42,7 +42,7 @@ namespace BasicRPGTest_Mono.Engine
 
             kbResist = 0.75f;
             mainhand = ItemManager.getByNamespace("hollysong");
-            offhand = ItemManager.getByNamespace("arcticfoxtail");
+            offhand = ItemManager.getByNamespace("hollysongwide");
         }
         public void updateCam()
         {
@@ -69,7 +69,7 @@ namespace BasicRPGTest_Mono.Engine
             if (mainhand == null) return;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 150, this, mainhand);
+            itemSwing = new ItemSwing(direction, 150, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
             attackTimer = new Timer(150);
             attackTimer.Elapsed += (sender, args) =>
             {

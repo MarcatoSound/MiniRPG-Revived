@@ -17,13 +17,20 @@ namespace BasicRPGTest_Mono.Engine.Entities
         public Player player;
         public Item item;
         public Graphic graphic;
+
+        public SwingStyle style;
         public Vector2 swingPos;
+        public float swingDist;
+
+        public int stabOffset;
+        public int stabFrame;
         public float rotation;
         public int rotationFrame;
+
         public Rectangle hitBox;
         public Rectangle itemBox;
 
-        public ItemSwing(Direction direction, int swingTime, Player player, Item item)
+        public ItemSwing(Direction direction, int swingTime, Player player, Item item, SwingStyle style = SwingStyle.Slash, float swingDist = 1.57f)
         {
             this.player = player;
             this.direction = direction;
@@ -33,6 +40,8 @@ namespace BasicRPGTest_Mono.Engine.Entities
             itemBox.X = itemBox.Width / 2;
             itemBox.Y = itemBox.Height / 2;
 
+            this.style = style;
+            this.swingDist = swingDist;
             swingTimer = new Timer(swingTime / 7);
             swingTimer.Elapsed += Update;
             swingTimer.Start();
@@ -40,13 +49,29 @@ namespace BasicRPGTest_Mono.Engine.Entities
 
         public void Update(Object source, ElapsedEventArgs args)
         {
-            if (rotationFrame == 6)
+            if (style == SwingStyle.Slash)
             {
-                Stop();
-                return;
+                if (rotationFrame == 6)
+                {
+                    Stop();
+                    return;
+                }
+                rotationFrame++;
+                rotation += swingDist / 7;
             }
-            rotationFrame++;
-            rotation += 0.25f;
+            if (style == SwingStyle.Stab)
+            {
+                if (stabFrame == 6)
+                {
+                    Stop();
+                    return;
+                }
+                stabFrame++;
+                if (stabFrame <= 2)
+                    stabOffset += 4;
+                else
+                    stabOffset -= 4;
+            }
         }
         public void Draw(SpriteBatch batch, Vector2 position)
         {
@@ -60,49 +85,99 @@ namespace BasicRPGTest_Mono.Engine.Entities
             int modx = 0;
             int mody = 0;
 
-            switch (direction)
+            if (style == SwingStyle.Slash)
             {
-                case Direction.Up:
-                    angle = 0;
-                    swingPos.Y -= 28;
-                    //modx = -(graphic.texture.Width / 4);
-                    mody = 40;
-                    hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
-                    break;
-                case Direction.Left:
-                    angle = -1.58f;
-                    swingPos.X -= 28;
-                    modx = 40;
-                    //mody = graphic.texture.Width / 4;
-                    hitBox = new Rectangle((int)swingPos.X - itemBox.Y - offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
-                    break;
-                case Direction.Down:
-                    angle = -3.15f;
-                    swingPos.Y += 28;
-                    //modx = graphic.texture.Width / 4;
-                    mody = -40;
-                    hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);
-                    break;
-                case Direction.Right:
-                    angle = -4.72f;
-                    swingPos.X += 28;
-                    modx = -40;
-                    //mody = -(graphic.texture.Width / 4);
-                    hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
-                    break;
+                switch (direction)
+                {
+                    case Direction.Up:
+                        angle = -1.57f + swingDist + ((1.57f - swingDist) / 2);
+                        swingPos.Y -= 28;
+                        //modx = -(graphic.texture.Width / 4);
+                        mody = 40;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
+                        break;
+                    case Direction.Left:
+                        angle = -3.14f + swingDist + ((1.57f - swingDist) / 2);
+                        swingPos.X -= 28;
+                        modx = 40;
+                        //mody = graphic.texture.Width / 4;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.Y - offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
+                        break;
+                    case Direction.Down:
+                        angle = -4.71f + swingDist + ((1.57f - swingDist) / 2);
+                        swingPos.Y += 28;
+                        //modx = graphic.texture.Width / 4;
+                        mody = -40;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);
+                        break;
+                    case Direction.Right:
+                        angle = -6.28f + swingDist + ((1.57f - swingDist) / 2);
+                        swingPos.X += 28;
+                        modx = -40;
+                        //mody = -(graphic.texture.Width / 4);
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
+                        break;
+                }
+                batch.Begin();
+                batch.DrawRectangle(hitBox, Color.White);
+                batch.End();
+
+                angle -= rotation;
+
+                graphic.draw(batch, new Vector2(swingPos.X + modx, swingPos.Y + mody), angle, origin);
             }
-            batch.Begin();
-            batch.DrawRectangle(hitBox, Color.White);
-            batch.End();
 
-            angle -= rotation;
+            if (style == SwingStyle.Stab)
+            {
+                switch (direction)
+                {
+                    case Direction.Up:
+                        angle = -0.785f;
+                        swingPos.Y -= 28;
+                        //modx = -(graphic.texture.Width / 4);
+                        mody = 40 - stabOffset;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
+                        break;
+                    case Direction.Left:
+                        angle = -2.36f;
+                        swingPos.X -= 28;
+                        modx = 40 - stabOffset;
+                        //mody = graphic.texture.Width / 4;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.Y - offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
+                        break;
+                    case Direction.Down:
+                        angle = -3.93f;
+                        swingPos.Y += 28;
+                        //modx = graphic.texture.Width / 4;
+                        mody = -40 + stabOffset;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);
+                        break;
+                    case Direction.Right:
+                        angle = -5.5f;
+                        swingPos.X += 28;
+                        modx = -40 + stabOffset;
+                        //mody = -(graphic.texture.Width / 4);
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
+                        break;
+                }
+                batch.Begin();
+                batch.DrawRectangle(hitBox, Color.White);
+                batch.End();
 
-            graphic.draw(batch, new Vector2(swingPos.X + modx, swingPos.Y + mody), angle, origin);
+                graphic.draw(batch, new Vector2(swingPos.X + modx, swingPos.Y + mody), angle, origin);
+            }
         }
         public void Stop()
         {
             swingTimer.Stop();
             player.itemSwing = null;
         }
+    }
+
+
+    public enum SwingStyle
+    {
+        Slash,
+        Stab
     }
 }
