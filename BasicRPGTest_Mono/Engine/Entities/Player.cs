@@ -41,7 +41,7 @@ namespace BasicRPGTest_Mono.Engine
             };
 
             kbResist = 0.75f;
-            mainhand = ItemManager.getByNamespace("crystalsword");
+            mainhand = ItemManager.getByNamespace("hollysong");
             offhand = ItemManager.getByNamespace("arcticfoxtail");
         }
         public void updateCam()
