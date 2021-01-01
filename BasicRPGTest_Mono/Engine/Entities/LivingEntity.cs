@@ -46,10 +46,11 @@ namespace BasicRPGTest_Mono.Engine
 
             EntityManager.add(this);
         }
-        public LivingEntity(LivingEntity entity, Vector2 pos) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
+        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
         {
             this.speed = entity.speed;
             this.position = pos;
+            this.instanceId = instanceId;
 
             tickTimer = new Timer(50);
             tickTimer.Elapsed += tryMove;
@@ -328,7 +329,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public void kill()
         {
-            MapManager.activeMap.entities.Remove(this);
+            MapManager.activeMap.entities.TryRemove(instanceId, out _);
         }
 
     }

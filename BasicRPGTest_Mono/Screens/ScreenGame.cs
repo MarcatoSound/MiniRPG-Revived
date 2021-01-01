@@ -124,7 +124,7 @@ namespace BasicRPGTest_Mono
         public override void Update(GameTime gameTime)
         {
             if (MapManager.activeMap == null) return;
-            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities);
+            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {
                 entity.update();
@@ -154,7 +154,7 @@ namespace BasicRPGTest_Mono
 
             player.draw(_spriteBatch);
 
-            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities);
+            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);

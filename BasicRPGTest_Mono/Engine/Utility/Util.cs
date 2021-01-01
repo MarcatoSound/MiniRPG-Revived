@@ -333,18 +333,18 @@ namespace BasicRPGTest_Mono.Engine.Utility
             return iteration;
 
         }
-        public static Spawn randomizeSpawn(ConcurrentQueue<Spawn> spawns)
+        public static Spawn randomizeSpawn(ConcurrentDictionary<int, Spawn> spawns)
         {
             int totalRatio = 0;
 
-            foreach (Spawn s in spawns)
+            foreach (Spawn s in spawns.Values)
                 totalRatio += s.weight;
 
             Random random = new Random();
             int x = random.Next(0, totalRatio);
 
             int iteration = 0; // so you know what to do next
-            foreach (Spawn s in spawns)
+            foreach (Spawn s in spawns.Values)
             {
                 if ((x -= s.weight) < 0)
                     break;

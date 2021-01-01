@@ -12,6 +12,7 @@ namespace BasicRPGTest_Mono.Engine
     {
         public string name { get; set; }
         public int id { get; set; }
+        public int instanceId { get; set; }
         public Graphic graphic { get; set; }
         public Rectangle boundingBox { get; set; }
         public Vector2 position { get; set; }

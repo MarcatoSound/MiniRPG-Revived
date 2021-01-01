@@ -26,10 +26,10 @@ namespace BasicRPGTest_Mono.Engine
 
         public List<Rectangle> collidables { get; set; }
 
-        public ConcurrentQueue<Entity> entities { get; set; }
-        public ConcurrentQueue<LivingEntity> livingEntities { get; set; }
+        public ConcurrentDictionary<int, Entity> entities { get; set; }
+        public ConcurrentDictionary<int, LivingEntity> livingEntities { get; set; }
 
-        public ConcurrentQueue<Spawn> spawns { get; set; }
+        public ConcurrentDictionary<int, Spawn> spawns { get; set; }
         //public int totalSpawnWeights { get; set; }
         public int livingEntityCap = 50;
         public Timer spawnTimer;
@@ -44,9 +44,9 @@ namespace BasicRPGTest_Mono.Engine
             regions = new Dictionary<Vector2, Region>();
             collidables = new List<Rectangle>();
 
-            this.entities = new ConcurrentQueue<Entity>();
-            this.livingEntities = new ConcurrentQueue<LivingEntity>();
-            this.spawns = new ConcurrentQueue<Spawn>();
+            this.entities = new ConcurrentDictionary<int, Entity>();
+            this.livingEntities = new ConcurrentDictionary<int, LivingEntity>();
+            this.spawns = new ConcurrentDictionary<int, Spawn>();
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
@@ -91,9 +91,9 @@ namespace BasicRPGTest_Mono.Engine
 
         public void initSpawns()
         {
-            spawns.Enqueue(new Spawn(EntityManager.get<LivingEntity>(3), 1));
-            spawns.Enqueue(new Spawn(EntityManager.get<LivingEntity>(1), 2));
-            spawns.Enqueue(new Spawn(EntityManager.get<LivingEntity>(2), 3));
+            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(3), 1));
+            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 2));
+            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 3));
         }
 
         public void Update()
@@ -110,12 +110,15 @@ namespace BasicRPGTest_Mono.Engine
             Spawn spawn = Utility.Util.randomizeSpawn(spawns);
 
             System.Diagnostics.Debug.WriteLine("Successfully spawned entity " + spawn.entity.name);
-            LivingEntity ent = new LivingEntity(spawn.entity, findSpawnLocation());
-            livingEntities.Enqueue(ent);
+
+            Vector2 target = findSpawnLocation(spawn.entity);
+
+            LivingEntity ent = new LivingEntity(spawn.entity, target, livingEntities.Count);
+            livingEntities.TryAdd(livingEntities.Keys.Count, ent);
 
         }
 
-        public Vector2 findSpawnLocation()
+        public Vector2 findSpawnLocation(LivingEntity ent)
         {
             Vector2 pos = new Vector2();
 
@@ -127,7 +130,21 @@ namespace BasicRPGTest_Mono.Engine
             pos.X = x;
             pos.Y = y;
 
+            Rectangle target = new Rectangle(x, y, ent.boundingBox.Width, ent.boundingBox.Height);
+            if (!isLocationSafe(target))
+            {
+                return findSpawnLocation(ent);
+            }
+
             return pos;
+        }
+        public bool isLocationSafe(Rectangle location)
+        {
+            foreach (Rectangle collidable in collidables)
+            {
+                if (location.Intersects(collidable)) return false;
+            }
+            return true;
         }
 
         public void Draw(OrthographicCamera camera, SpriteBatch batch)

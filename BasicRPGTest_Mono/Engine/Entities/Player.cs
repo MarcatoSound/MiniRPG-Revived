@@ -223,8 +223,8 @@ namespace BasicRPGTest_Mono.Engine
         {
             boundingBox = getBox(position);
             ((GraphicAnimated)graphic).update();
-
-            foreach (LivingEntity entity in MapManager.activeMap.livingEntities)
+            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
+            foreach (LivingEntity entity in entities)
             {
                 Vector2 screenPos = getPlayerScreenPosition();
                 if (swordSwing != null && swordSwing.hitBox.Intersects(entity.getScreenBox()) && !entity.isImmunity)
