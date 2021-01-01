@@ -16,6 +16,10 @@ namespace BasicRPGTest_Mono.Engine
         {
             this.texture = texture;
         }
+        public Graphic()
+        {
+
+        }
 
         public virtual void draw(SpriteBatch spriteBatch, Vector2 location, bool newBatch = true)
         {
@@ -27,6 +31,16 @@ namespace BasicRPGTest_Mono.Engine
                 spriteBatch.Begin();
 
             spriteBatch.Draw(texture, location, tintColor);
+
+            if (newBatch)
+                spriteBatch.End();
+        }
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, float rotation, Vector2 origin, bool newBatch = true)
+        {
+            if (newBatch)
+                spriteBatch.Begin();
+
+            spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
 
             if (newBatch)
                 spriteBatch.End();

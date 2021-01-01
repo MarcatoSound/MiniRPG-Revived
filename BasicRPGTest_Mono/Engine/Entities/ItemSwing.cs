@@ -12,11 +12,11 @@ namespace BasicRPGTest_Mono.Engine.Entities
 {
     public static class SwingData
     {
-        public static Dictionary<Direction, GraphicAnimated> swings;
+        public static Dictionary<Direction, Graphic> swings;
 
         static SwingData()
         {
-            swings = new Dictionary<Direction, GraphicAnimated>();
+            swings = new Dictionary<Direction, Graphic>();
         }
     }
     public class ItemSwing
@@ -25,8 +25,10 @@ namespace BasicRPGTest_Mono.Engine.Entities
         public Direction direction;
         public Player player;
         public Tool item;
-        public GraphicAnimated graphic;
+        public Graphic graphic;
         public Vector2 swingPos;
+        public float rotation;
+        public int rotationFrame;
         public Rectangle hitBox;
         public Rectangle itemBox;
 
@@ -35,10 +37,10 @@ namespace BasicRPGTest_Mono.Engine.Entities
             this.player = player;
             this.direction = direction;
             this.item = tool;
-            GraphicAnimated newGraphic;
+            Graphic newGraphic;
             SwingData.swings.TryGetValue(direction, out newGraphic);
             if (newGraphic == null) return;
-            graphic = new GraphicAnimated(newGraphic);
+            graphic = newGraphic;
             itemBox = tool.hitbox;
             itemBox.X = itemBox.Width / 2;
             itemBox.Y = itemBox.Height / 2;
@@ -51,12 +53,12 @@ namespace BasicRPGTest_Mono.Engine.Entities
         {
             this.player = player;
             this.direction = direction;
-            GraphicAnimated newGraphic;
+            Graphic newGraphic;
             SwingData.swings.TryGetValue(direction, out newGraphic);
             if (newGraphic == null) return;
-            graphic = new GraphicAnimated(newGraphic);
+            graphic = newGraphic;
 
-            itemBox = new Rectangle(0, 0, 32, 128);
+            itemBox = new Rectangle(0, 0, 48, 32);
             itemBox.X = itemBox.Width / 2;
             itemBox.Y = itemBox.Height / 2;
 
@@ -67,12 +69,13 @@ namespace BasicRPGTest_Mono.Engine.Entities
 
         public void Update(Object source, ElapsedEventArgs args)
         {
-            if (graphic.currentFrame == 6)
+            if (rotationFrame == 6)
             {
                 Stop();
                 return;
             }
-            graphic.update();
+            rotationFrame++;
+            rotation += 0.25f;
         }
         public void Draw(SpriteBatch batch, Vector2 position)
         {
@@ -80,24 +83,39 @@ namespace BasicRPGTest_Mono.Engine.Entities
 
             int offset = itemBox.Height - itemBox.Y - 16;
             if (offset < 0) offset = 0;
-            //if () offset = itemBox.Height - itemBox.Height;
+
+            float angle = 0;
+            Vector2 origin = new Vector2(graphic.texture.Width/4, graphic.texture.Height + 16);
+            int modx = 0;
+            int mody = 0;
+            System.Diagnostics.Debug.WriteLine("Origin: " + origin);
 
             switch (direction)
             {
                 case Direction.Up:
+                    angle = 0;
                     swingPos.Y -= 28;
+                    modx = 8;
+                    mody = 40;
                     hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
                     break;
                 case Direction.Left:
+                    angle = -1.58f;
                     swingPos.X -= 28;
+                    modx = 40;
                     hitBox = new Rectangle((int)swingPos.X - itemBox.Y - offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                     break;
                 case Direction.Down:
+                    angle = -3.15f;
                     swingPos.Y += 28;
+                    modx = -8;
+                    mody = -40;
                     hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);
                     break;
                 case Direction.Right:
+                    angle = -4.72f;
                     swingPos.X += 28;
+                    modx = -40;
                     hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                     break;
             }
@@ -105,8 +123,9 @@ namespace BasicRPGTest_Mono.Engine.Entities
             batch.DrawRectangle(hitBox, Color.White);
             batch.End();
 
+            angle -= rotation;
 
-            graphic.draw(batch, swingPos, Color.White);
+            graphic.draw(batch, new Vector2(swingPos.X + modx, swingPos.Y + mody), angle, origin);
         }
         public void Stop()
         {
