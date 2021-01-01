@@ -35,7 +35,7 @@ namespace BasicRPGTest_Mono.Engine
             this.position = position;
             boundingBox = getBox(position);
 
-            EntityManager.add(this);
+            //EntityManager.add(this);
         }
         public LivingEntity(string name, Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
         {
@@ -44,7 +44,7 @@ namespace BasicRPGTest_Mono.Engine
             this.speed = speed;
             this.position = position;
 
-            EntityManager.add(this);
+            //EntityManager.add(this);
         }
         public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
         {

@@ -43,23 +43,28 @@ namespace BasicRPGTest_Mono
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Core.graphics = _graphics.GraphicsDevice;
 
-            // TODO: use this.Content to load your game content here
             font = Content.Load<SpriteFont>("arial");
+
 
 
             // Load the general game objects
             loadTiles();
             loadEntities();
 
-
             loadMap();
 
-            //_tiledMapRenderer = new TiledMapRenderer(GraphicsDevice, MapManager.activeMap.tiledMap);
 
             Texture2D texture;
 
             texture = Content.Load<Texture2D>("test_sprite_atlas");
             player = new Player(texture, _graphics);
+
+            loadPlayer();
+
+
+            // Saving functionality
+            Save.save(MapManager.activeMap, worldName);
+            Save.save(player, worldName);
 
 
             base.LoadContent();
@@ -68,6 +73,7 @@ namespace BasicRPGTest_Mono
         public override void UnloadContent()
         {
             Save.save(MapManager.activeMap, worldName);
+            Save.save(player, worldName);
             Camera.reset();
 
             worldName = "";
@@ -80,14 +86,16 @@ namespace BasicRPGTest_Mono
 
         private void loadMap()
         {
-            // TODO Replace the loading functionality.
             string path = $"save\\{worldName}";
 
             int size = 128;
 
             if (Directory.Exists(path))
             {
+                // Load map data
                 MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
+
+
                 return;
             }
 
@@ -95,10 +103,21 @@ namespace BasicRPGTest_Mono
             // Generate the actual map contents
             MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
 
-            // Saving world functionality
-            Save.save(MapManager.activeMap, worldName);
+        }
+        private void loadPlayer()
+        {
 
+            string path = $"save\\{worldName}";
 
+            if (Directory.Exists(path))
+            {
+                // Load player data
+                Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
+                player.position = (Vector2)playerData["position"];
+                player.updateCam();
+
+                return;
+            }
         }
 
         private void loadTiles()
@@ -118,6 +137,11 @@ namespace BasicRPGTest_Mono
             EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26), _graphics));
             texture = Content.Load<Texture2D>("enemy3");
             EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26), _graphics));
+
+            foreach (LivingEntity entity in EntityManager.livingEntities)
+            {
+                System.Diagnostics.Debug.WriteLine("Entity: " + entity.name);
+            }
         }
 
 

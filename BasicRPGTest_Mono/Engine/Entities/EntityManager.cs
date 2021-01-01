@@ -7,7 +7,7 @@ namespace BasicRPGTest_Mono.Engine
     public static class EntityManager
     {
         public static List<Entity> entities;
-        public static List<LivingEntity> livingEntities;
+        public static List<LivingEntity> livingEntities { get; set; }
         // TODO Eventually add lists for monsters, animals, and NPCs
 
         static EntityManager()
@@ -53,6 +53,12 @@ namespace BasicRPGTest_Mono.Engine
             if (typeof(T) == typeof(LivingEntity)) return livingEntities as List<T>;
 
             return default(List<T>);
+        }
+
+        public static void clear()
+        {
+            entities.Clear();
+            livingEntities.Clear();
         }
     }
 }

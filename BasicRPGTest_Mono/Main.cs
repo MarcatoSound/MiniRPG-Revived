@@ -190,14 +190,6 @@ namespace BasicRPGTest_Mono
             Core.globalTime = gameTime;
         }
 
-        /*protected override void Draw(GameTime gameTime)
-        {
-            SpriteBatch batch = new SpriteBatch(_graphics.GraphicsDevice);
-            batch.Begin(SpriteSortMode.BackToFront);
-            batch.Draw(cursorTexture, new Vector2(Mouse.GetState().X, Mouse.GetState().Y), null, Color.White, 0f, new Vector2(), 0f, SpriteEffects.None, 1f);
-            batch.End();
-            base.Draw(gameTime);
-        }*/
 
         public void mainMenu()
         {

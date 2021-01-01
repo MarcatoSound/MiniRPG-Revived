@@ -37,7 +37,7 @@ namespace BasicRPGTest_Mono.Engine
             graphicsManager = graphicsDevice;
 
 
-            EntityManager.add(this);
+            //EntityManager.add(this);
         }
 
 

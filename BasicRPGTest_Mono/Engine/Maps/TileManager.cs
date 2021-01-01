@@ -31,5 +31,10 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             return tiles;
         }
+
+        public static void Clear()
+        {
+            tiles.Clear();
+        }
     }
 }

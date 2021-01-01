@@ -39,6 +39,17 @@ namespace BasicRPGTest_Mono.Engine
 
             kbResist = 0.75f;
         }
+        public void updateCam()
+        {
+            Vector2 camPos = new Vector2(position.X - (Camera.camera.BoundingRectangle.Width / 2), position.Y - (Camera.camera.BoundingRectangle.Height / 2));
+
+            if (camPos.X < 0) camPos.X = 0;
+            if (camPos.X > MapManager.activeMap.widthInPixels) camPos.X = MapManager.activeMap.widthInPixels;
+            if (camPos.Y < 0) camPos.Y = 0;
+            if (camPos.Y > MapManager.activeMap.heightInPixels) camPos.Y = MapManager.activeMap.heightInPixels;
+
+            Camera.camPos = camPos;
+        }
         public void attack(Direction direction)
         {
             if (isAttacking) return;
@@ -349,10 +360,10 @@ namespace BasicRPGTest_Mono.Engine
 
             int maxKbTime = 200;
             double zOut = Math.Pow(z, -1) * 10 + 0.3;
-            System.Diagnostics.Debug.WriteLine("zOut: " + zOut);
+            //System.Diagnostics.Debug.WriteLine("zOut: " + zOut);
             int kbTime = Convert.ToInt32(Math.Min(Math.Max(1000 * zOut - 400, 25), maxKbTime));
             kbTime = Convert.ToInt32(kbTime - (kbTime * kbResist));
-            System.Diagnostics.Debug.WriteLine("KB Time: " + kbTime);
+            //System.Diagnostics.Debug.WriteLine("KB Time: " + kbTime);
             knockbackTimer = new Timer(kbTime);
             knockbackTimer.Elapsed += (sender, args) =>
             {
