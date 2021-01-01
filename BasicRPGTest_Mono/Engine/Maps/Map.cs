@@ -6,6 +6,7 @@ using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
 using RPGEngine;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
@@ -25,10 +26,10 @@ namespace BasicRPGTest_Mono.Engine
 
         public List<Rectangle> collidables { get; set; }
 
-        public List<Entity> entities { get; set; }
-        public List<LivingEntity> livingEntities { get; set; }
+        public ConcurrentQueue<Entity> entities { get; set; }
+        public ConcurrentQueue<LivingEntity> livingEntities { get; set; }
 
-        public List<Spawn> spawns { get; set; }
+        public ConcurrentQueue<Spawn> spawns { get; set; }
         //public int totalSpawnWeights { get; set; }
         public int livingEntityCap = 50;
         public Timer spawnTimer;
@@ -43,9 +44,9 @@ namespace BasicRPGTest_Mono.Engine
             regions = new Dictionary<Vector2, Region>();
             collidables = new List<Rectangle>();
 
-            this.entities = new List<Entity>();
-            this.livingEntities = new List<LivingEntity>();
-            this.spawns = new List<Spawn>();
+            this.entities = new ConcurrentQueue<Entity>();
+            this.livingEntities = new ConcurrentQueue<LivingEntity>();
+            this.spawns = new ConcurrentQueue<Spawn>();
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
@@ -90,9 +91,9 @@ namespace BasicRPGTest_Mono.Engine
 
         public void initSpawns()
         {
-            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(3), 1));
-            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(1), 2));
-            spawns.Add(new Spawn(EntityManager.get<LivingEntity>(2), 3));
+            spawns.Enqueue(new Spawn(EntityManager.get<LivingEntity>(3), 1));
+            spawns.Enqueue(new Spawn(EntityManager.get<LivingEntity>(1), 2));
+            spawns.Enqueue(new Spawn(EntityManager.get<LivingEntity>(2), 3));
         }
 
         public void Update()
@@ -104,13 +105,13 @@ namespace BasicRPGTest_Mono.Engine
             if (livingEntities.Count >= livingEntityCap) return;
             Random rand = new Random();
 
-            //if (rand.Next(0, 100) >= 25) return;
+            if (rand.Next(0, 100) >= 25) return;
 
             Spawn spawn = Utility.Util.randomizeSpawn(spawns);
 
             System.Diagnostics.Debug.WriteLine("Successfully spawned entity " + spawn.entity.name);
             LivingEntity ent = new LivingEntity(spawn.entity, findSpawnLocation());
-            livingEntities.Add(ent);
+            livingEntities.Enqueue(ent);
 
         }
 

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
@@ -332,7 +333,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
             return iteration;
 
         }
-        public static Spawn randomizeSpawn(List<Spawn> spawns)
+        public static Spawn randomizeSpawn(ConcurrentQueue<Spawn> spawns)
         {
             int totalRatio = 0;
 
