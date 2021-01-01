@@ -94,6 +94,8 @@ namespace BasicRPGTest_Mono
                     if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
                     if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
 
+                    if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHands();
+
                     return;
                 }
 

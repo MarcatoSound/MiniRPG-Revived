@@ -56,7 +56,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
             if (offset < 0) offset = 0;
 
             float angle = 0;
-            Vector2 origin = new Vector2(graphic.texture.Width/4, graphic.texture.Height + (graphic.texture.Height / 4));
+            Vector2 origin = new Vector2(-(graphic.texture.Width / 3), graphic.texture.Height + (graphic.texture.Height / 3));
             int modx = 0;
             int mody = 0;
 
@@ -65,29 +65,29 @@ namespace BasicRPGTest_Mono.Engine.Entities
                 case Direction.Up:
                     angle = 0;
                     swingPos.Y -= 28;
-                    modx = 4;
-                    mody = 36;
+                    //modx = -(graphic.texture.Width / 4);
+                    mody = graphic.texture.Height + (graphic.texture.Height / 4);
                     hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
                     break;
                 case Direction.Left:
                     angle = -1.58f;
                     swingPos.X -= 28;
-                    modx = 36;
-                    mody = -4;
+                    modx = graphic.texture.Height + (graphic.texture.Height / 4);
+                    //mody = graphic.texture.Width / 4;
                     hitBox = new Rectangle((int)swingPos.X - itemBox.Y - offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                     break;
                 case Direction.Down:
                     angle = -3.15f;
                     swingPos.Y += 28;
-                    modx = -4;
-                    mody = -36;
+                    //modx = graphic.texture.Width / 4;
+                    mody = -(graphic.texture.Height + (graphic.texture.Height / 4));
                     hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);
                     break;
                 case Direction.Right:
                     angle = -4.72f;
                     swingPos.X += 28;
-                    modx = -36;
-                    mody = 4;
+                    modx = -(graphic.texture.Height + (graphic.texture.Height / 4));
+                    //mody = -(graphic.texture.Width / 4);
                     hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                     break;
             }

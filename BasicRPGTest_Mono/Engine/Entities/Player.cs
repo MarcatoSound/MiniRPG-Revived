@@ -24,6 +24,7 @@ namespace BasicRPGTest_Mono.Engine
         public bool isAttacking;
         public Timer attackTimer;
         public Item mainhand;
+        public Item offhand;
         public Player(Texture2D texture, GraphicsDeviceManager graphics) : base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
         {
             graphicsManager = graphics;
@@ -41,6 +42,7 @@ namespace BasicRPGTest_Mono.Engine
 
             kbResist = 0.75f;
             mainhand = ItemManager.getByNamespace("crystalsword");
+            offhand = ItemManager.getByNamespace("arcticfoxtail");
         }
         public void updateCam()
         {
@@ -52,6 +54,14 @@ namespace BasicRPGTest_Mono.Engine
             if (camPos.Y > MapManager.activeMap.heightInPixels) camPos.Y = MapManager.activeMap.heightInPixels;
 
             Camera.camPos = camPos;
+        }
+        public void swapHands()
+        {
+            Item oldMH = mainhand;
+            Item oldOH = offhand;
+
+            mainhand = oldOH;
+            offhand = oldMH;
         }
         public void attack(Direction direction)
         {
