@@ -50,7 +50,7 @@ namespace BasicRPGTest_Mono.Engine
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
-            //spawnTimer.Start();
+            spawnTimer.Start();
 
             for (int x = 0; x < width / 8; x++)
             {
@@ -91,9 +91,9 @@ namespace BasicRPGTest_Mono.Engine
 
         public void initSpawns()
         {
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 2));
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 3));
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(3), 1));
+            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(0), 2));
+            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 3));
+            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 1));
         }
 
         public void Update()
