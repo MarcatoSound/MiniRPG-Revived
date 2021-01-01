@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BasicRPGTest_Mono.Engine.Utility
 {
@@ -369,6 +370,13 @@ namespace BasicRPGTest_Mono.Engine.Utility
             cropTexture.SetData(data);
 
             return cropTexture;
+        }
+
+        public static string cleanString(string str)
+        {
+            str = Regex.Replace(str, "[!@#$%^&*();:'\",.<>/?[\\]{}\\-+_=|\\s]", "");
+
+            return str;
         }
     }
 }

@@ -109,7 +109,7 @@ namespace BasicRPGTest_Mono.Engine
 
             Spawn spawn = Utility.Util.randomizeSpawn(spawns);
 
-            System.Diagnostics.Debug.WriteLine("Successfully spawned entity " + spawn.entity.name);
+            //System.Diagnostics.Debug.WriteLine("Successfully spawned entity " + spawn.entity.name);
 
             Vector2 target = findSpawnLocation(spawn.entity);
 
@@ -142,6 +142,7 @@ namespace BasicRPGTest_Mono.Engine
         {
             foreach (Rectangle collidable in collidables)
             {
+                collidable.Inflate(5, 5);
                 if (location.Intersects(collidable)) return false;
             }
             return true;
