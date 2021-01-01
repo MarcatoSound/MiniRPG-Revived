@@ -17,7 +17,8 @@ namespace BasicRPGTest_Mono.Engine
         public string name { get; set; }
         [Obsolete("The TiledMap object is being abandoned. Replace references with appropriate replacements in the Map object.")]
         public TiledMap tiledMap { get; set; }
-        public Dictionary<Vector3, Tile> tiles { get; set; }
+        public List<TileLayer> layers { get; set; }
+        public Dictionary<Vector2, Region> regions { get; set; }
         // TODO implement regions so we loop through regions for rendering instead of all tiles.
         public int width { get; set; }
         public int height { get; set; }
@@ -58,14 +59,15 @@ namespace BasicRPGTest_Mono.Engine
             }
 
         }
-        public Map(string name, int size, Dictionary<Vector3, Tile> tiles)
+        public Map(string name, int size, List<TileLayer> layers) 
         {
             this.name = name;
-            this.tiles = tiles;
+            this.layers = layers;
             this.width = size;
             this.height = size;
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
+            regions = new Dictionary<Vector2, Region>();
             collidables = new List<Rectangle>();
 
             this.entities = new List<Entity>();
@@ -76,19 +78,40 @@ namespace BasicRPGTest_Mono.Engine
             spawnTimer.Elapsed += trySpawn;
             //spawnTimer.Start();
 
-            foreach (KeyValuePair<Vector3, Tile> pair in tiles)
+            for (int x = 0; x < width / 16; x++)
             {
-                Vector3 pos = pair.Key;
-                if (pos.Z != 1) continue;
-                Tile tile = pair.Value;
-
-                collidables.Add(new Rectangle(Convert.ToInt32(pos.X*32), Convert.ToInt32(pos.Y*32), 32, 32));
+                for (int y = 0; y < height / 16; y++)
+                {
+                    //System.Diagnostics.Debug.WriteLine($"Loaded Region: {x}, {y}");
+                    Region region = new Region(new Vector2(x * (TileManager.dimensions * 16), y * (TileManager.dimensions * 16)));
+                    regions.Add(new Vector2(x, y), region);
+                    //System.Diagnostics.Debug.WriteLine("Loaded region: " + region.box);
+                }
             }
 
-            System.Diagnostics.Debug.WriteLine("Width: " + width);
-            System.Diagnostics.Debug.WriteLine("Height: " + height);
-            System.Diagnostics.Debug.WriteLine("PixelWidth: " + widthInPixels);
-            System.Diagnostics.Debug.WriteLine("PixelHeight: " + heightInPixels);
+            foreach (TileLayer layer in layers)
+            {
+                Dictionary<Vector2, Tile> tiles = layer.tiles;
+                foreach (KeyValuePair<Vector2, Tile> pair in tiles)
+                {
+                    Vector2 pos = pair.Key;
+                    Tile tile = pair.Value;
+
+                    foreach (Region region in regions.Values)
+                    {
+                        if (!region.box.Intersects(tile.box)) continue;
+                        region.addTile(tile);
+                    }
+
+                    if (!tile.isCollidable) continue;
+
+                    // Create a collidable at the following true-map coordinate.
+                    //   pos.X and pos.Y refer to the TILE position, and are multiplied by the tile size to get their true position
+                    collidables.Add(new Rectangle(Convert.ToInt32(pos.X * TileManager.dimensions), Convert.ToInt32(pos.Y * TileManager.dimensions), TileManager.dimensions, TileManager.dimensions));
+                }
+            }
+
+
         }
 
         public void initSpawns()
@@ -135,13 +158,12 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Draw(OrthographicCamera camera, SpriteBatch batch)
         {
-            foreach (KeyValuePair<Vector3, Tile> pair in tiles)
+            foreach (Region region in regions.Values)
             {
-                Tile tile = pair.Value;
-                if (!camera.BoundingRectangle.Intersects(tile.box)) continue;
+                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
                 var transformMatrix = camera.GetViewMatrix();
                 batch.Begin(transformMatrix: transformMatrix);
-                tile.draw(batch);
+                region.draw(batch);
                 batch.End();
             }
         }

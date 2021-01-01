@@ -73,7 +73,7 @@ namespace BasicRPGTest_Mono
         }
         public override void UnloadContent()
         {
-            Save.save(MapManager.activeMap, worldName);
+            //Save.save(MapManager.activeMap, worldName);
             Camera.reset();
 
             worldName = "";
@@ -103,11 +103,11 @@ namespace BasicRPGTest_Mono
 
             int size = 128;
 
-            if (Directory.Exists(path))
+            /*if (Directory.Exists(path))
             {
                 MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
                 return;
-            }
+            }*/
 
 
             // Generate the actual map contents
@@ -115,7 +115,7 @@ namespace BasicRPGTest_Mono
             //MapManager.activeMap.tiledMap.AddTileset(masterTileset, 0);
 
             // Saving world functionality
-            Save.save(MapManager.activeMap, worldName);
+            //Save.save(MapManager.activeMap, worldName);
 
 
         }
@@ -148,19 +148,6 @@ namespace BasicRPGTest_Mono
             {
                 entity.update();
             }
-
-            /*if (Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                // Logic for converting camera position and player position to player TILE position
-                Vector2 playerMapPos = player.getPlayerTilePositionPrecise();
-                System.Diagnostics.Debug.WriteLine("Player tile position: " + playerMapPos);
-                System.Diagnostics.Debug.WriteLine("Player map position: " + player.position);
-            }*/
-
-            /*if (kstate.IsKeyDown(Keys.Up) || kstate.IsKeyDown(Keys.Down) || kstate.IsKeyDown(Keys.Left) || kstate.IsKeyDown(Keys.Right))
-                player.move(gameTime);*/
-
-
 
             player.update();
             Camera.camera.Position = Camera.camPos;

@@ -11,9 +11,9 @@ namespace BasicRPGTest_Mono.Engine
     public static class Generator
     {
 
-        public static Dictionary<Vector3, Tile> generateOverworldTiles(int size)
+        public static List<TileLayer> generateOverworldTiles(int size)
         {
-            Dictionary<Vector3, Tile> tiles = new Dictionary<Vector3, Tile>();
+            List<TileLayer> layers = new List<TileLayer>();
 
             Random rand = new Random();
             int id;
@@ -24,32 +24,36 @@ namespace BasicRPGTest_Mono.Engine
             groundTileChances.Add(5);
             groundTileChances.Add(3);
 
-            for (int z = 0; z < 2; z++)
+            TileLayer groundLayer = new TileLayer();
+            for (int x = 0; x < size; x++)
             {
-                for (int x = 0; x < size; x++)
+                for (int y = 0; y < size; y++)
                 {
-                    for (int y = 0; y < size; y++)
-                    {
-                        switch (z)
-                        {
-                            case 0:
-                                
-                                id = Utility.Util.weightedRandom(groundTileChances)-1;
 
-                                tiles.Add(new Vector3(x, y, z), new Tile(TileManager.get(id), new Vector2(x*32, y*32)));
-                                break;
-                            case 1:
-                                if (rand.Next(0, 100) > 5) continue;
-                                id = 4;
+                    id = Utility.Util.weightedRandom(groundTileChances) - 1;
 
-                                tiles.Add(new Vector3(x, y, z), new Tile(TileManager.get(id), new Vector2(x*32, y*32)));
-                                break;
-                        }
-                    }
+                    groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(id), new Vector2(x, y)));
+
                 }
             }
+            layers.Add(groundLayer);
 
-            return tiles;
+            TileLayer treeLayer = new TileLayer();
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+
+                    if (rand.Next(0, 100) > 5) continue;
+                    id = 4;
+
+                    treeLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(id), new Vector2(x, y)));
+
+                }
+            }
+            layers.Add(treeLayer);
+
+            return layers;
         }
         public static TiledMap generateOverworld(int size)
         {

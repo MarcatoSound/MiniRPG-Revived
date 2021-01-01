@@ -6,6 +6,7 @@ using MonoGame.Extended.Tiled;
 using Newtonsoft.Json.Linq;
 using Microsoft.Xna.Framework;
 using RPGEngine;
+using BasicRPGTest_Mono.Engine.Maps;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -39,33 +40,35 @@ namespace BasicRPGTest_Mono.Engine
             json.Add("width", width);
 
             JArray layers = new JArray();
-            JArray layerTiles = new JArray();
+            JObject jsonLayer;
+            JArray layerTiles;
 
             JObject tileData;
-            //foreach (MapLayer layer in map.layers)
-            //{
-            foreach (KeyValuePair<Vector3, Tile> pair in map.tiles)
+            foreach (TileLayer layer in map.layers)
             {
-                Vector3 pos = pair.Key;
-                Tile tile = pair.Value;
+                jsonLayer = new JObject();
+                layerTiles = new JArray();
+                foreach (Region region in map.regions.Values)
+                {
+                    foreach (Tile tile in region.tiles)
+                    {
 
-                tileData = new JObject();
+                        tileData = new JObject();
 
-                // Save the tile data and add it to the layer json
-                JToken tileId = new JValue(tile.id);
-                JToken tileX = new JValue(pos.X);
-                JToken tileY = new JValue(pos.Y);
-                JToken tileZ = new JValue(pos.Z);
+                        // Save the tile data and add it to the layer json
+                        JToken tileId = new JValue(tile.id);
+                        JToken tileX = new JValue(tile.tilePos.X);
+                        JToken tileY = new JValue(tile.tilePos.Y);
 
-                tileData.Add("id", tileId);
-                tileData.Add("x", tileX);
-                tileData.Add("y", tileY);
-                tileData.Add("z", tileZ);
+                        tileData.Add("id", tileId);
+                        tileData.Add("x", tileX);
+                        tileData.Add("y", tileY);
 
-                layerTiles.Add(tileData);
+                        layerTiles.Add(tileData);
+                    }
+                }
+                layers.Add(layerTiles);
             }
-            //}
-            layers.Add(layerTiles);
 
             json.Add("layers", layers);
 
