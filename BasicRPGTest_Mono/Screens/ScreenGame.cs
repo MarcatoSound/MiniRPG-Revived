@@ -63,10 +63,10 @@ namespace BasicRPGTest_Mono
 
 
             texture = Content.Load<Texture2D>("sword_swing_north");
-            SwingData.swings.Add(Direction.Up, new Graphic(Util.getSpriteFromSet(texture, 0, 0, 64)));
-            SwingData.swings.Add(Direction.Left, new Graphic(Util.getSpriteFromSet(texture, 0, 0, 64)));
-            SwingData.swings.Add(Direction.Down, new Graphic(Util.getSpriteFromSet(texture, 0, 0, 64)));
-            SwingData.swings.Add(Direction.Right, new Graphic(Util.getSpriteFromSet(texture, 0, 0, 64)));
+            SwingData.swings.Add(Direction.Up, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+            SwingData.swings.Add(Direction.Left, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+            SwingData.swings.Add(Direction.Down, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+            SwingData.swings.Add(Direction.Right, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
 
 
             // Saving functionality

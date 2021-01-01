@@ -35,12 +35,12 @@ namespace BasicRPGTest_Mono.Engine
             if (newBatch)
                 spriteBatch.End();
         }
-        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, float rotation, Vector2 origin, bool newBatch = true)
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, float rotation, Vector2 origin, float scale = 1, bool newBatch = true)
         {
             if (newBatch)
                 spriteBatch.Begin();
 
-            spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, scale, SpriteEffects.None, 0f);
 
             if (newBatch)
                 spriteBatch.End();
