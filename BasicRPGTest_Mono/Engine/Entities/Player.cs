@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -19,9 +20,10 @@ namespace BasicRPGTest_Mono.Engine
         public bool isDashing;
         public Timer dashTimer;
 
-        public ItemSwing swordSwing;
+        public ItemSwing itemSwing;
         public bool isAttacking;
         public Timer attackTimer;
+        public Item mainhand;
         public Player(Texture2D texture, GraphicsDeviceManager graphics) : base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
         {
             graphicsManager = graphics;
@@ -38,6 +40,7 @@ namespace BasicRPGTest_Mono.Engine
             };
 
             kbResist = 0.75f;
+            mainhand = ItemManager.getByNamespace("crystalsword");
         }
         public void updateCam()
         {
@@ -53,9 +56,10 @@ namespace BasicRPGTest_Mono.Engine
         public void attack(Direction direction)
         {
             if (isAttacking) return;
+            if (mainhand == null) return;
 
             isAttacking = true;
-            swordSwing = new ItemSwing(direction, 150, this);
+            itemSwing = new ItemSwing(direction, 150, this, mainhand);
             attackTimer = new Timer(150);
             attackTimer.Elapsed += (sender, args) =>
             {
@@ -238,7 +242,7 @@ namespace BasicRPGTest_Mono.Engine
             foreach (LivingEntity entity in entities)
             {
                 Vector2 screenPos = getPlayerScreenPosition();
-                if (swordSwing != null && swordSwing.hitBox.Intersects(entity.getScreenBox()) && !entity.isImmunity)
+                if (itemSwing != null && itemSwing.hitBox.Intersects(entity.getScreenBox()) && !entity.isImmunity)
                     entity.hurt(screenPos);
 
                 if (getBox(screenPos).Intersects(entity.getScreenBox()) && !entity.isImmunity)
@@ -392,9 +396,9 @@ namespace BasicRPGTest_Mono.Engine
             batch.DrawRectangle(getScreenBox(), Color.White);
             batch.End();
 
-            if (swordSwing != null)
+            if (itemSwing != null)
             {
-                swordSwing.Draw(batch, getPlayerScreenPosition());
+                itemSwing.Draw(batch, getPlayerScreenPosition());
             }
         }
 

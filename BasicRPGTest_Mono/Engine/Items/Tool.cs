@@ -12,6 +12,7 @@ namespace BasicRPGTest_Mono.Engine.Items
         public Tool(string displayName, Texture2D texture, Rectangle hitbox, double damage) : base(displayName, texture)
         {
             if (hitbox == null) this.hitbox = new Rectangle(0, 0, 24, 24);
+            else this.hitbox = hitbox;
 
             this.damage = damage;
             damageTypes = new Dictionary<DamageType, double>();

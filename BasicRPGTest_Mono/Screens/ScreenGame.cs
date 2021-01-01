@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
@@ -49,6 +50,7 @@ namespace BasicRPGTest_Mono
 
             // Load the general game objects
             loadTiles();
+            loadItems();
             loadEntities();
 
             loadMap();
@@ -60,13 +62,6 @@ namespace BasicRPGTest_Mono
             player = new Player(texture, _graphics);
 
             loadPlayer();
-
-
-            texture = Content.Load<Texture2D>("sword_swing_north");
-            SwingData.swings.Add(Direction.Up, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
-            SwingData.swings.Add(Direction.Left, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
-            SwingData.swings.Add(Direction.Down, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
-            SwingData.swings.Add(Direction.Right, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
 
 
             // Saving functionality
@@ -135,6 +130,14 @@ namespace BasicRPGTest_Mono
             TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false));
             TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false));
             TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false));
+        }
+        private void loadItems()
+        {
+            Texture2D sprite;
+            sprite = Content.Load<Texture2D>("crystal_sword");
+            ItemManager.add(new Tool("Crystal Sword", sprite, new Rectangle(0, 0, 48, 32), 10));
+            sprite = Content.Load<Texture2D>("arctic_fox_tail");
+            ItemManager.add(new Item("Arctic Fox Tail", sprite));
         }
         private void loadEntities()
         {

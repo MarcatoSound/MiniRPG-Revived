@@ -10,21 +10,12 @@ using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine.Entities
 {
-    public static class SwingData
-    {
-        public static Dictionary<Direction, Graphic> swings;
-
-        static SwingData()
-        {
-            swings = new Dictionary<Direction, Graphic>();
-        }
-    }
     public class ItemSwing
     {
         public Timer swingTimer;
         public Direction direction;
         public Player player;
-        public Tool item;
+        public Item item;
         public Graphic graphic;
         public Vector2 swingPos;
         public float rotation;
@@ -32,37 +23,17 @@ namespace BasicRPGTest_Mono.Engine.Entities
         public Rectangle hitBox;
         public Rectangle itemBox;
 
-        public ItemSwing(Direction direction, int swingTime, Player player, Tool tool)
+        public ItemSwing(Direction direction, int swingTime, Player player, Item item)
         {
             this.player = player;
             this.direction = direction;
-            this.item = tool;
-            Graphic newGraphic;
-            SwingData.swings.TryGetValue(direction, out newGraphic);
-            if (newGraphic == null) return;
-            graphic = newGraphic;
-            itemBox = tool.hitbox;
+            this.item = item;
+            graphic = item.graphic;
+            itemBox = item.hitbox;
             itemBox.X = itemBox.Width / 2;
             itemBox.Y = itemBox.Height / 2;
 
             swingTimer = new Timer(swingTime / 7);
-            swingTimer.Elapsed += Update;
-            swingTimer.Start();
-        }
-        public ItemSwing(Direction direction, int swingTime, Player player)
-        {
-            this.player = player;
-            this.direction = direction;
-            Graphic newGraphic;
-            SwingData.swings.TryGetValue(direction, out newGraphic);
-            if (newGraphic == null) return;
-            graphic = newGraphic;
-
-            itemBox = new Rectangle(0, 0, 48, 32);
-            itemBox.X = itemBox.Width / 2;
-            itemBox.Y = itemBox.Height / 2;
-
-            swingTimer = new Timer(swingTime/7);
             swingTimer.Elapsed += Update;
             swingTimer.Start();
         }
@@ -131,7 +102,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
         public void Stop()
         {
             swingTimer.Stop();
-            player.swordSwing = null;
+            player.itemSwing = null;
         }
     }
 }
