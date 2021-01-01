@@ -19,7 +19,7 @@ namespace BasicRPGTest_Mono.Engine
         public bool isDashing;
         public Timer dashTimer;
 
-        public SwordSwing swordSwing;
+        public ItemSwing swordSwing;
         public bool isAttacking;
         public Timer attackTimer;
         public Player(Texture2D texture, GraphicsDeviceManager graphics) : base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
@@ -55,7 +55,7 @@ namespace BasicRPGTest_Mono.Engine
             if (isAttacking) return;
 
             isAttacking = true;
-            swordSwing = new SwordSwing(direction, 150, this);
+            swordSwing = new ItemSwing(direction, 150, this);
             attackTimer = new Timer(150);
             attackTimer.Elapsed += (sender, args) =>
             {
