@@ -42,7 +42,7 @@ namespace BasicRPGTest_Mono.Engine
 
             kbResist = 0.75f;
             mainhand = ItemManager.getByNamespace("hollysong");
-            offhand = ItemManager.getByNamespace("hollysongwide");
+            offhand = ItemManager.getByNamespace("arcticfoxtail");
         }
         public void updateCam()
         {
