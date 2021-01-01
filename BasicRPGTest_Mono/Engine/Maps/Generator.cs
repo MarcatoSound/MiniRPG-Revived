@@ -24,7 +24,7 @@ namespace BasicRPGTest_Mono.Engine
             groundTileChances.Add(5);
             groundTileChances.Add(3);
 
-            TileLayer groundLayer = new TileLayer();
+            TileLayer groundLayer = new TileLayer("ground");
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
@@ -38,7 +38,7 @@ namespace BasicRPGTest_Mono.Engine
             }
             layers.Add(groundLayer);
 
-            TileLayer treeLayer = new TileLayer();
+            TileLayer treeLayer = new TileLayer("trees");
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)

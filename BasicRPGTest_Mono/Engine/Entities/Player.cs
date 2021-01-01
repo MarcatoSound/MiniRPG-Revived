@@ -368,7 +368,7 @@ namespace BasicRPGTest_Mono.Engine
             if (!isDashing)
             {
                 isDashing = true;
-                maxVelocity = new Vector2(Convert.ToInt32(speed * 5), Convert.ToInt32(speed * 5));
+                maxVelocity = new Vector2(Convert.ToInt32(speed * 4), Convert.ToInt32(speed * 4));
                 dashTimer.Start();
             }
         }

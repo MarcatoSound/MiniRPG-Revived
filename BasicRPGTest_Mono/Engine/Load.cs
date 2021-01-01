@@ -21,19 +21,25 @@ namespace BasicRPGTest_Mono.Engine
         {
         }
 
-        public static Dictionary<Vector3, Tile> loadMap(string world) 
+        public static List<TileLayer> loadMap(string world) 
         {
-            Dictionary < Vector3, Tile > tiles = new Dictionary<Vector3, Tile>();
+            List<TileLayer> layers = new List<TileLayer>();
 
             path = $"save\\{world}";
             reader = new StreamReader(path + "\\map.json");
 
             JObject mapJson = JObject.Parse(reader.ReadToEnd());
-            JArray layers = mapJson.Value<JArray>("layers");
+            JArray jsonLayers = mapJson.Value<JArray>("layers");
+            List<Tile> tiles;
 
-            foreach (JArray layerTiles in layers)
+            foreach (JObject jsonLayer in jsonLayers)
             {
-                foreach (JObject tileJson in layerTiles)
+                tiles = new List<Tile>();
+                TileLayer layer = new TileLayer(jsonLayer.Value<string>("layer"));
+                JArray tileArray = jsonLayer.Value<JArray>("tiles");
+                Tile tile;
+
+                foreach (JObject tileJson in tileArray)
                 {
                     Tile template = TileManager.get(tileJson.Value<int>("id"));
                     if (template == null) continue;
@@ -41,13 +47,18 @@ namespace BasicRPGTest_Mono.Engine
                     int x = tileJson.Value<int>("x");
                     int y = tileJson.Value<int>("y");
 
-                    tiles.Add(new Vector3(x, y, tileJson.Value<int>("z")), new Tile(template, new Vector2(x*32, y*32)));
+                    tile = new Tile(template, new Vector2(x, y));
+
+                    layer.tiles.Add(tile.pos, tile);
                 }
+
+                layers.Add(layer);
+
             }
 
             reader.Close();
 
-            return tiles;
+            return layers;
 
         }
 

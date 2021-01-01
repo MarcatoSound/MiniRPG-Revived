@@ -78,12 +78,12 @@ namespace BasicRPGTest_Mono.Engine
             spawnTimer.Elapsed += trySpawn;
             //spawnTimer.Start();
 
-            for (int x = 0; x < width / 16; x++)
+            for (int x = 0; x < width / 8; x++)
             {
-                for (int y = 0; y < height / 16; y++)
+                for (int y = 0; y < height / 8; y++)
                 {
                     //System.Diagnostics.Debug.WriteLine($"Loaded Region: {x}, {y}");
-                    Region region = new Region(new Vector2(x * (TileManager.dimensions * 16), y * (TileManager.dimensions * 16)));
+                    Region region = new Region(new Vector2(x * (TileManager.dimensions * 8), y * (TileManager.dimensions * 8)));
                     regions.Add(new Vector2(x, y), region);
                     //System.Diagnostics.Debug.WriteLine("Loaded region: " + region.box);
                 }
@@ -99,7 +99,8 @@ namespace BasicRPGTest_Mono.Engine
 
                     foreach (Region region in regions.Values)
                     {
-                        if (!region.box.Intersects(tile.box)) continue;
+                        Rectangle miniBox = new Rectangle(tile.box.X, tile.box.Y, tile.box.Width - 1, tile.box.Height - 1);
+                        if (!region.box.Intersects(miniBox)) continue;
                         region.addTile(tile);
                     }
 
@@ -107,7 +108,7 @@ namespace BasicRPGTest_Mono.Engine
 
                     // Create a collidable at the following true-map coordinate.
                     //   pos.X and pos.Y refer to the TILE position, and are multiplied by the tile size to get their true position
-                    collidables.Add(new Rectangle(Convert.ToInt32(pos.X * TileManager.dimensions), Convert.ToInt32(pos.Y * TileManager.dimensions), TileManager.dimensions, TileManager.dimensions));
+                    collidables.Add(new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
                 }
             }
 

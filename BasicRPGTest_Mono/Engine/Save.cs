@@ -48,26 +48,29 @@ namespace BasicRPGTest_Mono.Engine
             {
                 jsonLayer = new JObject();
                 layerTiles = new JArray();
-                foreach (Region region in map.regions.Values)
+
+                JToken layerName = new JValue(layer.name);
+                jsonLayer.Add("layer", layerName);
+
+                foreach (Tile tile in layer.tiles.Values)
                 {
-                    foreach (Tile tile in region.tiles)
-                    {
 
-                        tileData = new JObject();
+                    tileData = new JObject();
 
-                        // Save the tile data and add it to the layer json
-                        JToken tileId = new JValue(tile.id);
-                        JToken tileX = new JValue(tile.tilePos.X);
-                        JToken tileY = new JValue(tile.tilePos.Y);
+                    // Save the tile data and add it to the layer json
+                    JToken tileId = new JValue(tile.id);
+                    JToken tileX = new JValue(tile.tilePos.X);
+                    JToken tileY = new JValue(tile.tilePos.Y);
 
-                        tileData.Add("id", tileId);
-                        tileData.Add("x", tileX);
-                        tileData.Add("y", tileY);
+                    tileData.Add("id", tileId);
+                    tileData.Add("x", tileX);
+                    tileData.Add("y", tileY);
 
-                        layerTiles.Add(tileData);
-                    }
+                    layerTiles.Add(tileData);
                 }
-                layers.Add(layerTiles);
+
+                jsonLayer.Add("tiles", layerTiles);
+                layers.Add(jsonLayer);
             }
 
             json.Add("layers", layers);

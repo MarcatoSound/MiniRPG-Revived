@@ -8,10 +8,12 @@ namespace BasicRPGTest_Mono.Engine.Maps
 {
     public class TileLayer
     {
+        public string name { get; set; }
         public Dictionary<Vector2, Tile> tiles;
 
-        public TileLayer()
+        public TileLayer(string name)
         {
+            this.name = name;
             tiles = new Dictionary<Vector2, Tile>();
         }
 

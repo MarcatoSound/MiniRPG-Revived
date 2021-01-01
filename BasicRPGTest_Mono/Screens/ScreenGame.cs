@@ -73,7 +73,7 @@ namespace BasicRPGTest_Mono
         }
         public override void UnloadContent()
         {
-            //Save.save(MapManager.activeMap, worldName);
+            Save.save(MapManager.activeMap, worldName);
             Camera.reset();
 
             worldName = "";
@@ -103,11 +103,11 @@ namespace BasicRPGTest_Mono
 
             int size = 128;
 
-            /*if (Directory.Exists(path))
+            if (Directory.Exists(path))
             {
                 MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
                 return;
-            }*/
+            }
 
 
             // Generate the actual map contents
@@ -115,7 +115,7 @@ namespace BasicRPGTest_Mono
             //MapManager.activeMap.tiledMap.AddTileset(masterTileset, 0);
 
             // Saving world functionality
-            //Save.save(MapManager.activeMap, worldName);
+            Save.save(MapManager.activeMap, worldName);
 
 
         }
