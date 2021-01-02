@@ -17,6 +17,7 @@ using MonoGame.Extended.Input.InputListeners;
 using BasicRPGTest_Mono.Screens;
 using BasicRPGTest_Mono.Engine.Utility;
 using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.GUI;
 
 namespace BasicRPGTest_Mono
 {
@@ -79,6 +80,8 @@ namespace BasicRPGTest_Mono
                 {
                     if (args.Key == Keys.Space)
                     {
+                        GuiWindowManager.windows[0].box = new Rectangle(0, 0, 128, 512);
+                        GuiWindowManager.windows[0].buildWindow();
                         //System.Diagnostics.Debug.WriteLine("Region tiles: " + MapManager.activeMap.regions.);
                         //System.Diagnostics.Debug.WriteLine("Camera position: " + Camera.camPos);
                         //System.Diagnostics.Debug.WriteLine("Camera box: " + Camera.camera.BoundingRectangle);

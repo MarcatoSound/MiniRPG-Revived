@@ -11,25 +11,31 @@ namespace BasicRPGTest_Mono.Engine.GUI
     {
         public Rectangle box;
         public Texture2D guiTileset;
+        public RenderTarget2D texture;
 
         public GuiWindow(Rectangle box, Texture2D tileset)
         {
             this.box = box;
             guiTileset = tileset;
+            buildWindow();
         }
 
-        public void Draw(SpriteBatch batch)
+        public void buildWindow()
         {
+            texture = new RenderTarget2D(Core.graphics, box.Width, box.Height);
 
             int dimensions = guiTileset.Width / 3;
 
             if (box.Width / dimensions % 1 != 0)
-                throw new InvalidOperationException("GUI Window dimensions must be a multiple of " + dimensions + ": " + box.Width / dimensions);
+                throw new InvalidOperationException("GUI Window dimensions must be a multiple of " + dimensions + "... value: " + box.Width / dimensions);
 
             int tileWidth = box.Width / dimensions;
             int tileHeight = box.Height / dimensions;
 
             Vector2 pos = new Vector2();
+            Core.graphics.SetRenderTarget(texture);
+            Core.graphics.Clear(Color.Transparent);
+            SpriteBatch batch = new SpriteBatch(Core.graphics);
             //Matrix drawingMatrix = Matrix.CreateTranslation(0, 0, 0);
             //batch.Begin(transformMatrix: drawingMatrix);
             batch.Begin();
@@ -46,9 +52,9 @@ namespace BasicRPGTest_Mono.Engine.GUI
             Texture2D bottomCenterTexture = Util.getSpriteFromSet(guiTileset, 2, 1, dimensions);
             Texture2D bottomRightTexture = Util.getSpriteFromSet(guiTileset, 2, 2, dimensions);
 
-            for (int row = 0; row <= tileHeight; row++)
+            for (int row = 0; row <= tileHeight-1; row++)
             {
-                for (int column = 0; column <= tileWidth; column++)
+                for (int column = 0; column <= tileWidth-1; column++)
                 {
                     if (row == 0)
                     {
@@ -61,7 +67,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                         }
 
                         // Draw the top-right-corner tile
-                        if (column == tileWidth)
+                        if (column == tileWidth-1)
                         {
                             batch.Draw(topRightCornerTexture, pos, null, Color.White);
                             pos.X = 0;
@@ -75,7 +81,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                         continue;
                     }
 
-                    if (row == tileHeight)
+                    if (row == tileHeight-1)
                     {
                         // Draw the bottom-left-corner tile
                         if (column == 0)
@@ -86,7 +92,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                         }
 
                         // Draw the bottom-right-corner tile
-                        if (column == tileWidth)
+                        if (column == tileWidth-1)
                         {
                             batch.Draw(bottomRightTexture, pos, null, Color.White);
                             pos.X = 0;
@@ -109,7 +115,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                     }
 
                     // Draw the middle-right tile
-                    if (column == tileWidth)
+                    if (column == tileWidth-1)
                     {
                         batch.Draw(midRightTexture, pos, null, Color.White);
                         pos.X = 0;
@@ -126,6 +132,14 @@ namespace BasicRPGTest_Mono.Engine.GUI
 
             }
 
+            batch.End();
+            Core.graphics.Reset();
+        }
+
+        public void Draw(SpriteBatch batch)
+        {
+            batch.Begin();
+            batch.Draw(texture, new Vector2(), Color.White);
             batch.End();
         }
 

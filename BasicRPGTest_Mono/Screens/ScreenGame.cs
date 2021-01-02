@@ -160,6 +160,7 @@ namespace BasicRPGTest_Mono
             Texture2D texture = Content.Load<Texture2D>("gui_tileset");
             GuiWindowManager.tileset = texture;
             GuiWindowManager.add(new GuiInventory());
+
         }
 
 
