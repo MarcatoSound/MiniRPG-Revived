@@ -247,7 +247,6 @@ namespace BasicRPGTest_Mono.Engine
         public override void update()
         {
             boundingBox = getBox(position);
-            ((GraphicAnimated)graphic).update();
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {

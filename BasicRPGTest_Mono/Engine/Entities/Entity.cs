@@ -56,8 +56,6 @@ namespace BasicRPGTest_Mono.Engine
 
         public virtual void update()
         {
-            if (graphic is GraphicAnimated)
-                ((GraphicAnimated)graphic).update();
         }
         public virtual void draw(SpriteBatch batch)
         {

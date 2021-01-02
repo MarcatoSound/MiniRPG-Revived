@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace RPGEngine
 {
@@ -15,14 +16,33 @@ namespace RPGEngine
         public int currentFrame;
         private int totalFrames;
 
+        private int _framerate;
+        private int framerate 
+        { 
+            get { return _framerate; }
+            set
+            {
+                _framerate = 1000 / value;
+                frameTimer.Interval = 1000 / value;
+            }
+        }
+        private Timer frameTimer;
 
-        public GraphicAnimated(Texture2D texture, int rows, int columns) : base (texture)
+
+        public GraphicAnimated(Texture2D texture, int rows, int columns, int framerate = 15) : base (texture)
         {
             this.texture = texture;
             this.rows = rows;
             this.columns = columns;
             currentFrame = 0;
             totalFrames = this.rows * this.columns;
+
+            frameTimer = new Timer(framerate);
+            this.framerate = framerate;
+
+            frameTimer.Elapsed += update;
+            frameTimer.Start();
+
         }
         public GraphicAnimated(GraphicAnimated graphic) : base (graphic.texture)
         {
@@ -34,7 +54,7 @@ namespace RPGEngine
         }
 
 
-        public void update()
+        public void update(Object source, ElapsedEventArgs args)
         {
             currentFrame++;
             if (currentFrame == totalFrames)

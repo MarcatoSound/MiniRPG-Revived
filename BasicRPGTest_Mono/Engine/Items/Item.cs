@@ -14,6 +14,7 @@ namespace BasicRPGTest_Mono.Engine.Items
         public string displayName { get; set; }
         public Graphic graphic { get; set; }
 
+        // Attack data
         public float swingDist;
         public SwingStyle swingStyle;
         public Rectangle hitbox;
@@ -26,6 +27,8 @@ namespace BasicRPGTest_Mono.Engine.Items
             name = Utility.Util.cleanString(displayName).ToLower();
             this.displayName = displayName;
             this.graphic = graphic;
+
+
             if (GetType() == typeof(Item)) swingDist = 0.785f;
             if (GetType() == typeof(Item)) swingStyle = SwingStyle.Slash;
             if (GetType() == typeof(Item)) hitbox = new Rectangle(0, 0, 24, 24);
