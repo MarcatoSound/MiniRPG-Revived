@@ -80,15 +80,15 @@ namespace BasicRPGTest_Mono
                 {
                     if (args.Key == Keys.Space)
                     {
-                        GuiWindowManager.windows[0].box = new Rectangle(0, 0, 128, 512);
-                        GuiWindowManager.windows[0].buildWindow();
+                        if (GuiWindowManager.activeWindow == null) GuiWindowManager.openWindow(1);
+                        else GuiWindowManager.closeWindow();
                         //System.Diagnostics.Debug.WriteLine("Region tiles: " + MapManager.activeMap.regions.);
                         //System.Diagnostics.Debug.WriteLine("Camera position: " + Camera.camPos);
                         //System.Diagnostics.Debug.WriteLine("Camera box: " + Camera.camera.BoundingRectangle);
                     }
                     if (args.Key == Keys.Escape) mainMenu();
 
-                    if (Core.player.activeMenu == null)
+                    if (!Core.player.paused)
                     {
                         if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
                         {
@@ -105,9 +105,15 @@ namespace BasicRPGTest_Mono
                     } else
                     {
                         if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();
-                        if (args.Key == Keys.Down || args.Key == Keys.S) Core.player.activeMenu.index++;
-                        if (args.Key == Keys.Up || args.Key == Keys.W) Core.player.activeMenu.index--;
-                        if (args.Key == Keys.Enter) Core.player.activeMenu.select();
+                        //if (args.Key == Keys.Down || args.Key == Keys.S) Core.player.activeMenu.index++;
+                        //if (args.Key == Keys.Up || args.Key == Keys.W) Core.player.activeMenu.index--;
+                        if (args.Key == Keys.Enter)
+                        {
+                            if (GuiWindowManager.activeWindow is GuiTextBox)
+                            {
+                                ((GuiTextBox)GuiWindowManager.activeWindow).next();
+                            }
+                        }
                     }
 
                     return;

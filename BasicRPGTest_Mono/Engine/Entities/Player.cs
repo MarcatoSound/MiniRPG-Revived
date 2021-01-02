@@ -20,7 +20,7 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Player : LivingEntity
     {
-        public Menu activeMenu;
+        public bool paused;
 
         public bool isDashing;
         public Timer dashTimer;
@@ -73,27 +73,14 @@ namespace BasicRPGTest_Mono.Engine
 
             Camera.camPos = camPos;
         }
+        public void togglePause()
+        {
+            if (paused) paused = false;
+            else paused = true;
+        }
         public void openInv()
         {
-            if (activeMenu == null)
-            {
 
-                activeMenu = new Menu("Inventory", new Rectangle(50, 50, 540, 620), Color.Gray, Color.White, Core.mainFont);
-
-                MenuItem entry;
-                foreach (Item item in inventory.items.Values)
-                {
-                    entry = new MenuItem(item.displayName);
-                    entry.run = () =>
-                    {
-                        System.Diagnostics.Debug.WriteLine("Item selected: " + item.name);
-                    };
-                    activeMenu.add(entry);
-                }
-            } else
-            {
-                activeMenu = null;
-            }
         }
         public void swapHands()
         {
@@ -286,7 +273,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void update()
         {
-            if (activeMenu != null) return;
+            if (paused) return;
 
             boundingBox = getBox(position);
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
@@ -452,13 +439,6 @@ namespace BasicRPGTest_Mono.Engine
                 itemSwing.Draw(batch, getPlayerScreenPosition());
             }
 
-            if (activeMenu != null)
-            {
-                GuiWindowManager.windows[0].Draw(batch);
-                /*batch.Begin();
-                activeMenu.Draw(batch);
-                batch.End();*/
-            }
         }
 
     }

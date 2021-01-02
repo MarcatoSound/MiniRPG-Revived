@@ -41,7 +41,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
             }
         }
         ///<summary>
-        ///A menu with a selectable list of strings. USE { run = () => /* CODE HERE */ }
+        ///A menu with a selectable list of strings. USE  run = () => { /* CODE HERE */ }
         ///To add unique code to the menu selection.
         ///</summary>
         public Menu(string label, Rectangle rect, Color textColor, Color highlightColor, SpriteFont font, int padding = 5)

@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

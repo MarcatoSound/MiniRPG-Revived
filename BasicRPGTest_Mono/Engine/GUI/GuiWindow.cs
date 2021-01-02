@@ -136,10 +136,20 @@ namespace BasicRPGTest_Mono.Engine.GUI
             Core.graphics.Reset();
         }
 
-        public void Draw(SpriteBatch batch)
+        public virtual void open()
+        {
+            GuiWindowManager.openWindow(this);
+        }
+        public virtual void close()
+        {
+            GuiWindowManager.closeWindow();
+        }
+
+
+        public virtual void Draw(SpriteBatch batch)
         {
             batch.Begin();
-            batch.Draw(texture, new Vector2(), Color.White);
+            batch.Draw(texture, new Vector2(box.X, box.Y), Color.White);
             batch.End();
         }
 
