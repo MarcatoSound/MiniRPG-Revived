@@ -84,17 +84,28 @@ namespace BasicRPGTest_Mono
                         //System.Diagnostics.Debug.WriteLine("Camera box: " + Camera.camera.BoundingRectangle);
                     }
                     if (args.Key == Keys.Escape) mainMenu();
-                    if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
+
+                    if (Core.player.activeMenu == null)
                     {
-                        ((ScreenGame)activeScreen).player.Dash();
+                        if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
+                        {
+                            ((ScreenGame)activeScreen).player.Dash();
+                        }
+
+                        if (args.Key == Keys.Up) ((ScreenGame)activeScreen).player.attack(Direction.Up);
+                        if (args.Key == Keys.Left) ((ScreenGame)activeScreen).player.attack(Direction.Left);
+                        if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
+                        if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
+
+                        if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHands();
+                        if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();
+                    } else
+                    {
+                        if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();
+                        if (args.Key == Keys.Down || args.Key == Keys.S) Core.player.activeMenu.index++;
+                        if (args.Key == Keys.Up || args.Key == Keys.W) Core.player.activeMenu.index--;
+                        if (args.Key == Keys.Enter) Core.player.activeMenu.select();
                     }
-
-                    if (args.Key == Keys.Up) ((ScreenGame)activeScreen).player.attack(Direction.Up);
-                    if (args.Key == Keys.Left) ((ScreenGame)activeScreen).player.attack(Direction.Left);
-                    if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
-                    if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
-
-                    if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHands();
 
                     return;
                 }
@@ -172,6 +183,9 @@ namespace BasicRPGTest_Mono
         {
             cursorTexture = Content.Load<Texture2D>("cursor");
             Mouse.SetCursor(MouseCursor.FromTexture2D(cursorTexture, 0, 0));
+
+            SpriteFont font = Content.Load<SpriteFont>("font_main");
+            Core.mainFont = font;
 
             base.LoadContent();
         }

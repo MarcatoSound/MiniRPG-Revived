@@ -158,7 +158,7 @@
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:main_font.spritefont
+/build:main_font.spritefont;font_main.spritefont
 
 #begin stone.png
 /importer:TextureImporter

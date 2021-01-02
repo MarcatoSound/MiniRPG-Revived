@@ -122,7 +122,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         else 
                             textAnchor = new Vector2(font.MeasureString(entry.label).X / 2, lineHeight);
 
-                        if (entry == entries[index])
+                        if (z == index)
                             textColor = highlightColor;
                         else
                             textColor = this.textColor;
@@ -164,7 +164,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         if (entries.Count - 1 < z) break;
                         MenuItem entry = entries[z];
 
-                        if (entry.label == entries[index].label)
+                        if (z == index)
                             textColor = highlightColor;
                         else
                             textColor = this.textColor;
@@ -204,7 +204,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         if (entries.Count - 1 < z) break;
                         MenuItem entry = entries[z];
 
-                        if (entry.label == entries[index].label)
+                        if (z == index)
                             textColor = highlightColor;
                         else
                             textColor = this.textColor;

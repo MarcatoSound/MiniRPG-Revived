@@ -13,6 +13,7 @@ namespace BasicRPGTest_Mono.Engine.Items
         public string name { get; set; }
         public string displayName { get; set; }
         public Graphic graphic { get; set; }
+        public string description { get; set; }
 
         // Attack data
         public float swingDist;

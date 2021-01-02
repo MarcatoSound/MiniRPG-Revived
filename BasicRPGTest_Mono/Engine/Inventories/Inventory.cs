@@ -9,6 +9,12 @@ namespace BasicRPGTest_Mono.Engine
     public class Inventory
     {
         public ConcurrentDictionary<int, Item> items;
+        public int maxItems;
+
+        public Inventory()
+        {
+            items = new ConcurrentDictionary<int, Item>();
+        }
 
         public Item getItem(int slot)
         {
@@ -16,8 +22,26 @@ namespace BasicRPGTest_Mono.Engine
             return items[slot];
         }
 
+        public void addItem(Item item)
+        {
+            int slot = items.Count;
+            if (maxItems != 0 && slot + 1 > maxItems)
+            {
+                // Put an error message here
+                return;
+            }
+
+            items.TryAdd(slot, item);
+        }
+
         public void setItem(int slot, Item item)
         {
+            if (maxItems != 0 && slot + 1 > maxItems)
+            {
+                // Put an error message here
+                return;
+            }
+
             if (getItem(slot) != null) items.TryRemove(slot, out _);
             items.TryAdd(slot, item);
         }

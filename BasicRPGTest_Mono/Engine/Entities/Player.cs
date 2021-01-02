@@ -1,6 +1,8 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Inventories;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,16 +19,21 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Player : LivingEntity
     {
+        public Menu activeMenu;
+
         public bool isDashing;
         public Timer dashTimer;
 
         public ItemSwing itemSwing;
         public bool isAttacking;
         public Timer attackTimer;
-        public Item mainhand;
-        public Item offhand;
-        public Player(Texture2D texture, GraphicsDeviceManager graphics) : base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
+
+        public PlayerInventory inventory;
+        public Player(Texture2D texture, GraphicsDeviceManager graphics) : 
+            base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
         {
+            Core.player = this;
+
             graphicsManager = graphics;
             position = new Vector2(MapManager.activeMap.widthInPixels / 2, MapManager.activeMap.heightInPixels / 2);
             boundingBox = new Rectangle((int)position.X, (int)position.Y, 28, 26);
@@ -41,12 +48,22 @@ namespace BasicRPGTest_Mono.Engine
             };
 
             kbResist = 0.75f;
-            mainhand = ItemManager.getByNamespace("hollysong");
-            offhand = ItemManager.getByNamespace("arcticfoxtail");
+
+            inventory = new PlayerInventory();
+            inventory.addItem(ItemManager.getByNamespace("hollysong"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.mainhand = ItemManager.getByNamespace("hollysong");
+            inventory.offhand = ItemManager.getByNamespace("arcticfoxtail");
         }
         public void updateCam()
         {
-            Vector2 camPos = new Vector2(position.X - (Camera.camera.BoundingRectangle.Width / 2), position.Y - (Camera.camera.BoundingRectangle.Height / 2));
+            Vector2 camPos = new Vector2(
+                position.X - (Camera.camera.BoundingRectangle.Width / 2), 
+                position.Y - (Camera.camera.BoundingRectangle.Height / 2)
+                );
 
             if (camPos.X < 0) camPos.X = 0;
             if (camPos.X > MapManager.activeMap.widthInPixels) camPos.X = MapManager.activeMap.widthInPixels;
@@ -55,21 +72,43 @@ namespace BasicRPGTest_Mono.Engine
 
             Camera.camPos = camPos;
         }
+        public void openInv()
+        {
+            if (activeMenu == null)
+            {
+
+                activeMenu = new Menu("Inventory", new Rectangle(50, 50, 540, 620), Color.Gray, Color.White, Core.mainFont);
+
+                MenuItem entry;
+                foreach (Item item in inventory.items.Values)
+                {
+                    entry = new MenuItem(item.displayName);
+                    entry.run = () =>
+                    {
+                        System.Diagnostics.Debug.WriteLine("Item selected: " + item.name);
+                    };
+                    activeMenu.add(entry);
+                }
+            } else
+            {
+                activeMenu = null;
+            }
+        }
         public void swapHands()
         {
-            Item oldMH = mainhand;
-            Item oldOH = offhand;
+            Item oldMH = inventory.mainhand;
+            Item oldOH = inventory.offhand;
 
-            mainhand = oldOH;
-            offhand = oldMH;
+            inventory.mainhand = oldOH;
+            inventory.offhand = oldMH;
         }
         public void attack(Direction direction)
         {
             if (isAttacking) return;
-            if (mainhand == null) return;
+            if (inventory.mainhand == null) return;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 150, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
+            itemSwing = new ItemSwing(direction, 150, this, inventory.mainhand, inventory.mainhand.swingStyle, inventory.mainhand.swingDist);
             attackTimer = new Timer(150);
             attackTimer.Elapsed += (sender, args) =>
             {
@@ -246,6 +285,8 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void update()
         {
+            if (activeMenu != null) return;
+
             boundingBox = getBox(position);
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
@@ -408,6 +449,13 @@ namespace BasicRPGTest_Mono.Engine
             if (itemSwing != null)
             {
                 itemSwing.Draw(batch, getPlayerScreenPosition());
+            }
+
+            if (activeMenu != null)
+            {
+                batch.Begin();
+                activeMenu.Draw(batch);
+                batch.End();
             }
         }
 

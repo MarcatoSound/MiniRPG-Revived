@@ -11,5 +11,9 @@ namespace BasicRPGTest_Mono.Engine
         public static Main game;
         public static GameTime globalTime;
         public static GraphicsDevice graphics;
+
+        public static SpriteFont mainFont;
+
+        public static Player player;
     }
 }
