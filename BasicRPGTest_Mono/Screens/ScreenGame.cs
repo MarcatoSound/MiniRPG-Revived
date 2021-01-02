@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
@@ -52,6 +53,7 @@ namespace BasicRPGTest_Mono
             loadTiles();
             loadItems();
             loadEntities();
+            loadGuis();
 
             loadMap();
 
@@ -152,6 +154,12 @@ namespace BasicRPGTest_Mono
             {
                 System.Diagnostics.Debug.WriteLine("Entity: " + entity.name);
             }
+        }
+        private void loadGuis()
+        {
+            Texture2D texture = Content.Load<Texture2D>("gui_tileset");
+            GuiWindowManager.tileset = texture;
+            GuiWindowManager.add(new GuiInventory());
         }
 
 

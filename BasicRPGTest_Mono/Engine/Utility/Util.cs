@@ -372,6 +372,135 @@ namespace BasicRPGTest_Mono.Engine.Utility
             return cropTexture;
         }
 
+        public static Texture2D buildWindowTexture(Rectangle box, Texture2D spriteset, int dimensions = 16)
+        {
+
+            if (box.Width / dimensions % 1 == 0)
+                throw new InvalidOperationException("GUI Window dimensions must be a multiple of " + dimensions + ": " + box.Width / dimensions);
+
+            int tileWidth = box.Width / dimensions;
+            int tileHeight = box.Height / dimensions;
+
+            SpriteBatch batch = new SpriteBatch(Core.graphics);
+
+            Vector2 pos = new Vector2();
+            Matrix drawingMatrix = Matrix.CreateTranslation(0, 0, 0);
+            batch.Begin(transformMatrix: drawingMatrix);
+
+            Texture2D topLeftCornerTexture = getSpriteFromSet(spriteset, 0, 0, dimensions);
+            Texture2D topCenterTexture = getSpriteFromSet(spriteset, 0, 1, dimensions);
+            Texture2D topRightCornerTexture = getSpriteFromSet(spriteset, 0, 2, dimensions);
+
+            Texture2D midLeftTexture = getSpriteFromSet(spriteset, 1, 0, dimensions);
+            Texture2D midCenterTexture = getSpriteFromSet(spriteset, 1, 1, dimensions);
+            Texture2D midRightTexture = getSpriteFromSet(spriteset, 1, 2, dimensions);
+
+            Texture2D bottomLeftTexture = getSpriteFromSet(spriteset, 2, 0, dimensions);
+            Texture2D bottomCenterTexture = getSpriteFromSet(spriteset, 2, 1, dimensions);
+            Texture2D bottomRightTexture = getSpriteFromSet(spriteset, 2, 2, dimensions);
+
+            for (int row = 0; row <= tileHeight; row++)
+            {
+                for (int column = 0; column <= tileWidth; column++)
+                {
+                    if (row == 0)
+                    {
+                        // Draw the top-left-corner tile
+                        if (column == 0)
+                        {
+                            batch.Draw(topLeftCornerTexture, pos, null, Color.White);
+                            pos.X += dimensions;
+                            continue;
+                        }
+
+                        // Draw the top-right-corner tile
+                        if (column == tileWidth)
+                        {
+                            batch.Draw(topRightCornerTexture, pos, null, Color.White);
+                            pos.X = 0;
+                            continue;
+                        }
+
+                        // Draw the top-center tiles
+                        batch.Draw(topCenterTexture, pos, null, Color.White);
+                        pos.X += dimensions;
+
+                        continue;
+                    }
+
+                    if (row == tileHeight)
+                    {
+                        // Draw the bottom-left-corner tile
+                        if (column == 0)
+                        {
+                            batch.Draw(bottomLeftTexture, pos, null, Color.White);
+                            pos.X += dimensions;
+                            continue;
+                        }
+
+                        // Draw the bottom-right-corner tile
+                        if (column == tileWidth)
+                        {
+                            batch.Draw(bottomRightTexture, pos, null, Color.White);
+                            pos.X = 0;
+                            continue;
+                        }
+
+                        // Draw the bottom-center tiles
+                        batch.Draw(bottomCenterTexture, pos, null, Color.White);
+                        pos.X += dimensions;
+
+                        continue;
+                    }
+
+                    // Draw the middle-left tile
+                    if (column == 0)
+                    {
+                        batch.Draw(midLeftTexture, pos, null, Color.White);
+                        pos.X += dimensions;
+                        continue;
+                    }
+
+                    // Draw the middle-right tile
+                    if (column == tileWidth)
+                    {
+                        batch.Draw(midRightTexture, pos, null, Color.White);
+                        pos.X = 0;
+                        continue;
+                    }
+
+                    // Draw the middle-center tiles
+                    batch.Draw(midCenterTexture, pos, null, Color.White);
+                    pos.X += dimensions;
+
+                }
+
+                pos.Y += dimensions;
+
+            }
+
+            batch.End();
+
+
+
+            Texture2D window = new Texture2D(Core.graphics, box.Width, box.Height);
+            Color[] data = new Color[box.Width * box.Height];
+
+            Texture2D tile;
+            for (int row = 0; row < 3; row++)
+            {
+                for (int column = 0; column < 3; column++)
+                {
+                    tile = getSpriteFromSet(spriteset, row, column, dimensions);
+
+
+                }
+            }
+
+
+            return window;
+        }
+
         public static string cleanString(string str)
         {
             str = Regex.Replace(str, "[!@#$%^&*();:'\",.<>/?[\\]{}\\-+_=|\\s]", "");

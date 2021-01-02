@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Inventories;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
@@ -453,9 +454,10 @@ namespace BasicRPGTest_Mono.Engine
 
             if (activeMenu != null)
             {
-                batch.Begin();
+                GuiWindowManager.windows[0].Draw(batch);
+                /*batch.Begin();
                 activeMenu.Draw(batch);
-                batch.End();
+                batch.End();*/
             }
         }
 
