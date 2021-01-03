@@ -6,6 +6,8 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Engine
 {
+    // INCREDIBLY powerful camera handler provided by Khalid Abuhakmeh from Stackoverflow!
+
     public interface IFocusable
     {
         Vector2 Position { get; }
@@ -83,6 +85,7 @@ namespace BasicRPGTest_Mono.Engine
         private Vector2 _position;
         protected float _viewportHeight;
         protected float _viewportWidth;
+        private float _scale;
 
         public Camera2D(Game game)
             : base(game)
@@ -97,7 +100,26 @@ namespace BasicRPGTest_Mono.Engine
         }
         public float Rotation { get; set; }
         public Vector2 Origin { get; set; }
-        public float Scale { get; set; }
+        public float Scale
+        {
+            get { return _scale; }
+            set
+            {
+                if (value > maxZoom)
+                {
+                    _scale = maxZoom;
+                    return;
+                }
+                if (value < minZoom)
+                {
+                    _scale = minZoom;
+                    return;
+                }
+                _scale = value;
+            }
+        }
+        public float maxZoom { get; set; }
+        public float minZoom { get; set; }
         public Vector2 ScreenCenter { get; protected set; }
         public Matrix Transform { get; set; }
         public IFocusable Focus { get; set; }
@@ -117,6 +139,8 @@ namespace BasicRPGTest_Mono.Engine
             BoundingRectangle = new Rectangle(Convert.ToInt32(Position.X), Convert.ToInt32(Position.Y), Convert.ToInt32(_viewportWidth), Convert.ToInt32(_viewportHeight));
 
             ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
+            maxZoom = 1.5f;
+            minZoom = 0.5f;
             Scale = 1;
             MoveSpeed = 5f;
 
@@ -125,6 +149,8 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void Update(GameTime gameTime)
         {
+            Origin = ScreenCenter / Scale;
+
             // Create the Transform used by any
             // spritebatch process
             Transform = Matrix.Identity *
@@ -133,7 +159,6 @@ namespace BasicRPGTest_Mono.Engine
                         Matrix.CreateTranslation(Origin.X, Origin.Y, 0) *
                         Matrix.CreateScale(new Vector3(Scale, Scale, Scale));
 
-            Origin = ScreenCenter / Scale;
 
             // Move the Camera to the position that it needs to go
             var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -141,15 +166,15 @@ namespace BasicRPGTest_Mono.Engine
             Vector2 newPos = new Vector2(_position.X, _position.Y);
             newPos.X += (Focus.Position.X - Position.X) * MoveSpeed * delta;
             newPos.Y += (Focus.Position.Y - Position.Y) * MoveSpeed * delta;
-            if (newPos.X + (_viewportWidth / 2) > CameraLimits.Width || newPos.X - (_viewportWidth / 2) < 0) 
+            if (newPos.X + (_viewportWidth / 2 / Scale) > CameraLimits.Width || newPos.X - (_viewportWidth / 2 / Scale) < 0) 
                 newPos.X = _position.X;
-            if (newPos.Y + (_viewportHeight / 2) > CameraLimits.Height || newPos.Y - (_viewportHeight / 2) < 0)
+            if (newPos.Y + (_viewportHeight / 2 / Scale) > CameraLimits.Height || newPos.Y - (_viewportHeight / 2 / Scale) < 0)
                 newPos.Y = _position.Y;
 
             _position.X = newPos.X;
             _position.Y = newPos.Y;
 
-            BoundingRectangle = new Rectangle(Convert.ToInt32(_position.X - (_viewportWidth / 2)), Convert.ToInt32(_position.Y - (_viewportHeight / 2)), Convert.ToInt32(_viewportWidth), Convert.ToInt32(_viewportHeight));
+            BoundingRectangle = new Rectangle(Convert.ToInt32(_position.X - (_viewportWidth / 2 / Scale)), Convert.ToInt32(_position.Y - (_viewportHeight / 2 / Scale)), Convert.ToInt32(_viewportWidth / Scale), Convert.ToInt32(_viewportHeight / Scale));
 
             base.Update(gameTime);
         }

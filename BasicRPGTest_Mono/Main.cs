@@ -166,6 +166,14 @@ namespace BasicRPGTest_Mono
                     previousScrollValue = currentState.ScrollWheelValue;
                 }
 
+                if (activeScreen is ScreenGame)
+                {
+                    MouseState currentState = args.CurrentState;
+                    if (currentState.ScrollWheelValue < previousScrollValue) Camera.camera.Scale *= 0.9f;
+                    else if (currentState.ScrollWheelValue > previousScrollValue) Camera.camera.Scale *= 1.1f;
+                        previousScrollValue = currentState.ScrollWheelValue;
+                }
+
             };
             mouseListener.MouseClicked += (sender, args) =>
             {
