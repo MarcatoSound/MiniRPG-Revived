@@ -38,6 +38,18 @@
 /processorParam:TextureFormat=Color
 /build:arctic_fox_tail.png
 
+#begin cryorose.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:cryorose.png
+
 #begin crystal_sword.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -73,6 +85,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:dirt.png
+
+#begin dragontail.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:dragontail.png
 
 #begin enemy1.png
 /importer:TextureImporter
@@ -153,6 +177,18 @@
 /processorParam:TextureFormat=Color
 /build:hollysong.png
 
+#begin iron_root.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:iron_root.png
+
 #begin LightShadow_pipo.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -183,6 +219,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:stone.png
+
+#begin sun_feather.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:sun_feather.png
 
 #begin sword_swing_east.png
 /importer:TextureImporter
@@ -267,4 +315,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tileset_primary.png
+
+#begin unicorn_horn.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:unicorn_horn.png
 

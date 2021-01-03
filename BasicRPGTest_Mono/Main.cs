@@ -100,8 +100,14 @@ namespace BasicRPGTest_Mono
                         if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
                         if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
 
-                        if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHands();
+                        if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHotbars();
                         if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();
+
+                        if (args.Key == Keys.NumPad1) Core.player.inventory.hotbarPrimary.setSlot(0);
+                        if (args.Key == Keys.NumPad2) Core.player.inventory.hotbarPrimary.setSlot(1);
+                        if (args.Key == Keys.NumPad3) Core.player.inventory.hotbarPrimary.setSlot(2);
+                        if (args.Key == Keys.NumPad4) Core.player.inventory.hotbarPrimary.setSlot(3);
+                        if (args.Key == Keys.NumPad5) Core.player.inventory.hotbarPrimary.setSlot(4);
                     } else
                     {
                         if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();

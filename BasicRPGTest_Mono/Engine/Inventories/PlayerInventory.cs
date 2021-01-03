@@ -11,5 +11,12 @@ namespace BasicRPGTest_Mono.Engine.Inventories
         public Item offhand;
         public Hotbar hotbarPrimary;
         public Hotbar hotbarSecondary;
+
+        public PlayerInventory()
+        {
+            hotbarPrimary = new Hotbar();
+            hotbarSecondary = new Hotbar();
+        }
+
     }
 }

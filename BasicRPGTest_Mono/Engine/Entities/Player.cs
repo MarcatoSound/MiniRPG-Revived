@@ -53,11 +53,11 @@ namespace BasicRPGTest_Mono.Engine
             inventory = new PlayerInventory();
             inventory.addItem(ItemManager.getByNamespace("hollysong"));
             inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.mainhand = ItemManager.getByNamespace("hollysong");
-            inventory.offhand = ItemManager.getByNamespace("arcticfoxtail");
+            inventory.hotbarPrimary.setItem(0, ItemManager.getByNamespace("hollysong"));
+            inventory.hotbarPrimary.setItem(1, ItemManager.getByNamespace("ironroot"));
+            inventory.hotbarPrimary.setItem(2, ItemManager.getByNamespace("cryorose"));
+            inventory.hotbarSecondary.setItem(0, ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.hotbarSecondary.setItem(1, ItemManager.getByNamespace("sunfeather"));
         }
         public void updateCam()
         {
@@ -82,21 +82,23 @@ namespace BasicRPGTest_Mono.Engine
         {
 
         }
-        public void swapHands()
+        public void swapHotbars()
         {
-            Item oldMH = inventory.mainhand;
-            Item oldOH = inventory.offhand;
+            Hotbar oldPrimary = inventory.hotbarPrimary;
+            Hotbar oldSecondary = inventory.hotbarSecondary;
 
-            inventory.mainhand = oldOH;
-            inventory.offhand = oldMH;
+            inventory.hotbarPrimary = oldSecondary;
+            inventory.hotbarSecondary = oldPrimary;
         }
         public void attack(Direction direction)
         {
             if (isAttacking) return;
-            if (inventory.mainhand == null) return;
+            if (inventory.hotbarPrimary.hand == null) return;
+
+            Item mainhand = inventory.hotbarPrimary.hand;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 150, this, inventory.mainhand, inventory.mainhand.swingStyle, inventory.mainhand.swingDist);
+            itemSwing = new ItemSwing(direction, 150, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
             attackTimer = new Timer(150);
             attackTimer.Elapsed += (sender, args) =>
             {

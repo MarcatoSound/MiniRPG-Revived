@@ -140,6 +140,14 @@ namespace BasicRPGTest_Mono
             ItemManager.add(new Tool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 10, swingDist: 1.57f));
             sprite = Content.Load<Texture2D>("arctic_fox_tail");
             ItemManager.add(new Item("Arctic Fox Tail", sprite));
+            sprite = Content.Load<Texture2D>("unicorn_horn");
+            ItemManager.add(new Item("Unicorn Horn", sprite));
+            sprite = Content.Load<Texture2D>("sun_feather");
+            ItemManager.add(new Item("Sun Feather", sprite));
+            sprite = Content.Load<Texture2D>("cryorose");
+            ItemManager.add(new Item("Cryorose", sprite));
+            sprite = Content.Load<Texture2D>("iron_root");
+            ItemManager.add(new Item("Iron Root", sprite));
         }
         private void loadEntities()
         {
