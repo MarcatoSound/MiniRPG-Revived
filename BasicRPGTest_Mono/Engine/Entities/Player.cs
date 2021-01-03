@@ -80,7 +80,7 @@ namespace BasicRPGTest_Mono.Engine
             inventory.hotbarSecondary.setItem(0, ItemManager.getByNamespace("arcticfoxtail"));
             inventory.hotbarSecondary.setItem(1, ItemManager.getByNamespace("sunfeather"));
 
-            GuiWindowManager.playerInv.inventory = inventory;
+            GuiWindowManager.playerInv.updateGui();
         }
         public void updateCam()
         {

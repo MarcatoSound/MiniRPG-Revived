@@ -13,46 +13,50 @@ namespace BasicRPGTest_Mono.Engine.GUI
         private int spacing;
         private const int maxItems = 40;
         public List<Item> items;
+        public List<ItemSlot> slots;
 
-        public GuiPlayerInventoryPage()
+        public GuiPlayerInventoryPage(int size = 40)
         {
-            startPos = new Vector2(302, 53);
+            startPos = new Vector2(664, 193);
             spacing = 50;
             items = new List<Item>();
+            slots = new List<ItemSlot>();
+
+
+            Vector2 pos = new Vector2(startPos.X, startPos.Y);
+            ItemSlot slot;
+            for (int row = 1; row <= 8; row++)
+            {
+                for (int col = 1; col <= 5; col++)
+                {
+                    slot = new ItemSlot(null, new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), 24, 24));
+                    slots.Add(slot);
+                    pos.X += spacing;
+                }
+                pos.X = startPos.X;
+                pos.Y += spacing;
+            }
         }
 
         public void addItem(Item item)
         {
             if (items.Count + 1 > maxItems) return;
             items.Add(item);
+
+            ItemSlot slot = slots[items.Count - 1];
+            slot.item = item;
         }
 
 
         public void Draw(SpriteBatch batch)
         {
-            Vector2 pos = new Vector2(startPos.X, startPos.Y);
-            int itemNumber = 0;
-            Item item;
-            float scale;
-
-            for (int row = 1; row <= 8; row++)
+            foreach (ItemSlot slot in slots)
             {
-                for (int col = 1; col <= 5; col++)
+                if (slot.item != null)
                 {
-                    item = items[itemNumber];
-                    if (item != null)
-                    {
-                        scale = 24.0f / item.graphic.texture.Width;
-                        item.graphic.draw(batch, pos, 0f, Vector2.Zero, scale, false);
-                    }
-                    //System.Diagnostics.Debug.WriteLine("Item number: " + itemNumber);
-                    itemNumber++;
-                    pos.X += spacing;
+                    slot.Draw(batch);
                 }
-                pos.X = startPos.X;
-                pos.Y += spacing;
             }
-
         }
     }
 

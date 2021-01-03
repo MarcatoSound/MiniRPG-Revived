@@ -18,6 +18,7 @@ using BasicRPGTest_Mono.Screens;
 using BasicRPGTest_Mono.Engine.Utility;
 using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.Items;
 
 namespace BasicRPGTest_Mono
 {
@@ -144,7 +145,9 @@ namespace BasicRPGTest_Mono
             };
 
             // MOUSE INPUT HANDLING
-            mouseListener = new MouseListener();
+            MouseListenerSettings mListenerSettings = new MouseListenerSettings();
+            mListenerSettings.DoubleClickMilliseconds = 50;
+            mouseListener = new MouseListener(mListenerSettings);
             Components.Add(new InputListenerComponent(this, mouseListener));
             mouseListener.MouseWheelMoved += (sender, args) =>
             {
@@ -165,6 +168,50 @@ namespace BasicRPGTest_Mono
                     if (currentState.ScrollWheelValue < previousScrollValue) ((ScreenLoadMenu)activeScreen).down();
                     else if (currentState.ScrollWheelValue > previousScrollValue) ((ScreenLoadMenu)activeScreen).up();
                     previousScrollValue = currentState.ScrollWheelValue;
+                }
+
+            };
+            mouseListener.MouseClicked += (sender, args) =>
+            {
+                if (activeScreen is ScreenGame)
+                {
+                    if (GuiWindowManager.activeWindow is GuiPlayerInventory)
+                    {
+                        GuiPlayerInventory playerInv = (GuiPlayerInventory)GuiWindowManager.activeWindow;
+
+                        if (args.Button == MonoGame.Extended.Input.MouseButton.Left)
+                        {
+                            if (playerInv.cursorItem == null)
+                            {
+                                int slotIndex;
+                                Item item = playerInv.getItemAt(args.Position, out slotIndex);
+                                // TODO Prevent inventory from closing while item is in cursor
+                                if (item != null)
+                                {
+                                    slotIndex += 40 * playerInv.currentPage;
+                                    playerInv.cursorItem = item;
+                                    playerInv.removeItem(slotIndex);
+
+
+                                    playerInv.updateGui();
+                                }
+                            }
+                            else
+                            {
+                                int slotIndex;
+                                ItemSlot slot = playerInv.getSlotAt(args.Position, out slotIndex);
+                                if (slot != null)
+                                {
+                                    slotIndex += 40 * playerInv.currentPage;
+                                    playerInv.addItem(slotIndex, playerInv.cursorItem);
+                                    playerInv.cursorItem = null;
+
+
+                                    playerInv.updateGui();
+                                }
+                            }
+                        }
+                    }
                 }
             };
 
