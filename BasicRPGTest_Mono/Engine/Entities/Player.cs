@@ -81,20 +81,6 @@ namespace BasicRPGTest_Mono.Engine
 
             GuiWindowManager.playerInv.updateGui();
         }
-        public void updateCam()
-        {
-            Vector2 camPos = new Vector2(
-                Position.X - (Camera.camera.BoundingRectangle.Width / 2), 
-                Position.Y - (Camera.camera.BoundingRectangle.Height / 2)
-                );
-
-            if (camPos.X < 0) camPos.X = 0;
-            if (camPos.X > MapManager.activeMap.widthInPixels) camPos.X = MapManager.activeMap.widthInPixels;
-            if (camPos.Y < 0) camPos.Y = 0;
-            if (camPos.Y > MapManager.activeMap.heightInPixels) camPos.Y = MapManager.activeMap.heightInPixels;
-
-            Camera.camPos = camPos;
-        }
         public void toggleInv()
         {
             if (GuiWindowManager.activeWindow == null)
@@ -113,6 +99,7 @@ namespace BasicRPGTest_Mono.Engine
             inventory.hotbarPrimary = oldSecondary;
             inventory.hotbarSecondary = oldPrimary;
         }
+
         public void attack(Direction direction)
         {
             if (isAttacking) return;
@@ -130,13 +117,20 @@ namespace BasicRPGTest_Mono.Engine
                 attackTimer = null;
             };
             attackTimer.Start();
-            
+
+        }
+        public void Dash()
+        {
+            if (!isDashing)
+            {
+                isDashing = true;
+                maxVelocity = new Vector2(Convert.ToInt32(speed * 4), Convert.ToInt32(speed * 4));
+                dashTimer.Start();
+            }
         }
         public override void move()
         {
-            Vector2 _cameraPosition = Camera.camera.Position;
             Vector2 newPlayerPos = Position;
-            Vector2 newCameraPos = _cameraPosition;
 
             if (velocity.X > 0)
             {
@@ -146,17 +140,10 @@ namespace BasicRPGTest_Mono.Engine
                 if (newPlayerPos.X > (MapManager.activeMap.widthInPixels - (graphic.width / 2)))
                     newPlayerPos.X = MapManager.activeMap.widthInPixels - (graphic.width / 2);
 
-                if (!(newPlayerPos.X <= graphicsManager.PreferredBackBufferWidth / 2))
-                    newCameraPos.X += velocity.X * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.X >= (MapManager.activeMap.widthInPixels - Camera.camera.BoundingRectangle.Width))
-                    newCameraPos.X = MapManager.activeMap.widthInPixels - Camera.camera.BoundingRectangle.Width;
-
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
                     newPlayerPos.X = Position.X;
-                    newCameraPos.X = _cameraPosition.X;
                 }
 
             }
@@ -168,17 +155,11 @@ namespace BasicRPGTest_Mono.Engine
                 if (newPlayerPos.X < 0 + (graphic.width / 2))
                     newPlayerPos.X = 0 + (graphic.width / 2);
 
-                if (!(newPlayerPos.X >= MapManager.activeMap.widthInPixels - (graphicsManager.PreferredBackBufferWidth / 2)))
-                    newCameraPos.X += velocity.X * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.X <= 0)
-                    newCameraPos.X = 0;
 
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
                     newPlayerPos.X = Position.X;
-                    newCameraPos.X = _cameraPosition.X;
                 }
 
             }
@@ -191,17 +172,10 @@ namespace BasicRPGTest_Mono.Engine
                 if (newPlayerPos.Y > (MapManager.activeMap.heightInPixels - (graphic.width / 2)))
                     newPlayerPos.Y = MapManager.activeMap.heightInPixels - (graphic.width / 2);
 
-                if (!(newPlayerPos.Y <= graphicsManager.PreferredBackBufferHeight / 2))
-                    newCameraPos.Y += velocity.Y * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.Y >= (MapManager.activeMap.heightInPixels - Camera.camera.BoundingRectangle.Height))
-                    newCameraPos.Y = MapManager.activeMap.heightInPixels - Camera.camera.BoundingRectangle.Height;
-
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
                     newPlayerPos.Y = Position.Y;
-                    newCameraPos.Y = _cameraPosition.Y;
                 }
 
             }
@@ -213,24 +187,17 @@ namespace BasicRPGTest_Mono.Engine
                 if (newPlayerPos.Y < 0 + (graphic.height / 2))
                     newPlayerPos.Y = 0 + (graphic.height / 2);
 
-                if (!(newPlayerPos.Y >= MapManager.activeMap.heightInPixels - (graphicsManager.PreferredBackBufferHeight / 2)))
-                    newCameraPos.Y += velocity.Y * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
-                if (newCameraPos.Y <= 0)
-                    newCameraPos.Y = 0;
 
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
                     newPlayerPos.Y = Position.Y;
-                    newCameraPos.Y = _cameraPosition.Y;
                 }
 
             }
 
 
             Position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
-            //Camera.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
 
         }
 
@@ -246,36 +213,12 @@ namespace BasicRPGTest_Mono.Engine
 
             return pos;
         }
-        public Vector2 getPlayerTilePosition(Vector2 truePos)
-        {
-            Vector2 pos = new Vector2(truePos.X, truePos.Y);
-
-            pos.X = (int)pos.X / TileManager.dimensions;
-            pos.Y = (int)pos.Y / TileManager.dimensions;
-
-            return pos;
-        }
         public Vector2 getPlayerTilePositionPrecise()
         {
             Vector2 pos = new Vector2(Position.X, Position.Y);
 
             pos.X = pos.X / TileManager.dimensions;
             pos.Y = pos.Y / TileManager.dimensions;
-
-            return pos;
-        }
-        public Vector2 getPlayerScreenPosition()
-        {
-            Vector2 pos = new Vector2(graphicsManager.PreferredBackBufferWidth / 2, graphicsManager.PreferredBackBufferHeight / 2);
-
-            // Check if the player is already considered "centered" first
-            if (Position.X == pos.X && Position.Y == pos.Y)
-                return pos;
-
-            if (Position.X < pos.X) pos.X = Position.X;
-            if (Position.Y < pos.Y) pos.Y = Position.Y;
-            if (Position.X > MapManager.activeMap.widthInPixels - pos.X) pos.X = pos.X + (Position.X - (MapManager.activeMap.widthInPixels - pos.X));
-            if (Position.Y > MapManager.activeMap.heightInPixels - pos.Y) pos.Y = pos.Y + (Position.Y - (MapManager.activeMap.heightInPixels - pos.Y));
 
             return pos;
         }
@@ -418,10 +361,8 @@ namespace BasicRPGTest_Mono.Engine
 
             int maxKbTime = 200;
             double zOut = Math.Pow(z, -1) * 10 + 0.3;
-            //System.Diagnostics.Debug.WriteLine("zOut: " + zOut);
             int kbTime = Convert.ToInt32(Math.Min(Math.Max(1000 * zOut - 400, 25), maxKbTime));
             kbTime = Convert.ToInt32(kbTime - (kbTime * kbResist));
-            //System.Diagnostics.Debug.WriteLine("KB Time: " + kbTime);
             knockbackTimer = new Timer(kbTime);
             knockbackTimer.Elapsed += (sender, args) =>
             {
@@ -431,15 +372,6 @@ namespace BasicRPGTest_Mono.Engine
                 knockbackTimer = null;
             };
             knockbackTimer.Start();
-        }
-        public void Dash()
-        {
-            if (!isDashing)
-            {
-                isDashing = true;
-                maxVelocity = new Vector2(Convert.ToInt32(speed * 4), Convert.ToInt32(speed * 4));
-                dashTimer.Start();
-            }
         }
         public override void draw(SpriteBatch batch)
         {

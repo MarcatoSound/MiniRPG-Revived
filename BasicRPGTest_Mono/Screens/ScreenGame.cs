@@ -121,7 +121,6 @@ namespace BasicRPGTest_Mono
                 // Load player data
                 Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
                 player.Position = (Vector2)playerData["position"];
-                player.updateCam();
 
                 return;
             }

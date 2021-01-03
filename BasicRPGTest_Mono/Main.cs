@@ -81,13 +81,7 @@ namespace BasicRPGTest_Mono
                 {
                     if (args.Key == Keys.Space)
                     {
-                        System.Diagnostics.Debug.WriteLine("Camera: " + Camera.camera.BoundingRectangle);
-                        System.Diagnostics.Debug.WriteLine("Player: " + Core.player.Position);
-                        //if (GuiWindowManager.activeWindow == null) GuiWindowManager.openWindow(1);
-                        //else GuiWindowManager.closeWindow();
-                        //System.Diagnostics.Debug.WriteLine("Region tiles: " + MapManager.activeMap.regions.);
-                        //System.Diagnostics.Debug.WriteLine("Camera position: " + Camera.camPos);
-                        //System.Diagnostics.Debug.WriteLine("Camera box: " + Camera.camera.BoundingRectangle);
+                        // Debug key
                     }
                     if (args.Key == Keys.Escape) mainMenu();
 
@@ -252,11 +246,8 @@ namespace BasicRPGTest_Mono
                 _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
                 _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
                 Camera.camera.Initialize();
-                //var viewportadapter = new BoxingViewportAdapter(Window, GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
-                //Camera.camera = new Camera2D(this);
             };
 
-            var viewportadapter = new BoxingViewportAdapter(Window, GraphicsDevice, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
             Camera.camera = new Camera2D(this);
             Camera.camera.Initialize();
 

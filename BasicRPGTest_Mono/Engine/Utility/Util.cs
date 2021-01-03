@@ -1,5 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -355,6 +356,16 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return spawns[iteration];
 
+        }
+
+        public static Vector2 getTilePosition(Vector2 truePos)
+        {
+            Vector2 pos = new Vector2(truePos.X, truePos.Y);
+
+            pos.X = (int)pos.X / TileManager.dimensions;
+            pos.Y = (int)pos.Y / TileManager.dimensions;
+
+            return pos;
         }
 
         public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int dimensions = 32)
