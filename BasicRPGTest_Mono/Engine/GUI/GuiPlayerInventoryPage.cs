@@ -9,14 +9,18 @@ namespace BasicRPGTest_Mono.Engine.GUI
 {
     public class GuiPlayerInventoryPage
     {
+        private GuiPlayerInventory parent;
+
         private Vector2 startPos;
         private int spacing;
         private const int maxItems = 40;
         public List<Item> items;
         public List<ItemSlot> slots;
 
-        public GuiPlayerInventoryPage(int size = 40)
+        public GuiPlayerInventoryPage(GuiPlayerInventory parent)
         {
+            this.parent = parent;
+
             startPos = new Vector2(664, 193);
             spacing = 50;
             items = new List<Item>();

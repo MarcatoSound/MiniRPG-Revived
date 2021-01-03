@@ -29,6 +29,10 @@ namespace BasicRPGTest_Mono.Engine.Inventories
         public Hotbar()
         {
             maxItems = 5;
+            for (int i = 0; i < maxItems; i++)
+            {
+                items.TryAdd(i, null);
+            }
         }
 
         public void next()

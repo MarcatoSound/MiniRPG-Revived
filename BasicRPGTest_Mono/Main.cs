@@ -188,7 +188,8 @@ namespace BasicRPGTest_Mono
                                 // TODO Prevent inventory from closing while item is in cursor
                                 if (item != null)
                                 {
-                                    slotIndex += 40 * playerInv.currentPage;
+                                    if (slotIndex > 13)
+                                        slotIndex += 40 * playerInv.currentPage;
                                     playerInv.cursorItem = item;
                                     playerInv.removeItem(slotIndex);
 
@@ -202,9 +203,10 @@ namespace BasicRPGTest_Mono
                                 ItemSlot slot = playerInv.getSlotAt(args.Position, out slotIndex);
                                 if (slot != null)
                                 {
-                                    slotIndex += 40 * playerInv.currentPage;
+                                    if (slotIndex > 13)
+                                        slotIndex += 40 * playerInv.currentPage;
                                     playerInv.addItem(slotIndex, playerInv.cursorItem);
-                                    playerInv.cursorItem = null;
+                                    //playerInv.cursorItem = null;
 
 
                                     playerInv.updateGui();
