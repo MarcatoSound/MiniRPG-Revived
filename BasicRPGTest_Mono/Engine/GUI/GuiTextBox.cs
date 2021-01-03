@@ -12,7 +12,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
         public TextBox textBox;
 
         public GuiTextBox(string text, int padding = 10) : 
-            base(new Rectangle(128, 0, 512, 128), GuiWindowManager.tileset)
+            base("textbox", new Rectangle(128, 0, 512, 128), GuiWindowManager.tileset)
         {
             this.text = text;
             Rectangle textBoxRect = new Rectangle(box.X + padding, box.Y + padding, box.Width - (padding * 2), box.Height - (padding * 2));

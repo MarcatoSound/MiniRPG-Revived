@@ -53,11 +53,34 @@ namespace BasicRPGTest_Mono.Engine
             inventory = new PlayerInventory();
             inventory.addItem(ItemManager.getByNamespace("hollysong"));
             inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.addItem(ItemManager.getByNamespace("ironroot"));
+            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
+            inventory.addItem(ItemManager.getByNamespace("cryorose"));
+            inventory.addItem(ItemManager.getByNamespace("unicornhorn"));
+            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.addItem(ItemManager.getByNamespace("ironroot"));
+            inventory.addItem(ItemManager.getByNamespace("unicornhorn"));
+            inventory.addItem(ItemManager.getByNamespace("cryorose"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.addItem(ItemManager.getByNamespace("ironroot"));
+            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
+            inventory.addItem(ItemManager.getByNamespace("cryorose"));
+            inventory.addItem(ItemManager.getByNamespace("unicornhorn"));
+            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
+            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
+            inventory.setItem(23, ItemManager.getByNamespace("ironroot"));
+            inventory.setItem(35, ItemManager.getByNamespace("unicornhorn"));
+            inventory.setItem(30, ItemManager.getByNamespace("cryorose"));
+            inventory.setItem(52, ItemManager.getByNamespace("hollysong"));
+            inventory.addItem(ItemManager.getByNamespace("hollysong"));
             inventory.hotbarPrimary.setItem(0, ItemManager.getByNamespace("hollysong"));
             inventory.hotbarPrimary.setItem(1, ItemManager.getByNamespace("ironroot"));
             inventory.hotbarPrimary.setItem(2, ItemManager.getByNamespace("cryorose"));
             inventory.hotbarSecondary.setItem(0, ItemManager.getByNamespace("arcticfoxtail"));
             inventory.hotbarSecondary.setItem(1, ItemManager.getByNamespace("sunfeather"));
+
+            GuiWindowManager.playerInv.inventory = inventory;
         }
         public void updateCam()
         {
@@ -78,9 +101,15 @@ namespace BasicRPGTest_Mono.Engine
             if (paused) paused = false;
             else paused = true;
         }
-        public void openInv()
+        public void toggleInv()
         {
-
+            if (GuiWindowManager.activeWindow == null)
+            {
+                GuiPlayerInventory invGui = (GuiPlayerInventory)GuiWindowManager.getByName("playerinventory");
+                invGui.updateGui();
+                GuiWindowManager.openWindow(invGui);
+            }
+            else GuiWindowManager.closeWindow();
         }
         public void swapHotbars()
         {

@@ -153,6 +153,18 @@
 /processorParam:TextureFormat=Color
 /build:grass.png
 
+#begin gui_inventory.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:gui_inventory.png
+
 #begin gui_tileset.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -188,18 +200,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:iron_root.png
-
-#begin LightShadow_pipo.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:LightShadow_pipo.png
 
 #begin main_font.spritefont
 /importer:FontDescriptionImporter

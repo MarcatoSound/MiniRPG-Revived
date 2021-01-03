@@ -101,7 +101,7 @@ namespace BasicRPGTest_Mono
                         if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
 
                         if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHotbars();
-                        if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();
+                        if (args.Key == Keys.E) Core.player.toggleInv();
 
                         if (args.Key == Keys.NumPad1) Core.player.inventory.hotbarPrimary.setSlot(0);
                         if (args.Key == Keys.NumPad2) Core.player.inventory.hotbarPrimary.setSlot(1);
@@ -110,7 +110,7 @@ namespace BasicRPGTest_Mono
                         if (args.Key == Keys.NumPad5) Core.player.inventory.hotbarPrimary.setSlot(4);
                     } else
                     {
-                        if (args.Key == Keys.E) ((ScreenGame)activeScreen).player.openInv();
+                        if (args.Key == Keys.E) Core.player.toggleInv();
                         //if (args.Key == Keys.Down || args.Key == Keys.S) Core.player.activeMenu.index++;
                         //if (args.Key == Keys.Up || args.Key == Keys.W) Core.player.activeMenu.index--;
                         if (args.Key == Keys.Enter)
@@ -118,6 +118,21 @@ namespace BasicRPGTest_Mono
                             if (GuiWindowManager.activeWindow is GuiTextBox)
                             {
                                 ((GuiTextBox)GuiWindowManager.activeWindow).next();
+                            }
+                        }
+
+                        if (args.Key == Keys.Right)
+                        {
+                            if (GuiWindowManager.activeWindow is GuiPlayerInventory)
+                            {
+                                ((GuiPlayerInventory)GuiWindowManager.activeWindow).nextPage();
+                            }
+                        }
+                        if (args.Key == Keys.Left)
+                        {
+                            if (GuiWindowManager.activeWindow is GuiPlayerInventory)
+                            {
+                                ((GuiPlayerInventory)GuiWindowManager.activeWindow).previousPage();
                             }
                         }
                     }
@@ -162,6 +177,7 @@ namespace BasicRPGTest_Mono
             IsMouseVisible = true;
             Core.game = this;
             Core.graphics = _graphics.GraphicsDevice;
+            Core.content = Content;
 
             Window.AllowUserResizing = true;
             

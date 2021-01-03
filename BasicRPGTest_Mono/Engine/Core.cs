@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace BasicRPGTest_Mono.Engine
         public static GameTime globalTime;
         public static GraphicsDevice graphics;
 
+        public static ContentManager content;
         public static SpriteFont mainFont;
 
         public static Player player;

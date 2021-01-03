@@ -7,7 +7,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
     public class GuiInventory : GuiWindow
     {
         public GuiInventory() : 
-            base(new Microsoft.Xna.Framework.Rectangle(0, 0, 512, 128), GuiWindowManager.tileset)
+            base("inventory", new Microsoft.Xna.Framework.Rectangle(0, 0, 512, 128), GuiWindowManager.tileset)
         {
 
         }

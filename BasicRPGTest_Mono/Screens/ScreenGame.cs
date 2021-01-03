@@ -79,6 +79,7 @@ namespace BasicRPGTest_Mono
             Save.save(MapManager.activeMap, worldName);
             Save.save(player, worldName);
             Camera.reset();
+            GuiWindowManager.closeWindow();
 
             worldName = "";
             player = null;
@@ -167,13 +168,7 @@ namespace BasicRPGTest_Mono
         {
             Texture2D texture = Content.Load<Texture2D>("gui_tileset");
             GuiWindowManager.tileset = texture;
-            GuiWindowManager.add(new GuiInventory());
-            GuiWindowManager.add(new GuiTextBox("Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                "Pellentesque ornare elit quis volutpat eleifend. Sed lorem libero, blandit a fringilla eget, " +
-                "tristique quis massa. Integer dapibus molestie nibh ut ultricies. Sed sit amet venenatis ex. " +
-                "Cras fringilla egestas ultricies. Morbi quis fringilla quam. Suspendisse potenti. Fusce auctor " +
-                "placerat ornare. Sed."
-                ));
+            GuiWindowManager.add(new GuiPlayerInventory());
         }
 
 

@@ -9,15 +9,22 @@ namespace BasicRPGTest_Mono.Engine.GUI
 {
     public class GuiWindow
     {
+        public string name;
         public Rectangle box;
         public Texture2D guiTileset;
         public RenderTarget2D texture;
 
-        public GuiWindow(Rectangle box, Texture2D tileset)
+        public GuiWindow(string name, Rectangle box, Texture2D tileset)
         {
+            this.name = name;
             this.box = box;
             guiTileset = tileset;
             buildWindow();
+        }
+        public GuiWindow(string name, Rectangle box)
+        {
+            this.name = name;
+            this.box = box;
         }
 
         public void buildWindow()

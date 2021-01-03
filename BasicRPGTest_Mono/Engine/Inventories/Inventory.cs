@@ -18,19 +18,29 @@ namespace BasicRPGTest_Mono.Engine
 
         public Item getItem(int slot)
         {
-            if (slot > items.Count - 1) return null;
-            return items[slot];
+            Item item;
+            try
+            {
+                item = items[slot];
+            } catch (KeyNotFoundException)
+            {
+                return null;
+            }
+            return item;
         }
 
         public void addItem(Item item)
         {
-            int slot = items.Count;
+            int slot = getFirstEmpty();
+            //System.Diagnostics.Debug.WriteLine("First empty: " + slot);
             if (maxItems != 0 && slot + 1 > maxItems)
             {
                 // Put an error message here
+                System.Diagnostics.Debug.WriteLine("Canceled adding item " + item.displayName);
                 return;
             }
 
+            items.TryRemove(slot, out _);
             items.TryAdd(slot, item);
         }
 
@@ -42,14 +52,24 @@ namespace BasicRPGTest_Mono.Engine
                 return;
             }
 
-            if (getItem(slot) != null) items.TryRemove(slot, out _);
+            items.TryRemove(slot, out _);
             items.TryAdd(slot, item);
         }
         public void setItem(int slot, Item item, out Item oldItem)
         {
-            if (getItem(slot) != null) items.TryRemove(slot, out oldItem);
-            else oldItem = null;
+            items.TryRemove(slot, out oldItem);
             items.TryAdd(slot, item);
+        }
+
+        // Returns -1 if there are no empty slots.
+        public int getFirstEmpty()
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (getItem(i) == null) return i;
+            }
+
+            return -1;
         }
 
     }
