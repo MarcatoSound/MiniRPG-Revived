@@ -148,13 +148,12 @@ namespace BasicRPGTest_Mono.Engine
             return true;
         }
 
-        public void Draw(OrthographicCamera camera, SpriteBatch batch)
+        public void Draw(Camera2D camera, SpriteBatch batch)
         {
             foreach (Region region in regions.Values)
             {
                 if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                var transformMatrix = camera.GetViewMatrix();
-                batch.Begin(transformMatrix: transformMatrix);
+                batch.Begin(transformMatrix: Camera.camera.Transform);
                 region.draw(batch);
                 batch.End();
             }

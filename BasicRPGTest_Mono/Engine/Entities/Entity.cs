@@ -15,7 +15,14 @@ namespace BasicRPGTest_Mono.Engine
         public int instanceId { get; set; }
         public Graphic graphic { get; set; }
         public Rectangle boundingBox { get; set; }
-        public Vector2 position { get; set; }
+        public Vector2 Position { get; set; }
+        public Vector2 CenteredPosition
+        {
+            get
+            {
+                return new Vector2(Position.X + (graphic.texture.Width / 2), Position.Y + (graphic.texture.Height / 2));
+            }
+        }
 
         private Color _tintColor = Color.White;
         public Color tintColor
@@ -60,39 +67,14 @@ namespace BasicRPGTest_Mono.Engine
         public virtual void draw(SpriteBatch batch)
         {
             if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
-            Vector2 screenPos = getScreenPosition();
-            Vector2 screenPosCentered = getScreenPosition(true);
-            graphic.draw(batch, screenPos, tintColor);
+            graphic.draw(batch, Position, tintColor);
 
-            batch.Begin();
-            batch.DrawRectangle(new Rectangle((int)screenPos.X, (int)screenPos.Y, 5, 5), Color.AliceBlue);
-            batch.DrawRectangle(new Rectangle((int)screenPosCentered.X, (int)screenPosCentered.Y, 1, 1), Color.AliceBlue);
+            batch.Begin(transformMatrix: Camera.camera.Transform);
+            batch.DrawRectangle(new Rectangle((int)CenteredPosition.X, (int)CenteredPosition.Y, 5, 5), Color.AliceBlue);
             batch.End();
         }
 
-        public Vector2 getScreenPosition(bool centered = false)
-        {
-            Vector2 pos = new Vector2(position.X, position.Y);
 
-            pos.X = pos.X - Camera.camPos.X;
-            pos.Y = pos.Y - Camera.camPos.Y;
-
-            if (centered)
-            {
-                pos.X += graphic.texture.Width / 2;
-                pos.Y += graphic.texture.Height / 2;
-            }
-
-            return pos;
-        }
-
-        public virtual Rectangle getScreenBox()
-        {
-            Vector2 pos = getScreenPosition();
-            Rectangle box = new Rectangle(Convert.ToInt32(pos.X + ((32 - boundingBox.Width) / 2)), Convert.ToInt32(pos.Y + (32 - boundingBox.Height)), boundingBox.Width, boundingBox.Height);
-
-            return box;
-        }
         public virtual Rectangle getBox(Vector2 pos)
         {
             Rectangle box = new Rectangle(Convert.ToInt32(pos.X + (32 - boundingBox.Width) / 2), Convert.ToInt32(pos.Y + (32 - boundingBox.Height)), boundingBox.Width, boundingBox.Height);

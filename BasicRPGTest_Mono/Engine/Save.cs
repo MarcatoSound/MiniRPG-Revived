@@ -34,8 +34,8 @@ namespace BasicRPGTest_Mono.Engine
             System.Diagnostics.Debug.WriteLine("## Saving player info!");
 
             JObject jsonPos = new JObject();
-            jsonPos.Add("x", player.position.X);
-            jsonPos.Add("y", player.position.Y);
+            jsonPos.Add("x", player.Position.X);
+            jsonPos.Add("y", player.Position.Y);
 
             json.Add("position", jsonPos);
 

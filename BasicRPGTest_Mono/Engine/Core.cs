@@ -17,5 +17,7 @@ namespace BasicRPGTest_Mono.Engine
         public static SpriteFont mainFont;
 
         public static Player player;
+
+        public static bool paused;
     }
 }

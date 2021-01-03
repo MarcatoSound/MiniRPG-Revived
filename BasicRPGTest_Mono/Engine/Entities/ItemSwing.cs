@@ -118,7 +118,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                         hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                         break;
                 }
-                batch.Begin();
+                batch.Begin(transformMatrix: Camera.camera.Transform);
                 batch.DrawRectangle(hitBox, Color.White);
                 batch.End();
 
@@ -160,7 +160,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                         hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                         break;
                 }
-                batch.Begin();
+                batch.Begin(transformMatrix: Camera.camera.Transform);
                 batch.DrawRectangle(hitBox, Color.White);
                 batch.End();
 

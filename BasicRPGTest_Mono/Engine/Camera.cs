@@ -8,7 +8,8 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class Camera
     {
-        public static OrthographicCamera camera;
+        public static Camera2D camera;
+        //public static OrthographicCamera camera;
 
         private static Vector2 _camPos;
         public static Vector2 camPos
@@ -17,7 +18,7 @@ namespace BasicRPGTest_Mono.Engine
             set
             {
                 _camPos = value;
-                camera.Position = _camPos;
+                //camera.Position = _camPos;
             }
         }
 

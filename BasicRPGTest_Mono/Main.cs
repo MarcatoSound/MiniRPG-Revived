@@ -81,15 +81,17 @@ namespace BasicRPGTest_Mono
                 {
                     if (args.Key == Keys.Space)
                     {
-                        if (GuiWindowManager.activeWindow == null) GuiWindowManager.openWindow(1);
-                        else GuiWindowManager.closeWindow();
+                        System.Diagnostics.Debug.WriteLine("Camera: " + Camera.camera.BoundingRectangle);
+                        System.Diagnostics.Debug.WriteLine("Player: " + Core.player.Position);
+                        //if (GuiWindowManager.activeWindow == null) GuiWindowManager.openWindow(1);
+                        //else GuiWindowManager.closeWindow();
                         //System.Diagnostics.Debug.WriteLine("Region tiles: " + MapManager.activeMap.regions.);
                         //System.Diagnostics.Debug.WriteLine("Camera position: " + Camera.camPos);
                         //System.Diagnostics.Debug.WriteLine("Camera box: " + Camera.camera.BoundingRectangle);
                     }
                     if (args.Key == Keys.Escape) mainMenu();
 
-                    if (!Core.player.paused)
+                    if (!Core.paused)
                     {
                         if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
                         {
@@ -249,12 +251,14 @@ namespace BasicRPGTest_Mono
                 System.Diagnostics.Debug.WriteLine("Client Height: " + Window.ClientBounds.Height);
                 _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
                 _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
-                var viewportadapter = new BoxingViewportAdapter(Window, GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
-                Camera.camera = new OrthographicCamera(viewportadapter);
+                Camera.camera.Initialize();
+                //var viewportadapter = new BoxingViewportAdapter(Window, GraphicsDevice, Window.ClientBounds.Width, Window.ClientBounds.Height);
+                //Camera.camera = new Camera2D(this);
             };
 
             var viewportadapter = new BoxingViewportAdapter(Window, GraphicsDevice, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
-            Camera.camera = new OrthographicCamera(viewportadapter);
+            Camera.camera = new Camera2D(this);
+            Camera.camera.Initialize();
 
             mainMenu();
         }

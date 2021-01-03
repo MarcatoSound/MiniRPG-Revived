@@ -76,7 +76,7 @@ namespace RPGEngine
             Rectangle destinationRectangle = new Rectangle((int)location.X, (int)location.Y, width, height);
 
             if (newBatch)
-                spriteBatch.Begin();
+                spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
 
             spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, tintColor, 0f, new Vector2(width / 2, height / 2), SpriteEffects.None, 0f);
 

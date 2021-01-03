@@ -32,7 +32,7 @@ namespace BasicRPGTest_Mono.Engine
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
             this.speed = speed;
-            this.position = position;
+            this.Position = position;
             boundingBox = getBox(position);
 
             //EntityManager.add(this);
@@ -42,14 +42,14 @@ namespace BasicRPGTest_Mono.Engine
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
             this.speed = speed;
-            this.position = position;
+            this.Position = position;
 
             //EntityManager.add(this);
         }
         public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
         {
             this.speed = entity.speed;
-            this.position = pos;
+            this.Position = pos;
             this.instanceId = instanceId;
 
             tickTimer = new Timer(50);
@@ -196,7 +196,7 @@ namespace BasicRPGTest_Mono.Engine
         }
         public virtual void move()
         {
-            Vector2 newPos = position;
+            Vector2 newPos = Position;
             Rectangle newBox = boundingBox;
 
             // Right
@@ -211,7 +211,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(newBox))
                 {
-                    newPos.X = position.X;
+                    newPos.X = Position.X;
                     newBox.X = boundingBox.X;
                 }
             }
@@ -228,7 +228,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(newBox))
                 {
-                    newPos.X = position.X;
+                    newPos.X = Position.X;
                     newBox.X = boundingBox.X;
                 }
             }
@@ -244,7 +244,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(newBox))
                 {
-                    newPos.Y = position.Y;
+                    newPos.Y = Position.Y;
                     newBox.Y = boundingBox.Y;
                 }
             }
@@ -261,12 +261,12 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(newBox))
                 {
-                    newPos.Y = position.Y;
+                    newPos.Y = Position.Y;
                     newBox.Y = boundingBox.Y;
                 }
             }
 
-            position = new Vector2(newPos.X, newPos.Y);
+            Position = new Vector2(newPos.X, newPos.Y);
             boundingBox = new Rectangle(newBox.X, newBox.Y, newBox.Width, newBox.Height);
 
         }
@@ -297,7 +297,7 @@ namespace BasicRPGTest_Mono.Engine
             if (isGettingKnockedBack) return;
             isGettingKnockedBack = true;
 
-            Vector2 screenPos = getScreenPosition();
+            Vector2 screenPos = Position;
             screenPos.X = screenPos.X + (graphic.texture.Width / 2);
             screenPos.Y = screenPos.Y + (graphic.texture.Height / 2);
             Vector2 targetDist = new Vector2();

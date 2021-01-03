@@ -64,6 +64,8 @@ namespace BasicRPGTest_Mono
             player = new Player(texture, _graphics);
 
             loadPlayer();
+            Camera.camera.Position = player.Position;
+            Camera.camera.CameraLimits = new Rectangle(0, 0, MapManager.activeMap.widthInPixels, MapManager.activeMap.heightInPixels);
 
 
             // Saving functionality
@@ -118,7 +120,7 @@ namespace BasicRPGTest_Mono
             {
                 // Load player data
                 Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
-                player.position = (Vector2)playerData["position"];
+                player.Position = (Vector2)playerData["position"];
                 player.updateCam();
 
                 return;
@@ -175,14 +177,20 @@ namespace BasicRPGTest_Mono
         public override void Update(GameTime gameTime)
         {
             if (MapManager.activeMap == null) return;
-            List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
-            foreach (LivingEntity entity in entities)
+            
+            if (!Core.paused)
             {
-                entity.update();
+                List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
+                foreach (LivingEntity entity in entities)
+                {
+                    entity.update();
+                }
+
+                player.update();
             }
 
-            player.update();
-            Camera.camera.Position = Camera.camPos;
+
+            Camera.camera.Update(gameTime);
 
         }
 
@@ -209,8 +217,8 @@ namespace BasicRPGTest_Mono
             foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);
-                _spriteBatch.Begin();
-                _spriteBatch.DrawRectangle(entity.getScreenBox(), Color.White);
+                _spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
+                _spriteBatch.DrawRectangle(entity.boundingBox, Color.White);
                 _spriteBatch.End();
             }
 

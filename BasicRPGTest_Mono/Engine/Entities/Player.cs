@@ -18,10 +18,8 @@ using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine
 {
-    public class Player : LivingEntity
+    public class Player : LivingEntity, IFocusable
     {
-        public bool paused;
-
         public bool isDashing;
         public Timer dashTimer;
 
@@ -34,11 +32,12 @@ namespace BasicRPGTest_Mono.Engine
             base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
         {
             Core.player = this;
+            Camera.camera.Focus = this;
 
             graphicsManager = graphics;
-            position = new Vector2(MapManager.activeMap.widthInPixels / 2, MapManager.activeMap.heightInPixels / 2);
-            boundingBox = new Rectangle((int)position.X, (int)position.Y, 28, 26);
-            Camera.camPos = new Vector2(position.X - (Camera.camera.BoundingRectangle.Width / 2), position.Y - (Camera.camera.BoundingRectangle.Height / 2));
+            Position = new Vector2(MapManager.activeMap.widthInPixels / 2, MapManager.activeMap.heightInPixels / 2);
+            boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 28, 26);
+            Camera.camPos = new Vector2(Position.X - (Camera.camera.BoundingRectangle.Width / 2), Position.Y - (Camera.camera.BoundingRectangle.Height / 2));
             maxVelocity = new Vector2(speed, speed);
             dashTimer = new Timer(200);
             dashTimer.Elapsed += (sender, args) =>
@@ -85,8 +84,8 @@ namespace BasicRPGTest_Mono.Engine
         public void updateCam()
         {
             Vector2 camPos = new Vector2(
-                position.X - (Camera.camera.BoundingRectangle.Width / 2), 
-                position.Y - (Camera.camera.BoundingRectangle.Height / 2)
+                Position.X - (Camera.camera.BoundingRectangle.Width / 2), 
+                Position.Y - (Camera.camera.BoundingRectangle.Height / 2)
                 );
 
             if (camPos.X < 0) camPos.X = 0;
@@ -95,11 +94,6 @@ namespace BasicRPGTest_Mono.Engine
             if (camPos.Y > MapManager.activeMap.heightInPixels) camPos.Y = MapManager.activeMap.heightInPixels;
 
             Camera.camPos = camPos;
-        }
-        public void togglePause()
-        {
-            if (paused) paused = false;
-            else paused = true;
         }
         public void toggleInv()
         {
@@ -141,7 +135,7 @@ namespace BasicRPGTest_Mono.Engine
         public override void move()
         {
             Vector2 _cameraPosition = Camera.camera.Position;
-            Vector2 newPlayerPos = position;
+            Vector2 newPlayerPos = Position;
             Vector2 newCameraPos = _cameraPosition;
 
             if (velocity.X > 0)
@@ -161,7 +155,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
-                    newPlayerPos.X = position.X;
+                    newPlayerPos.X = Position.X;
                     newCameraPos.X = _cameraPosition.X;
                 }
 
@@ -183,7 +177,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
-                    newPlayerPos.X = position.X;
+                    newPlayerPos.X = Position.X;
                     newCameraPos.X = _cameraPosition.X;
                 }
 
@@ -206,7 +200,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
-                    newPlayerPos.Y = position.Y;
+                    newPlayerPos.Y = Position.Y;
                     newCameraPos.Y = _cameraPosition.Y;
                 }
 
@@ -228,15 +222,15 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (isColliding(getBox(newPlayerPos)))
                 {
-                    newPlayerPos.Y = position.Y;
+                    newPlayerPos.Y = Position.Y;
                     newCameraPos.Y = _cameraPosition.Y;
                 }
 
             }
 
 
-            position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
-            Camera.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
+            Position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
+            //Camera.camPos = new Vector2(newCameraPos.X, newCameraPos.Y);
 
         }
 
@@ -244,7 +238,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public Vector2 getPlayerTilePosition()
         {
-            Vector2 pos = new Vector2(position.X, position.Y);
+            Vector2 pos = new Vector2(Position.X, Position.Y);
 
             pos.X = (int)pos.X / TileManager.dimensions;
             pos.Y = (int)pos.Y / TileManager.dimensions;
@@ -263,7 +257,7 @@ namespace BasicRPGTest_Mono.Engine
         }
         public Vector2 getPlayerTilePositionPrecise()
         {
-            Vector2 pos = new Vector2(position.X, position.Y);
+            Vector2 pos = new Vector2(Position.X, Position.Y);
 
             pos.X = pos.X / TileManager.dimensions;
             pos.Y = pos.Y / TileManager.dimensions;
@@ -275,22 +269,15 @@ namespace BasicRPGTest_Mono.Engine
             Vector2 pos = new Vector2(graphicsManager.PreferredBackBufferWidth / 2, graphicsManager.PreferredBackBufferHeight / 2);
 
             // Check if the player is already considered "centered" first
-            if (position.X == pos.X && position.Y == pos.Y)
+            if (Position.X == pos.X && Position.Y == pos.Y)
                 return pos;
 
-            if (position.X < pos.X) pos.X = position.X;
-            if (position.Y < pos.Y) pos.Y = position.Y;
-            if (position.X > MapManager.activeMap.widthInPixels - pos.X) pos.X = pos.X + (position.X - (MapManager.activeMap.widthInPixels - pos.X));
-            if (position.Y > MapManager.activeMap.heightInPixels - pos.Y) pos.Y = pos.Y + (position.Y - (MapManager.activeMap.heightInPixels - pos.Y));
+            if (Position.X < pos.X) pos.X = Position.X;
+            if (Position.Y < pos.Y) pos.Y = Position.Y;
+            if (Position.X > MapManager.activeMap.widthInPixels - pos.X) pos.X = pos.X + (Position.X - (MapManager.activeMap.widthInPixels - pos.X));
+            if (Position.Y > MapManager.activeMap.heightInPixels - pos.Y) pos.Y = pos.Y + (Position.Y - (MapManager.activeMap.heightInPixels - pos.Y));
 
             return pos;
-        }
-        public override Rectangle getScreenBox()
-        {
-            Vector2 pos = getScreenPosition();
-            Rectangle box = getBox(pos);
-
-            return box;
         }
         public override Rectangle getBox(Vector2 pos)
         {
@@ -304,18 +291,16 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void update()
         {
-            if (paused) return;
 
-            boundingBox = getBox(position);
+            boundingBox = getBox(Position);
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {
-                Vector2 screenPos = getPlayerScreenPosition();
-                if (itemSwing != null && itemSwing.hitBox.Intersects(entity.getScreenBox()) && !entity.isImmunity)
-                    entity.hurt(screenPos);
+                if (itemSwing != null && itemSwing.hitBox.Intersects(entity.boundingBox) && !entity.isImmunity)
+                    entity.hurt(Position);
 
-                if (getBox(screenPos).Intersects(entity.getScreenBox()) && !entity.isImmunity)
-                    hurt(entity.getScreenPosition(true));
+                if (getBox(Position).Intersects(entity.boundingBox) && !entity.isImmunity)
+                    hurt(entity.CenteredPosition);
             }
 
             var kstate = Keyboard.GetState();
@@ -419,7 +404,7 @@ namespace BasicRPGTest_Mono.Engine
             if (isGettingKnockedBack) return;
             isGettingKnockedBack = true;
 
-            Vector2 screenPos = getPlayerScreenPosition();
+            Vector2 screenPos = Position;
             Vector2 targetDist = new Vector2();
             targetDist.X = screenPos.X - sourcePos.X;
             targetDist.Y = screenPos.Y - sourcePos.Y;
@@ -458,16 +443,16 @@ namespace BasicRPGTest_Mono.Engine
         }
         public override void draw(SpriteBatch batch)
         {
-            Vector2 screenPos = getPlayerScreenPosition();
+            Vector2 screenPos = Position;
             graphic.draw(batch, screenPos, tintColor);
 
-            batch.Begin();
-            batch.DrawRectangle(getScreenBox(), Color.White);
+            batch.Begin(transformMatrix: Camera.camera.Transform);
+            batch.DrawRectangle(getBox(Position), Color.White);
             batch.End();
 
             if (itemSwing != null)
             {
-                itemSwing.Draw(batch, getPlayerScreenPosition());
+                itemSwing.Draw(batch, Position);
             }
 
         }

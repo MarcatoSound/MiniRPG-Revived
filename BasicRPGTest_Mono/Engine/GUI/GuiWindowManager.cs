@@ -57,17 +57,17 @@ namespace BasicRPGTest_Mono.Engine.GUI
         public static void openWindow(int i)
         {
             activeWindow = windows[i];
-            Core.player.paused = true;
+            Core.paused = true;
         }
         public static void openWindow(GuiWindow window)
         {
             activeWindow = window;
-            Core.player.paused = true;
+            Core.paused = true;
         }
         public static void closeWindow()
         {
             activeWindow = null;
-            Core.player.paused = false;
+            Core.paused = false;
         }
 
         public static void Clear()
