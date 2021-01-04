@@ -5,6 +5,7 @@ using System.Text;
 using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
@@ -54,6 +55,7 @@ namespace BasicRPGTest_Mono
             loadItems();
             loadEntities();
             loadGuis();
+            loadHud();
 
             loadMap();
 
@@ -171,6 +173,12 @@ namespace BasicRPGTest_Mono
             GuiWindowManager.tileset = texture;
             GuiWindowManager.add(new GuiPlayerInventory());
         }
+        private void loadHud()
+        {
+            Texture2D texture = Content.Load<Texture2D>("hud_tileset");
+            HudManager.tileset = texture;
+            HudManager.add(new HotbarPrimary());
+        }
 
 
         public override void Update(GameTime gameTime)
@@ -187,6 +195,8 @@ namespace BasicRPGTest_Mono
 
                 player.update();
             }
+
+            HudManager.Update();
 
 
             Camera.camera.Update(gameTime);
@@ -220,6 +230,8 @@ namespace BasicRPGTest_Mono
             }
 
             player.draw(_spriteBatch);
+
+            HudManager.Draw(_spriteBatch);
 
             if (GuiWindowManager.activeWindow != null)
             {

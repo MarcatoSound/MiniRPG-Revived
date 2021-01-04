@@ -189,6 +189,18 @@
 /processorParam:TextureFormat=Color
 /build:hollysong.png
 
+#begin hud_tileset.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:hud_tileset.png
+
 #begin iron_root.png
 /importer:TextureImporter
 /processor:TextureProcessor

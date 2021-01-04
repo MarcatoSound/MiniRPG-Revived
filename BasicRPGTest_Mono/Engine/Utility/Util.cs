@@ -383,6 +383,21 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return cropTexture;
         }
+        public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int width, int height)
+        {
+
+            int x = column * width;
+            int y = row * height;
+
+            Rectangle sourceRectangle = new Rectangle(x, y, width, height);
+
+            Texture2D cropTexture = new Texture2D(Core.graphics, sourceRectangle.Width, sourceRectangle.Height);
+            Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
+            spriteset.GetData(0, sourceRectangle, data, 0, data.Length);
+            cropTexture.SetData(data);
+
+            return cropTexture;
+        }
 
         public static Texture2D buildWindowTexture(Rectangle box, Texture2D spriteset, int dimensions = 16)
         {

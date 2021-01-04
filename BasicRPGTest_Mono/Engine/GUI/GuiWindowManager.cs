@@ -38,7 +38,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
             return null;
         }
 
-        public static List<GuiWindow> getTiles()
+        public static List<GuiWindow> getWindows()
         {
             return windows;
         }
