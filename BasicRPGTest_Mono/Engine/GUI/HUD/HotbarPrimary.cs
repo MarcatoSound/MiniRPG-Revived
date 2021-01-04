@@ -18,12 +18,12 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         private int slotDist;
 
         public HotbarPrimary() : 
-            base("hotbarprimary", new Vector2(Core.game.Window.ClientBounds.Width / 16, Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 10)))
+            base("hotbarprimary", new Vector2(Core.game.Window.ClientBounds.Width / 16, Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 9)))
         {
             System.Diagnostics.Debug.WriteLine("Hotbar 1 position: " + screenPos);
 
-            slotTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 0, 48);
-            selectedTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 1, 48);
+            slotTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 0, 64);
+            selectedTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 1, 64);
 
             slotDist = slotTexture.Width + 2;
         }
@@ -32,8 +32,8 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         {
             if (screenPos.X != Core.game.Window.ClientBounds.Width / 16)
                 screenPos.X = Core.game.Window.ClientBounds.Width / 16;
-            if (screenPos.Y != Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 10))
-                screenPos.Y = Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 10);
+            if (screenPos.Y != Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 9))
+                screenPos.Y = Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 9);
 
             if (Core.player == null) return;
             if (Core.player.inventory == null) return;
@@ -48,8 +48,7 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
 
             Texture2D texture;
             Vector2 pos = new Vector2(screenPos.X, screenPos.Y);
-            Vector2 itemOffset = new Vector2(-5, -5);
-            //Vector2 itemPos = new Vector2(pos.X - (slotTexture.Width / 2) + pos.Y - (slotTexture.Height / 2));
+            Vector2 itemPos;
             Item item;
             float scale;
             for (int i = 0; i < hotbar.maxItems; i++)
@@ -64,8 +63,10 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
 
                 if (item != null)
                 {
-                    scale = 38.0f / item.graphic.texture.Width;
-                    item.graphic.draw(batch, pos, 0f, itemOffset, scale, false);
+                    scale = 56.0f / item.graphic.texture.Width;
+                    itemPos.X = pos.X + 4;
+                    itemPos.Y = pos.Y + 4;
+                    item.graphic.draw(batch, itemPos, 0f, Vector2.Zero, scale, false);
                 }
 
                 pos.X += slotDist;

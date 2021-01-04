@@ -25,10 +25,11 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         {
             System.Diagnostics.Debug.WriteLine("Hotbar 2 position: " + screenPos);
 
-            slotTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 4, 24);
-            selectedTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 1, 4, 24);
+            slotTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 4, 32);
+            selectedTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 1, 4, 32);
 
             slotDist = slotTexture.Width + 2;
+
             primary = (HotbarPrimary)HudManager.getByName("hotbarprimary");
         }
 
@@ -36,12 +37,8 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         {
             if (screenPos.X != primary.screenPos.X)
                 screenPos.X = primary.screenPos.X;
-            if (screenPos.Y != primary.screenPos.Y - 35)
-                screenPos.Y = primary.screenPos.Y - 35;
-            //if (screenPos.X != Core.game.Window.ClientBounds.Width / 16)
-            //    screenPos.X = Core.game.Window.ClientBounds.Width / 16;
-            //if (screenPos.Y != Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 7))
-            //    screenPos.Y = Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 7);
+            if (screenPos.Y != primary.screenPos.Y - 40)
+                screenPos.Y = primary.screenPos.Y - 40;
 
             if (Core.player == null) return;
             if (Core.player.inventory == null) return;
@@ -59,8 +56,7 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
 
             Texture2D texture;
             Vector2 pos = new Vector2(screenPos.X, screenPos.Y);
-            Vector2 itemOffset = new Vector2(-2, -2);
-            //Vector2 itemPos = new Vector2(pos.X - (slotTexture.Width / 2) + pos.Y - (slotTexture.Height / 2));
+            Vector2 itemPos;
             Item item;
             float scale;
             for (int i = 0; i < hotbar.maxItems; i++)
@@ -75,8 +71,10 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
 
                 if (item != null)
                 {
-                    scale = 20.0f / item.graphic.texture.Width;
-                    item.graphic.draw(batch, pos, 0f, itemOffset, scale, false);
+                    scale = 28.0f / item.graphic.texture.Width;
+                    itemPos.X = pos.X + 2;
+                    itemPos.Y = pos.Y + 2;
+                    item.graphic.draw(batch, itemPos, 0f, Vector2.Zero, scale, false);
                 }
 
                 pos.X += slotDist;

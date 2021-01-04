@@ -84,6 +84,10 @@ namespace BasicRPGTest_Mono
             Save.save(player, worldName);
             Camera.reset();
             GuiWindowManager.closeWindow();
+            GuiWindowManager.Clear();
+            HudManager.Clear();
+            EntityManager.clear();
+            TileManager.Clear();
 
             worldName = "";
             player = null;
@@ -180,7 +184,7 @@ namespace BasicRPGTest_Mono
 
             HotbarPrimary hotbar1 = new HotbarPrimary();
             HudManager.add(hotbar1);
-            Vector2 hotbar2Pos = new Vector2(hotbar1.screenPos.X, hotbar1.screenPos.Y - 35);
+            Vector2 hotbar2Pos = new Vector2(hotbar1.screenPos.X, hotbar1.screenPos.Y - 40);
             HudManager.add(new HotbarSecondary(hotbar2Pos));
         }
 

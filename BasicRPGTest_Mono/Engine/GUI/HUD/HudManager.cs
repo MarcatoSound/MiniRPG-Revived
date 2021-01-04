@@ -57,5 +57,10 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
             }
             batch.End();
         }
+
+        public static void Clear()
+        {
+            elements.Clear();
+        }
     }
 }
