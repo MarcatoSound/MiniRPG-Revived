@@ -177,7 +177,11 @@ namespace BasicRPGTest_Mono
         {
             Texture2D texture = Content.Load<Texture2D>("hud_tileset");
             HudManager.tileset = texture;
-            HudManager.add(new HotbarPrimary());
+
+            HotbarPrimary hotbar1 = new HotbarPrimary();
+            HudManager.add(hotbar1);
+            Vector2 hotbar2Pos = new Vector2(hotbar1.screenPos.X, hotbar1.screenPos.Y - 35);
+            HudManager.add(new HotbarSecondary(hotbar2Pos));
         }
 
 
