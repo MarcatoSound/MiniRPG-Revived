@@ -269,7 +269,8 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (kstate.IsKeyDown(Keys.W))
                 {
-                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+                    if (!kstate.IsKeyDown(Keys.S))
+                        if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, Direction.Up);
 
                     newVel = new Vector2(velocity.X, velocity.Y - (float)(maxVelocity.Y / 5));
                     if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
@@ -288,7 +289,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (kstate.IsKeyDown(Keys.S))
                 {
-                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+                    if (!kstate.IsKeyDown(Keys.W))
+                        if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, Direction.Down);
 
                     newVel = new Vector2(velocity.X, velocity.Y + (float)(maxVelocity.Y / 5));
                     if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
@@ -307,7 +309,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (kstate.IsKeyDown(Keys.A))
                 {
-                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+                    if (!kstate.IsKeyDown(Keys.D))
+                        if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, Direction.Left);
 
                     newVel = new Vector2(velocity.X - (float)(maxVelocity.X / 5), velocity.Y);
                     if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
@@ -326,7 +329,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (kstate.IsKeyDown(Keys.D))
                 {
-                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+                    if (!kstate.IsKeyDown(Keys.A))
+                        if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, Direction.Right);
 
                     newVel = new Vector2(velocity.X + (float)(maxVelocity.X / 5), velocity.Y);
                     if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
