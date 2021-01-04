@@ -15,6 +15,7 @@ namespace RPGEngine
         public string name { get; set; }
         public int id { get; set; }
         public Vector2 pos { get; set; } = new Vector2(0, 0);
+        public Vector2 drawPos { get; set; } = new Vector2(0, 0);
         public Vector2 tilePos { get; set; } = new Vector2(0, 0);
         public Rectangle box { get; set; }
         public Graphic graphic { get; set; }
@@ -50,7 +51,8 @@ namespace RPGEngine
             this.isCollidable = tile.isCollidable;
             this.isInstance = true;
             this.tilePos = tilePos;
-            this.pos = new Vector2(tilePos.X * 32, tilePos.Y * 32);
+            this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
+            this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
         }
@@ -58,7 +60,7 @@ namespace RPGEngine
         public void draw(SpriteBatch spriteBatch)
         {
             if (!isInstance) return;
-            graphic.draw(spriteBatch, pos, false);
+            graphic.draw(spriteBatch, drawPos, false);
         }
 
     }

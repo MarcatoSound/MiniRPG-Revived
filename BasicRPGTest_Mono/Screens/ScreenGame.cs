@@ -60,7 +60,7 @@ namespace BasicRPGTest_Mono
 
             Texture2D texture;
 
-            texture = Content.Load<Texture2D>("test_sprite_atlas");
+            texture = Content.Load<Texture2D>("player_spriteset");
             player = new Player(texture, _graphics);
 
             loadPlayer();
@@ -210,8 +210,6 @@ namespace BasicRPGTest_Mono
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Color.Black);
             _spriteBatch.End();
 
-            player.draw(_spriteBatch);
-
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {
@@ -220,6 +218,8 @@ namespace BasicRPGTest_Mono
                 _spriteBatch.DrawRectangle(entity.boundingBox, Color.White);
                 _spriteBatch.End();
             }
+
+            player.draw(_spriteBatch);
 
             if (GuiWindowManager.activeWindow != null)
             {

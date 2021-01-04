@@ -39,7 +39,9 @@ namespace BasicRPGTest_Mono
         {
 
             // KEYBOARD INPUT HANDLING
-            keyboardListener = new KeyboardListener();
+            KeyboardListenerSettings kListenerSettings = new KeyboardListenerSettings();
+            kListenerSettings.RepeatPress = false;
+            keyboardListener = new KeyboardListener(kListenerSettings);
             Components.Add(new InputListenerComponent(this, keyboardListener));
             keyboardListener.KeyPressed += (sender, args) =>
             {
@@ -92,9 +94,14 @@ namespace BasicRPGTest_Mono
                             ((ScreenGame)activeScreen).player.Dash();
                         }
 
+                        if (args.Key == Keys.W) Core.player.setDirection(Direction.Up);
+                        if (args.Key == Keys.S) Core.player.setDirection(Direction.Down);
+                        if (args.Key == Keys.A) Core.player.setDirection(Direction.Left);
+                        if (args.Key == Keys.D) Core.player.setDirection(Direction.Right);
+
                         if (args.Key == Keys.Up) ((ScreenGame)activeScreen).player.attack(Direction.Up);
-                        if (args.Key == Keys.Left) ((ScreenGame)activeScreen).player.attack(Direction.Left);
                         if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
+                        if (args.Key == Keys.Left) ((ScreenGame)activeScreen).player.attack(Direction.Left);
                         if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
 
                         if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHotbars();

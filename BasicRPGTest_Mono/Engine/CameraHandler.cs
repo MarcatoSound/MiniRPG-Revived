@@ -86,6 +86,7 @@ namespace BasicRPGTest_Mono.Engine
         protected float _viewportHeight;
         protected float _viewportWidth;
         private float _scale;
+        private float _oldScale;
 
         public Camera2D(Game game)
             : base(game)
@@ -105,6 +106,8 @@ namespace BasicRPGTest_Mono.Engine
             get { return _scale; }
             set
             {
+                _oldScale = _scale;
+
                 if (value > maxZoom)
                 {
                     _scale = maxZoom;
@@ -140,8 +143,9 @@ namespace BasicRPGTest_Mono.Engine
 
             ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
             maxZoom = 1.5f;
-            minZoom = 0.5f;
-            Scale = 1;
+            minZoom = 0.8f;
+            Scale = 1.25f;
+            _oldScale = 1.25f;
             MoveSpeed = 5f;
 
             base.Initialize();
@@ -149,7 +153,14 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void Update(GameTime gameTime)
         {
-            Origin = ScreenCenter / Scale;
+            // Move the Camera to the position that it needs to go
+            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            float newScale = Scale;
+            newScale -= (Scale - _oldScale) * 5 * (delta * 10);
+            _oldScale = newScale;
+
+            Origin = ScreenCenter / newScale;
 
             // Create the Transform used by any
             // spritebatch process
@@ -157,24 +168,22 @@ namespace BasicRPGTest_Mono.Engine
                         Matrix.CreateTranslation(-Position.X, -Position.Y, 0) *
                         Matrix.CreateRotationZ(Rotation) *
                         Matrix.CreateTranslation(Origin.X, Origin.Y, 0) *
-                        Matrix.CreateScale(new Vector3(Scale, Scale, Scale));
+                        Matrix.CreateScale(new Vector3(newScale, newScale, newScale));
 
 
-            // Move the Camera to the position that it needs to go
-            var delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
             Vector2 newPos = new Vector2(_position.X, _position.Y);
             newPos.X += (Focus.Position.X - Position.X) * MoveSpeed * delta;
             newPos.Y += (Focus.Position.Y - Position.Y) * MoveSpeed * delta;
-            if (newPos.X + (_viewportWidth / 2 / Scale) > CameraLimits.Width || newPos.X - (_viewportWidth / 2 / Scale) < 0) 
+            if (newPos.X + (_viewportWidth / 2 / newScale) > CameraLimits.Width || newPos.X - (_viewportWidth / 2 / newScale) < 0) 
                 newPos.X = _position.X;
-            if (newPos.Y + (_viewportHeight / 2 / Scale) > CameraLimits.Height || newPos.Y - (_viewportHeight / 2 / Scale) < 0)
+            if (newPos.Y + (_viewportHeight / 2 / newScale) > CameraLimits.Height || newPos.Y - (_viewportHeight / 2 / newScale) < 0)
                 newPos.Y = _position.Y;
 
             _position.X = newPos.X;
             _position.Y = newPos.Y;
 
-            BoundingRectangle = new Rectangle(Convert.ToInt32(_position.X - (_viewportWidth / 2 / Scale)), Convert.ToInt32(_position.Y - (_viewportHeight / 2 / Scale)), Convert.ToInt32(_viewportWidth / Scale), Convert.ToInt32(_viewportHeight / Scale));
+            BoundingRectangle = new Rectangle(Convert.ToInt32(_position.X - (_viewportWidth / 2 / newScale)), Convert.ToInt32(_position.Y - (_viewportHeight / 2 / newScale)), Convert.ToInt32(_viewportWidth / newScale), Convert.ToInt32(_viewportHeight / newScale));
 
             base.Update(gameTime);
         }

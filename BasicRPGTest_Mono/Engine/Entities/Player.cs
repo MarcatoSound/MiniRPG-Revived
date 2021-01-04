@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Graphics;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Inventories;
 using BasicRPGTest_Mono.Engine.Items;
@@ -20,6 +21,7 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Player : LivingEntity, IFocusable
     {
+
         public bool isDashing;
         public Timer dashTimer;
 
@@ -29,14 +31,14 @@ namespace BasicRPGTest_Mono.Engine
 
         public PlayerInventory inventory;
         public Player(Texture2D texture, GraphicsDeviceManager graphics) : 
-            base("player", new GraphicAnimated(texture, 3, 4), new Rectangle(0, 0, 28, 26), graphics, 125f)
+            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 28), graphics, 125f)
         {
             Core.player = this;
             Camera.camera.Focus = this;
 
             graphicsManager = graphics;
             Position = new Vector2(MapManager.activeMap.widthInPixels / 2, MapManager.activeMap.heightInPixels / 2);
-            boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 28, 26);
+            boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 24, 28);
             Camera.camPos = new Vector2(Position.X - (Camera.camera.BoundingRectangle.Width / 2), Position.Y - (Camera.camera.BoundingRectangle.Height / 2));
             maxVelocity = new Vector2(speed, speed);
             dashTimer = new Timer(200);
@@ -105,6 +107,8 @@ namespace BasicRPGTest_Mono.Engine
             if (isAttacking) return;
             if (inventory.hotbarPrimary.hand == null) return;
 
+            ((GraphicSet)graphic).setSprite(GraphicType.Attack, direction);
+
             Item mainhand = inventory.hotbarPrimary.hand;
 
             isAttacking = true;
@@ -127,6 +131,10 @@ namespace BasicRPGTest_Mono.Engine
                 maxVelocity = new Vector2(Convert.ToInt32(speed * 4), Convert.ToInt32(speed * 4));
                 dashTimer.Start();
             }
+        }
+        public void setDirection(Direction direction)
+        {
+            this.direction = direction;
         }
         public override void move()
         {
@@ -196,7 +204,6 @@ namespace BasicRPGTest_Mono.Engine
 
             }
 
-
             Position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
 
         }
@@ -207,9 +214,8 @@ namespace BasicRPGTest_Mono.Engine
         {
             Vector2 pos = new Vector2(Position.X, Position.Y);
 
-            pos.X = (int)pos.X / TileManager.dimensions;
-            pos.Y = (int)pos.Y / TileManager.dimensions;
-            pos.Y = (int)pos.Y / TileManager.dimensions;
+            pos.X = Convert.ToInt32(pos.X / TileManager.dimensions);
+            pos.Y = Convert.ToInt32(pos.Y / TileManager.dimensions);
 
             return pos;
         }
@@ -225,7 +231,7 @@ namespace BasicRPGTest_Mono.Engine
         public override Rectangle getBox(Vector2 pos)
         {
             int x = (int)(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
-            int y = (int)(pos.Y - (boundingBox.Height - (graphic.height / 2)));
+            int y = (int)(pos.Y - (boundingBox.Height - (graphic.texture.Height / 2)));
 
             Rectangle box = new Rectangle(x, y, boundingBox.Width, boundingBox.Height);
 
@@ -242,17 +248,29 @@ namespace BasicRPGTest_Mono.Engine
                 if (itemSwing != null && itemSwing.hitBox.Intersects(entity.boundingBox) && !entity.isImmunity)
                     entity.hurt(Position);
 
-                if (getBox(Position).Intersects(entity.boundingBox) && !entity.isImmunity)
+                if (boundingBox.Intersects(entity.boundingBox) && !entity.isImmunity)
                     hurt(entity.CenteredPosition);
             }
 
             var kstate = Keyboard.GetState();
+
+            if (kstate.IsKeyDown(Keys.W) || kstate.IsKeyDown(Keys.S) || kstate.IsKeyDown(Keys.A) || kstate.IsKeyDown(Keys.D))
+            {
+                isMoving = true;
+            } else
+            {
+                isMoving = false;
+                if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Idle, direction);
+            }
+
             Vector2 newVel = velocity;
 
             if (!isGettingKnockedBack)
             {
                 if (kstate.IsKeyDown(Keys.W))
                 {
+                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+
                     newVel = new Vector2(velocity.X, velocity.Y - (float)(maxVelocity.Y / 5));
                     if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
                     velocity = newVel;
@@ -270,6 +288,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (kstate.IsKeyDown(Keys.S))
                 {
+                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+
                     newVel = new Vector2(velocity.X, velocity.Y + (float)(maxVelocity.Y / 5));
                     if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
                     velocity = newVel;
@@ -287,6 +307,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (kstate.IsKeyDown(Keys.A))
                 {
+                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+
                     newVel = new Vector2(velocity.X - (float)(maxVelocity.X / 5), velocity.Y);
                     if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
                     velocity = newVel;
@@ -304,6 +326,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (kstate.IsKeyDown(Keys.D))
                 {
+                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, direction);
+
                     newVel = new Vector2(velocity.X + (float)(maxVelocity.X / 5), velocity.Y);
                     if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
                     velocity = newVel;
@@ -379,7 +403,7 @@ namespace BasicRPGTest_Mono.Engine
             graphic.draw(batch, screenPos, tintColor);
 
             batch.Begin(transformMatrix: Camera.camera.Transform);
-            batch.DrawRectangle(getBox(Position), Color.White);
+            batch.DrawRectangle(boundingBox, Color.LightGray);
             batch.End();
 
             if (itemSwing != null)

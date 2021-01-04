@@ -9,6 +9,8 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class LivingEntity : Entity
     {
+        public bool isMoving;
+
         public float speed { get; set; }
         public Vector2 velocity { get; set; }
         public Vector2 maxVelocity { get; set; }

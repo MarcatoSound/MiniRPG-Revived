@@ -30,7 +30,7 @@ namespace BasicRPGTest_Mono.Engine
             if (newBatch)
                 spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
 
-            spriteBatch.Draw(texture, location, tintColor);
+            spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
 
             if (newBatch)
                 spriteBatch.End();

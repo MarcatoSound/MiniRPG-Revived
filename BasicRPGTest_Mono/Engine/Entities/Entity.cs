@@ -77,7 +77,10 @@ namespace BasicRPGTest_Mono.Engine
 
         public virtual Rectangle getBox(Vector2 pos)
         {
-            Rectangle box = new Rectangle(Convert.ToInt32(pos.X + (32 - boundingBox.Width) / 2), Convert.ToInt32(pos.Y + (32 - boundingBox.Height)), boundingBox.Width, boundingBox.Height);
+            int x = (int)(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
+            int y = (int)(pos.Y - (boundingBox.Height - (graphic.texture.Height / 2)));
+
+            Rectangle box = new Rectangle(x, y, boundingBox.Width, boundingBox.Height);
 
             return box;
         }
