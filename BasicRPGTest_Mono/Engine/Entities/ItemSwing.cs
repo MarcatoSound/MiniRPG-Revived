@@ -91,7 +91,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                 {
                     case Direction.Up:
                         angle = -1.57f + swingDist + ((1.57f - swingDist) / 2);
-                        swingPos.Y -= 28;
+                        swingPos.Y -= 36;
                         //modx = -(graphic.texture.Width / 4);
                         mody = 40;
                         hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
@@ -105,7 +105,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                         break;
                     case Direction.Down:
                         angle = -4.71f + swingDist + ((1.57f - swingDist) / 2);
-                        swingPos.Y += 28;
+                        swingPos.Y += 36;
                         //modx = graphic.texture.Width / 4;
                         mody = -40;
                         hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);

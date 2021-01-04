@@ -31,14 +31,14 @@ namespace BasicRPGTest_Mono.Engine
 
         public PlayerInventory inventory;
         public Player(Texture2D texture, GraphicsDeviceManager graphics) : 
-            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 28), graphics, 125f)
+            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), graphics, 125f)
         {
             Core.player = this;
             Camera.camera.Focus = this;
 
             graphicsManager = graphics;
             Position = new Vector2(MapManager.activeMap.widthInPixels / 2, MapManager.activeMap.heightInPixels / 2);
-            boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 24, 28);
+            boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 24, 32);
             Camera.camPos = new Vector2(Position.X - (Camera.camera.BoundingRectangle.Width / 2), Position.Y - (Camera.camera.BoundingRectangle.Height / 2));
             maxVelocity = new Vector2(speed, speed);
             dashTimer = new Timer(200);
@@ -231,7 +231,7 @@ namespace BasicRPGTest_Mono.Engine
         public override Rectangle getBox(Vector2 pos)
         {
             int x = (int)(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
-            int y = (int)(pos.Y - (boundingBox.Height - (graphic.texture.Height / 2)));
+            int y = (int)(pos.Y - (boundingBox.Height - (graphic.texture.Height / 2.5)));
 
             Rectangle box = new Rectangle(x, y, boundingBox.Width, boundingBox.Height);
 
