@@ -37,7 +37,18 @@ namespace BasicRPGTest_Mono.Engine
             Camera.camera.Focus = this;
 
             graphicsManager = graphics;
-            Position = new Vector2(MapManager.activeMap.widthInPixels / 2, MapManager.activeMap.heightInPixels / 2);
+
+            Random rand = new Random();
+            Vector2 spawnPoint = new Vector2(rand.Next(32, MapManager.activeMap.widthInPixels / 2 - 32), rand.Next(32, MapManager.activeMap.heightInPixels / 2 - 32));
+            Rectangle spawnBox = new Rectangle(Convert.ToInt32(spawnPoint.X), Convert.ToInt32(spawnPoint.Y), 24, 32);
+            if (!MapManager.activeMap.isLocationSafe(spawnBox))
+            {
+                System.Diagnostics.Debug.WriteLine($"Spawn point {spawnPoint} unsafe! Finding another one...");
+                spawnPoint.X = rand.Next(32, MapManager.activeMap.widthInPixels / 2 - 32);
+                spawnPoint.Y = rand.Next(32, MapManager.activeMap.heightInPixels / 2 - 32);
+            }
+            Position = spawnPoint;
+
             boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 24, 32);
             Camera.camPos = new Vector2(Position.X - (Camera.camera.BoundingRectangle.Width / 2), Position.Y - (Camera.camera.BoundingRectangle.Height / 2));
             maxVelocity = new Vector2(speed, speed);

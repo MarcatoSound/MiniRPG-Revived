@@ -143,7 +143,8 @@ namespace BasicRPGTest_Mono.Engine
 
             ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
             maxZoom = 1.5f;
-            minZoom = 0.8f;
+            //minZoom = 0.8f;
+            minZoom = 0.3f;
             Scale = 1.25f;
             _oldScale = 1.25f;
             MoveSpeed = 5f;

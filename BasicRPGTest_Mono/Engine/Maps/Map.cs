@@ -24,7 +24,7 @@ namespace BasicRPGTest_Mono.Engine
         public int widthInPixels { get; set; }
         public int heightInPixels { get; set; }
 
-        public List<Rectangle> collidables { get; set; }
+        public ConcurrentDictionary<int, Rectangle> collidables { get; set; }
 
         public ConcurrentDictionary<int, Entity> entities { get; set; }
         public ConcurrentDictionary<int, LivingEntity> livingEntities { get; set; }
@@ -42,7 +42,7 @@ namespace BasicRPGTest_Mono.Engine
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
             regions = new Dictionary<Vector2, Region>();
-            collidables = new List<Rectangle>();
+            collidables = new ConcurrentDictionary<int, Rectangle>();
 
             this.entities = new ConcurrentDictionary<int, Entity>();
             this.livingEntities = new ConcurrentDictionary<int, LivingEntity>();
@@ -63,6 +63,7 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
+
             foreach (TileLayer layer in layers)
             {
                 Dictionary<Vector2, Tile> tiles = layer.tiles;
@@ -71,18 +72,26 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    foreach (Region region in regions.Values)
-                    {
-                        Rectangle miniBox = new Rectangle(tile.box.X, tile.box.Y, tile.box.Width - 1, tile.box.Height - 1);
-                        if (!region.box.Intersects(miniBox)) continue;
-                        region.addTile(tile);
-                    }
+                    Vector2 regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    tile.region = regionPos;
+                    regions[regionPos].addTile(tile);
 
+
+                    /*foreach (Region region in regions.Values)
+                    {
+                        Vector2 tilePos = tile.pos;
+                        if (region.box.Contains(tilePos))
+                        {
+                            region.addTile(tile);
+                            break;
+                        }
+                    }*/
+
+                    if (layer.name == "water") continue;
                     if (!tile.isCollidable) continue;
 
-                    // Create a collidable at the following true-map coordinate.
-                    //   pos.X and pos.Y refer to the TILE position, and are multiplied by the tile size to get their true position
-                    collidables.Add(new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
+                    // Create a collidable box at the following true-map coordinate.
+                    collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
                 }
             }
 
@@ -124,8 +133,8 @@ namespace BasicRPGTest_Mono.Engine
 
             Random rand = new Random();
 
-            int x = rand.Next(1, widthInPixels);
-            int y = rand.Next(1, heightInPixels);
+            int x = rand.Next(32, widthInPixels - 32);
+            int y = rand.Next(32, heightInPixels - 32);
 
             pos.X = x;
             pos.Y = y;
@@ -140,7 +149,7 @@ namespace BasicRPGTest_Mono.Engine
         }
         public bool isLocationSafe(Rectangle location)
         {
-            foreach (Rectangle collidable in collidables)
+            foreach (Rectangle collidable in collidables.Values)
             {
                 collidable.Inflate(5, 5);
                 if (location.Intersects(collidable)) return false;
@@ -157,20 +166,6 @@ namespace BasicRPGTest_Mono.Engine
                 region.draw(batch);
                 batch.End();
             }
-        }
-
-
-        public float[,] createNoise()
-        {
-            Random seedGenerator = new Random();
-            SimplexNoise.Noise.Seed = seedGenerator.Next(0, 9999999);
-            float[,] values = SimplexNoise.Noise.Calc2D(128, 128, 1);
-
-            return values;
-        }
-        public void testNoise()
-        {
-
         }
 
 

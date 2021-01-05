@@ -19,6 +19,9 @@ using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended.ViewportAdapters;
 using RPGEngine;
+using SharpNoise.Builders;
+using SharpNoise.Modules;
+using SharpNoise.Utilities.Imaging;
 
 namespace BasicRPGTest_Mono
 {
@@ -52,6 +55,7 @@ namespace BasicRPGTest_Mono
 
             // Load the general game objects
             loadTiles();
+            loadBiomes();
             loadItems();
             loadEntities();
             loadGuis();
@@ -97,40 +101,6 @@ namespace BasicRPGTest_Mono
         }
 
 
-        private void loadMap()
-        {
-            string path = $"save\\{worldName}";
-
-            int size = 128;
-
-            if (Directory.Exists(path))
-            {
-                // Load map data
-                MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
-
-
-                return;
-            }
-
-
-            // Generate the actual map contents
-            MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
-
-        }
-        private void loadPlayer()
-        {
-
-            string path = $"save\\{worldName}";
-
-            if (Directory.Exists(path))
-            {
-                // Load player data
-                Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
-                player.Position = (Vector2)playerData["position"];
-
-                return;
-            }
-        }
 
         private void loadTiles()
         {
@@ -140,6 +110,12 @@ namespace BasicRPGTest_Mono
             TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false));
             TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false));
             TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false));
+            TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
+        }
+        private void loadBiomes()
+        {
+            BiomeManager.add(new Biome("ocean", TileManager.getByName("water"), null));
+            BiomeManager.add(new Biome("field", TileManager.getByName("grass"), TileManager.getByName("stone")));
         }
         private void loadItems()
         {
@@ -187,6 +163,40 @@ namespace BasicRPGTest_Mono
             Vector2 hotbar2Pos = new Vector2(hotbar1.screenPos.X, hotbar1.screenPos.Y - 40);
             HudManager.add(new HotbarSecondary(hotbar2Pos));
         }
+        private void loadMap()
+        {
+            string path = $"save\\{worldName}";
+
+            int size = 384;
+
+            if (Directory.Exists(path))
+            {
+                // Load map data
+                MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
+
+
+                return;
+            }
+
+
+            // Generate the actual map contents
+            MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
+
+        }
+        private void loadPlayer()
+        {
+
+            string path = $"save\\{worldName}";
+
+            if (Directory.Exists(path))
+            {
+                // Load player data
+                Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
+                player.Position = (Vector2)playerData["position"];
+
+                return;
+            }
+        }
 
 
         public override void Update(GameTime gameTime)
@@ -217,7 +227,7 @@ namespace BasicRPGTest_Mono
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
 
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.End();
@@ -225,7 +235,7 @@ namespace BasicRPGTest_Mono
             MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Color.Black);
+            _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
@@ -233,7 +243,7 @@ namespace BasicRPGTest_Mono
             {
                 entity.draw(_spriteBatch);
                 _spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
-                _spriteBatch.DrawRectangle(entity.boundingBox, Color.White);
+                _spriteBatch.DrawRectangle(entity.boundingBox, Microsoft.Xna.Framework.Color.White);
                 _spriteBatch.End();
             }
 
@@ -245,6 +255,8 @@ namespace BasicRPGTest_Mono
             {
                 GuiWindowManager.activeWindow.Draw(_spriteBatch);
             }
+
+
 
         }
 

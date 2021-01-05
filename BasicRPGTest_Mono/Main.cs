@@ -19,6 +19,10 @@ using BasicRPGTest_Mono.Engine.Utility;
 using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Items;
+using SharpNoise.Modules;
+using SharpNoise.Utilities.Imaging;
+using SharpNoise.Builders;
+using System.Drawing.Imaging;
 
 namespace BasicRPGTest_Mono
 {
@@ -84,6 +88,40 @@ namespace BasicRPGTest_Mono
                     if (args.Key == Keys.Space)
                     {
                         // Debug key
+
+                        Random seedGenerator = new Random();
+                        int seed = seedGenerator.Next(0, 9999999);
+                        System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
+                        Perlin gen = new Perlin();
+                        gen.Seed = seed;
+                        gen.Frequency = 0.01;
+                        gen.Persistence = 0.5;
+                        gen.Lacunarity = 2.25;
+                        gen.OctaveCount = 4;
+
+                        ScaleBias mod = new ScaleBias();
+                        mod.Source0 = gen;
+                        mod.Bias = 0.2;
+                        mod.Scale = 0.68;
+
+                        PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
+                        builder.SourceModule = mod;
+                        builder.SetBounds(0, 512, 0, 512);
+                        SharpNoise.NoiseMap map = new SharpNoise.NoiseMap(512, 512);
+                        builder.DestNoiseMap = map;
+                        builder.SetDestSize(512, 512);
+                        builder.Build();
+
+
+                        Image img = new Image();
+                        ImageRenderer renderer = new ImageRenderer();
+                        renderer.DestinationImage = img;
+                        renderer.SourceNoiseMap = map;
+                        renderer.BuildGrayscaleGradient();
+                        renderer.Render();
+
+                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);
+
                     }
                     if (args.Key == Keys.Escape) mainMenu();
 
@@ -305,7 +343,7 @@ namespace BasicRPGTest_Mono
         public void startGame(string worldName)
         {
             activeScreen = new ScreenGame(this, worldName);
-            screenManager.LoadScreen(activeScreen, new WipeTransition(_graphics.GraphicsDevice, Color.Black, 0.7F));
+            screenManager.LoadScreen(activeScreen, new WipeTransition(_graphics.GraphicsDevice, Microsoft.Xna.Framework.Color.Black, 0.7F));
         }
 
     }

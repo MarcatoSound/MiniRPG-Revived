@@ -26,6 +26,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
             if (i > tiles.Count - 1) return null;
             return tiles[i];
         }
+        public static Tile getByName(string name)
+        {
+            foreach (Tile tile in tiles)
+            {
+                if (tile.name == name) return tile;
+            }
+
+            return null;
+        }
 
         public static List<Tile> getTiles()
         {
