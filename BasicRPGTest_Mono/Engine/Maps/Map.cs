@@ -147,13 +147,48 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
-            foreach (Region region in regions.Values)
+            // Set to TRUE if you want to hard speed test the function
+            bool speedTestRun = false;
+
+
+            if (speedTestRun == true)
             {
-                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                region.draw(batch);
-                batch.End();
+                // Start Code Timer for speed test
+                Utility.CodeTimer.startTimer();
+
+                int count = 1000;  // Default Test: 1000
+                for (int i = 0; i < count; i++)
+                {
+                    // Draw code
+                    foreach (Region region in regions.Values)
+                    {
+                        if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                        batch.Begin(transformMatrix: Camera.camera.Transform);
+                        region.draw(batch);
+                        batch.End();
+                    }
+
+                }
+
+                // End Code Timer for speed test
+                Utility.CodeTimer.endTimer();
+                // Report function's speed
+                Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + Utility.CodeTimer.getTotalTimeInMilliseconds());
+
             }
+            else
+            {
+                // Draw code
+                foreach (Region region in regions.Values)
+                {
+                    if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                    batch.Begin(transformMatrix: Camera.camera.Transform);
+                    region.draw(batch);
+                    batch.End();
+                }
+
+            }
+
         }
 
 

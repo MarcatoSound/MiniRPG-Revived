@@ -534,5 +534,39 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return str;
         }
+
+
+        //----------------------------------------------------------------------------------
+        // Handy Debug Message Wrappers
+        //----------------------------------------------------------------------------------
+        public static void myDebug(string mMessage)
+        {
+            // Gives basic Debug Message
+            System.Diagnostics.Debug.WriteLine(mMessage);
+        }
+
+        public static void myDebug(string mSource, string mMessage)
+        {
+            // Gives a Debug mMessage with given mSource String at beginning.
+            System.Diagnostics.Debug.WriteLine("<" + mSource + ">:  " + mMessage);
+        }
+
+        public static void myDebug(bool mError, string mSource, string mMessage)
+        {
+            // Adds an ERROR warning to beginning of Debug mMessage if mError = True
+            if (mError == true)
+            {
+                // Gives Error message at start of mSource and Debug mMessage
+                System.Diagnostics.Debug.WriteLine("! ERROR:  <" + mSource + ">:  " + mMessage);
+
+            }
+            else
+            {
+                // Gives a Debug mMessage with given mSource String at beginning.
+                System.Diagnostics.Debug.WriteLine("<" + mSource + ">:  " + mMessage);
+            }
+        }
+
+
     }
 }
