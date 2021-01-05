@@ -39,9 +39,10 @@ namespace BasicRPGTest_Mono.Engine
         }
         public static List<TileLayer> loadMap(string world) 
         {
-            
+
             // Track how long this function takes to run
-            Utility.CodeTimer.startTimer();
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
 
 
             List<TileLayer> layers = new List<TileLayer>();
@@ -81,8 +82,8 @@ namespace BasicRPGTest_Mono.Engine
 
 
             // End Code Timer and Report function's time in milliseconds.
-            Utility.CodeTimer.endTimer();
-            Utility.Util.myDebug("Load.cs loadMap()", "CODE TIMER: " + Utility.CodeTimer.getTotalTimeInMilliseconds() + " ms");
+            codeTimer.endTimer();
+            Utility.Util.myDebug("Load.cs loadMap()", "CODE TIMER: " + codeTimer.getTotalTimeInMilliseconds() + " ms");
 
 
             return layers;

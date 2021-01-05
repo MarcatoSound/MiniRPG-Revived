@@ -223,6 +223,12 @@ namespace BasicRPGTest_Mono
 
         public override void Draw(GameTime gameTime)
         {
+
+            // Start Code Timer. Can be used for testing different sections of the code
+            //Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+            //codeTimer.startTimer();
+
+
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
@@ -232,7 +238,9 @@ namespace BasicRPGTest_Mono
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.End();
 
-            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            //MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            // Below function is for hard speed testing function
+            MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
@@ -257,8 +265,35 @@ namespace BasicRPGTest_Mono
             }
 
 
+            // End Code Timer for speed test
+            //codeTimer.endTimer();
+            // Report function's speed
+            //Engine.Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+
 
         }
 
+
+        public void Draw_SpeedTest (GameTime gameTime, int mIterationsCount)
+        {
+            // Start Code Timer for speed test
+            Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+            codeTimer.startTimer();
+
+            // If No Interation count as given, use Default of 1000
+            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
+
+            for (int i = 0; i < mIterationsCount; i++)
+            {
+                // Draw code
+                this.Draw(gameTime);
+            }
+
+            // End Code Timer for speed test
+            codeTimer.endTimer();
+            // Report function's speed
+            Engine.Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+
+        }
     }
 }

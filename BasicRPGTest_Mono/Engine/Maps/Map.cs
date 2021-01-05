@@ -147,50 +147,36 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
-            // Set to TRUE if you want to hard speed test the function
-            bool speedTestRun = false;
-
-
-            if (speedTestRun == true)
+            // Draw code
+            foreach (Region region in regions.Values)
             {
-                // Start Code Timer for speed test
-                Utility.CodeTimer.startTimer();
-
-                int count = 1000;  // Default Test: 1000
-                for (int i = 0; i < count; i++)
-                {
-                    // Draw code
-                    foreach (Region region in regions.Values)
-                    {
-                        if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                        batch.Begin(transformMatrix: Camera.camera.Transform);
-                        region.draw(batch);
-                        batch.End();
-                    }
-
-                }
-
-                // End Code Timer for speed test
-                Utility.CodeTimer.endTimer();
-                // Report function's speed
-                Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + Utility.CodeTimer.getTotalTimeInMilliseconds());
-
+                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                batch.Begin(transformMatrix: Camera.camera.Transform);
+                region.draw(batch);
+                batch.End();
             }
-            else
-            {
-                // Draw code
-                foreach (Region region in regions.Values)
-                {
-                    if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                    batch.Begin(transformMatrix: Camera.camera.Transform);
-                    region.draw(batch);
-                    batch.End();
-                }
-
-            }
-
         }
 
+        public void Draw_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        {
+            // Start Code Timer for speed test
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
+
+            // If No Interation count as given, use Default of 1000
+            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
+
+            for (int i = 0; i < mIterationsCount; i++)
+            {
+                // Draw code
+                this.Draw(camera, batch);
+            }
+
+            // End Code Timer for speed test
+            codeTimer.endTimer();
+            // Report function's speed
+            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+        }
 
         public void Clear()
         {
