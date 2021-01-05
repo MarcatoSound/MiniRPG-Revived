@@ -383,6 +383,16 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return cropTexture;
         }
+        public static Texture2D getSpriteFromSet(Texture2D spriteset, Rectangle sourceRectangle)
+        {
+
+            Texture2D cropTexture = new Texture2D(Core.graphics, sourceRectangle.Width, sourceRectangle.Height);
+            Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
+            spriteset.GetData(0, sourceRectangle, data, 0, data.Length);
+            cropTexture.SetData(data);
+
+            return cropTexture;
+        }
         public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int width, int height)
         {
 

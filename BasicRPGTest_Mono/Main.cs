@@ -89,7 +89,15 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        Random seedGenerator = new Random();
+                        List<Tile> tiles = MapManager.activeMap.regions[new Vector2(5, 1)].tiles;
+                        System.Diagnostics.Debug.WriteLine($"Region size: {tiles.Count}");
+
+                        foreach (Tile tile in tiles)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Region tile sides: {tile.sideGraphics.Count}");
+                        }
+
+                        /*Random seedGenerator = new Random();
                         int seed = seedGenerator.Next(0, 9999999);
                         System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
                         Perlin gen = new Perlin();
@@ -120,7 +128,7 @@ namespace BasicRPGTest_Mono
                         renderer.BuildGrayscaleGradient();
                         renderer.Render();
 
-                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);
+                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);*/
 
                     }
                     if (args.Key == Keys.Escape) mainMenu();

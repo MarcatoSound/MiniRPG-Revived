@@ -65,7 +65,7 @@ namespace BasicRPGTest_Mono.Engine
 
                     tile = new Tile(template, new Vector2(x, y));
 
-                    layer.tiles.Add(tile.pos, tile);
+                    layer.setTile(tile.tilePos, tile);
                 }
 
                 layers.Add(layer);

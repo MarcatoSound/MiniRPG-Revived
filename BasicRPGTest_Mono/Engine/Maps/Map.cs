@@ -73,6 +73,7 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
                     tile.region = regionPos;
                     regions[regionPos].addTile(tile);
+                    tile.update();
 
 
                     if (layer.name == "water") continue;
@@ -147,12 +148,15 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
-            foreach (Region region in regions.Values)
+            foreach (TileLayer layer in layers)
             {
-                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                region.draw(batch);
-                batch.End();
+                foreach (Region region in regions.Values)
+                {
+                    if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                    batch.Begin(transformMatrix: Camera.camera.Transform);
+                    region.draw(batch, layer);
+                    batch.End();
+                }
             }
         }
 
