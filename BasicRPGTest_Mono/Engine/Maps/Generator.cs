@@ -28,23 +28,13 @@ namespace BasicRPGTest_Mono.Engine
             groundTileChances.Add(3);
 
             NoiseMap noise = createLandNoise();
-            /*for (int x = 0; x < 8; x++)
-            {
-                for (int y = 0; y < 8; y++)
-                {
-                    System.Diagnostics.Debug.WriteLine(noiseMap.GetValue(x, y));
-                }
-
-            }*/
-
-            //float[,] noise = createNoise();
 
             TileLayer waterLayer = new TileLayer("water");
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
-                    if (noise[x, y] < 0.07)
+                    if (noise[x, y] < 0)
                     {
                         waterLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(5)), new Vector2(x, y)));
                         continue;
@@ -58,7 +48,11 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
-                    if (noise[x, y] >= 0.07)
+                    if (noise[x, y] >= 0 && noise[x, y] < 0.07)
+                    {
+                        groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(3)), new Vector2(x, y)));
+                    }
+                    else if (noise[x, y] >= 0.07)
                     {
                         groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(0)), new Vector2(x, y)));
                     }

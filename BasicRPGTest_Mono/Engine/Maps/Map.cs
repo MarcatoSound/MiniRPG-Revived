@@ -56,10 +56,8 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < height / 8; y++)
                 {
-                    //System.Diagnostics.Debug.WriteLine($"Loaded Region: {x}, {y}");
                     Region region = new Region(new Vector2(x * (TileManager.dimensions * 8), y * (TileManager.dimensions * 8)));
                     regions.Add(new Vector2(x, y), region);
-                    //System.Diagnostics.Debug.WriteLine("Loaded region: " + region.box);
                 }
             }
 
@@ -76,16 +74,6 @@ namespace BasicRPGTest_Mono.Engine
                     tile.region = regionPos;
                     regions[regionPos].addTile(tile);
 
-
-                    /*foreach (Region region in regions.Values)
-                    {
-                        Vector2 tilePos = tile.pos;
-                        if (region.box.Contains(tilePos))
-                        {
-                            region.addTile(tile);
-                            break;
-                        }
-                    }*/
 
                     if (layer.name == "water") continue;
                     if (!tile.isCollidable) continue;
