@@ -11,6 +11,13 @@ namespace RPGEngine
 {
     public class Tile
     {
+        //====================================================================================
+        // VARIABLES
+        //====================================================================================
+
+        public Map map;
+        public TileLayer layer;
+
         public Tile parent;
         public const int dimensions = 32;
         public string name { get; set; }
@@ -23,7 +30,12 @@ namespace RPGEngine
         public Graphic graphic { get; set; }
 
         public bool isCollidable { get; set; }
-        public bool isInstance { get; set; } 
+        public bool isInstance { get; set; }
+
+
+        //====================================================================================
+        // CONSTRUCTORS
+        //====================================================================================
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true)
         {
@@ -35,6 +47,7 @@ namespace RPGEngine
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
         }
+
         public Tile(string name, Graphic graphic, bool collidable = false, bool instance = true)
         {
             id = TileManager.tiles.Count;
@@ -59,10 +72,26 @@ namespace RPGEngine
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
         }
 
+
+        //====================================================================================
+        // PROPERTIES
+        //====================================================================================
+
+
+        //====================================================================================
+        // FUNCTIONS
+        //====================================================================================
+
         public void draw(SpriteBatch spriteBatch)
         {
             if (!isInstance) return;
+            // Otherwise...
+
+            // Tile Template (parent, that holds texture, etc.) draws itself at drawPos (this Tile's position)
             parent.graphic.draw(spriteBatch, drawPos, false);
+
+            // Add Count to Map Drawn Tiles tracker (if Map exists)
+            //if (map != null) { map.setTilesTotalCountDrawn(1); }
         }
 
     }

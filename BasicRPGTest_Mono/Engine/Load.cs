@@ -37,6 +37,7 @@ namespace BasicRPGTest_Mono.Engine
 
             return playerData;
         }
+
         public static List<TileLayer> loadMap(string world) 
         {
 
@@ -70,7 +71,6 @@ namespace BasicRPGTest_Mono.Engine
                     int y = tileJson.Value<int>("y");
 
                     tile = new Tile(template, new Vector2(x, y));
-
                     layer.tiles.Add(tile.pos, tile);
                 }
 

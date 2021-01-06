@@ -15,6 +15,10 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Map
     {
+        //====================================================================================
+        // VARIABLES
+        //====================================================================================
+
         public string name { get; set; }
         public List<TileLayer> layers { get; set; }
         public Dictionary<Vector2, Region> regions { get; set; }
@@ -33,6 +37,15 @@ namespace BasicRPGTest_Mono.Engine
         //public int totalSpawnWeights { get; set; }
         public int livingEntityCap = 50;
         public Timer spawnTimer;
+
+        private long v_drawnTileCount;
+
+        private List<Region> v_regionsVisible = new List<Region>();
+
+
+        //====================================================================================
+        // CONSTRUCTOR
+        //====================================================================================
         public Map(string name, int size, List<TileLayer> layers) 
         {
             this.name = name;
@@ -72,6 +85,8 @@ namespace BasicRPGTest_Mono.Engine
 
                     Vector2 regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
                     tile.region = regionPos;
+                    tile.map = this;  // Tile remembers the Map it belongs to
+                    tile.layer = layer;  // Tile remembers Map's Layer it belongs to
                     regions[regionPos].addTile(tile);
 
 
@@ -85,6 +100,31 @@ namespace BasicRPGTest_Mono.Engine
 
 
         }
+
+
+        //====================================================================================
+        // PROPERTIES
+        //====================================================================================
+
+        public long getTilesTotalCount ()
+        {
+            int tCount = 0;
+
+            foreach (TileLayer tileLayer in layers)
+            {
+                tCount += tileLayer.tiles.Count;
+            }
+
+            return tCount;
+        }
+
+        public long getTilesTotalCountDrawn () { return this.v_drawnTileCount; }
+        public void setTilesTotalCountDrawn (long mValue) { this.v_drawnTileCount += mValue;  }
+
+
+        //====================================================================================
+        // FUNCTIONS
+        //====================================================================================
 
         public void initSpawns()
         {
@@ -135,6 +175,7 @@ namespace BasicRPGTest_Mono.Engine
 
             return pos;
         }
+
         public bool isLocationSafe(Rectangle location)
         {
             foreach (Rectangle collidable in collidables.Values)
@@ -145,16 +186,60 @@ namespace BasicRPGTest_Mono.Engine
             return true;
         }
 
-        public void Draw(Camera2D camera, SpriteBatch batch)
+
+        public void update_VisibleRegions (Camera2D camera)
         {
-            // Draw code
             foreach (Region region in regions.Values)
             {
-                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                region.draw(batch);
-                batch.End();
+                // If THIS Region is INSIDE Camera's view (BoundingRectangle)
+                if (camera.BoundingRectangle.Intersects(region.box))
+                {
+                    // If List Does NOT Contain this Region
+                    if (!v_regionsVisible.Contains(region))
+                    {
+                        // Add this Region to Collection
+                        v_regionsVisible.Add(region);
+
+                        //Utility.Util.myDebug("Region Added:  " + region.box);
+                    }
+
+                }
+                // If THIS Region is OUTSIDE Camera's view (BoundingRectangle)
+                else
+                {
+                    // If List DOES Contain this Region
+                    if (v_regionsVisible.Contains(region))
+                    {
+                        // Add this Region to Collection
+                        v_regionsVisible.Remove(region);
+
+                        //Utility.Util.myDebug("Region Removed:  " + region.box);
+                    }
+                }
             }
+
+
+
+        }
+
+
+
+        public void Draw(Camera2D camera, SpriteBatch batch)
+        {
+            // Drawing code (Draw by Map Region, one tile at a time)
+
+            // Clear Drawn Tiles Count (new fresh frame)
+            //v_drawnTileCount = 0;
+
+            batch.Begin(transformMatrix: Camera.camera.Transform);
+            foreach (Region region in v_regionsVisible)
+            {
+                region.draw(batch);
+            }
+            batch.End();
+
+            // Report Total # of Tiles Drawn
+            //Utility.Util.myDebug("Map.cs Draw()", "TILES DRAWN:  " + this.v_drawnTileCount + " of " + getTilesTotalCount());
         }
 
         public void Draw_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
