@@ -41,7 +41,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
                     tile.draw(batch);
 
             }
-            //batch.DrawRectangle(box, Color.White);
+            batch.DrawRectangle(box, Color.White);
         }
 
     }

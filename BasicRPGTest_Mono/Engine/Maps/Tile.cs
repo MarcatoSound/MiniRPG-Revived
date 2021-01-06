@@ -12,22 +12,24 @@ namespace RPGEngine
 {
     public class Tile
     {
-        public Tile parent;
+        // General variables
         public const int dimensions = 32;
         public string name { get; set; }
         public int id { get; set; }
+        public Graphic graphic { get; set; }
+        public Dictionary<TileSide, Graphic> sideGraphics { get; set; }
+        public Rectangle box { get; set; }
+        public bool isCollidable { get; set; }
+
+        // Instance variables
+        public bool isInstance { get; set; }
+        public Tile parent { get; set; }
         public Vector2 pos { get; set; } = new Vector2(0, 0);
         public Vector2 drawPos { get; set; } = new Vector2(0, 0);
         public Vector2 tilePos { get; set; } = new Vector2(0, 0);
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
-        public Rectangle box { get; set; }
-        public Graphic graphic { get; set; }
-        public Dictionary<TileSide, Graphic> sideGraphics { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
-
-        public bool isCollidable { get; set; }
-        public bool isInstance { get; set; } 
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true)
         {
@@ -38,40 +40,22 @@ namespace RPGEngine
             isInstance = instance;
             sideGraphics = new Dictionary<TileSide, Graphic>();
 
-            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
-        }
-        public Tile(string name, Graphic graphic, bool collidable = false, bool instance = true)
-        {
-            id = TileManager.tiles.Count;
-            this.name = name;
-            this.graphic = graphic;
-            isCollidable = collidable;
-            isInstance = instance;
-            sideGraphics = new Dictionary<TileSide, Graphic>();
-
-            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
-        }
-        public Tile(string name, Texture2D texture, bool useSides, bool collidable = false, bool instance = true)
-        {
-            // TODO Replace this constructor with a check for if the texture provided is larger than the tile dimensions.
-            this.name = name;
-            graphic = new Graphic(Util.getSpriteFromSet(texture, 1, 1));
-            isCollidable = collidable;
-            isInstance = instance;
-            sideGraphics = new Dictionary<TileSide, Graphic>();
-
-            sideGraphics.Add(TileSide.NorthWest, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
-            sideGraphics.Add(TileSide.North, new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
-            sideGraphics.Add(TileSide.NorthEast, new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
-            sideGraphics.Add(TileSide.West, new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
-            sideGraphics.Add(TileSide.East, new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
-            sideGraphics.Add(TileSide.SouthWest, new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
-            sideGraphics.Add(TileSide.South, new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
-            sideGraphics.Add(TileSide.SouthEast, new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
+            if (texture.Width > dimensions)
+            {
+                sideGraphics.Add(TileSide.NorthWest, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+                sideGraphics.Add(TileSide.North, new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
+                sideGraphics.Add(TileSide.NorthEast, new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
+                sideGraphics.Add(TileSide.West, new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
+                sideGraphics.Add(TileSide.East, new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
+                sideGraphics.Add(TileSide.SouthWest, new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
+                sideGraphics.Add(TileSide.South, new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
+                sideGraphics.Add(TileSide.SouthEast, new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
+            }
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
         }
 
+        // For instantiating an existing tile
         public Tile(Tile tile, Vector2 tilePos)
         {
             this.parent = tile;
@@ -145,77 +129,6 @@ namespace RPGEngine
 
             return;
 
-            //
-
-            // TODO Replace the constant "drawAdjacentTiles" call with an "update" call that snapshots
-            //   the tile's data. Perhaps a set of bools determining which sides of the tile need to be drawn?
-            if (parent.sideGraphics.Count == 0) return;
-            Graphic northGraphic = getSideGraphic(TileSide.North);
-            Graphic southGraphic = getSideGraphic(TileSide.South);
-            Graphic westGraphic = getSideGraphic(TileSide.West);
-            Graphic eastGraphic = getSideGraphic(TileSide.East);
-            Vector2 northPos;
-            Vector2 southPos;
-            Vector2 westPos;
-            Vector2 eastPos;
-            Tile northTile;
-            Tile southTile;
-            Tile westTile;
-            Tile eastTile;
-
-
-            if (northGraphic != null)
-            {
-                northPos = new Vector2(tilePos.X, tilePos.Y - 1); ;
-                northTile = layer.getTile(northPos);
-                if (northTile == null)
-                {
-                    northPos.X = northPos.X * TileManager.dimensions + (TileManager.dimensions / 2);
-                    northPos.Y = northPos.Y * TileManager.dimensions + (TileManager.dimensions / 2);
-                    northGraphic.draw(batch, northPos, false);
-                    //batch.DrawRectangle(new Rectangle(Convert.ToInt32(northPos.X - 16), Convert.ToInt32(northPos.Y - 16), 32, 32), Color.White);
-                }
-            }
-
-            if (southGraphic != null)
-            {
-                southPos = new Vector2(tilePos.X, tilePos.Y + 1);
-                southTile = layer.getTile(southPos);
-                if (southTile == null)
-                {
-                    southPos.X = southPos.X * TileManager.dimensions + (TileManager.dimensions / 2);
-                    southPos.Y = southPos.Y * TileManager.dimensions + (TileManager.dimensions / 2);
-                    southGraphic.draw(batch, southPos, false);
-                    //batch.DrawRectangle(new Rectangle(Convert.ToInt32(southPos.X - 16), Convert.ToInt32(southPos.Y - 16), 32, 32), Color.White);
-                }
-            }
-
-            if (westGraphic != null)
-            {
-                westPos = new Vector2(tilePos.X - 1, tilePos.Y);
-                westTile = layer.getTile(westPos);
-                if (westTile == null)
-                {
-                    westPos.X = westPos.X * TileManager.dimensions + (TileManager.dimensions / 2);
-                    westPos.Y = westPos.Y * TileManager.dimensions + (TileManager.dimensions / 2);
-                    westGraphic.draw(batch, westPos, false);
-                    //batch.DrawRectangle(new Rectangle(Convert.ToInt32(westPos.X - 16), Convert.ToInt32(westPos.Y - 16), 32, 32), Color.White);
-                }
-            }
-
-            if (eastGraphic != null)
-            {
-                eastPos = new Vector2(tilePos.X + 1, tilePos.Y);
-                eastTile = layer.getTile(eastPos);
-                if (eastTile == null)
-                {
-                    eastPos.X = eastPos.X * TileManager.dimensions + (TileManager.dimensions / 2);
-                    eastPos.Y = eastPos.Y * TileManager.dimensions + (TileManager.dimensions / 2);
-                    eastGraphic.draw(batch, eastPos, false);
-                    //batch.DrawRectangle(new Rectangle(Convert.ToInt32(eastPos.X - 16), Convert.ToInt32(eastPos.Y - 16), 32, 32), Color.White);
-                }
-            }
-
         }
 
         public void update()
@@ -227,6 +140,7 @@ namespace RPGEngine
             foreach (TileSide side in Enum.GetValues(typeof(TileSide)))
             {
                 graphic = getSideGraphic(side);
+                if (graphic == null) continue;
                 checkPos = tilePos;
                 switch (side)
                 {
@@ -267,86 +181,6 @@ namespace RPGEngine
             }
 
             return;
-
-            //
-
-            if (parent.sideGraphics.Count == 0) return;
-            Graphic northGraphic = getSideGraphic(TileSide.North);
-            Graphic southGraphic = getSideGraphic(TileSide.South);
-            Graphic westGraphic = getSideGraphic(TileSide.West);
-            Graphic eastGraphic = getSideGraphic(TileSide.East);
-            Vector2 northPos;
-            Vector2 southPos;
-            Vector2 westPos;
-            Vector2 eastPos;
-            Tile northTile;
-            Tile southTile;
-            Tile westTile;
-            Tile eastTile;
-
-
-            if (northGraphic != null)
-            {
-                northPos = new Vector2(tilePos.X, tilePos.Y - 1); ;
-                northTile = layer.getTile(northPos);
-                if (northTile == null)
-                {
-                    sides.Remove(TileSide.North);
-                    sides.Add(TileSide.North, true);
-                }
-                else
-                {
-                    sides.Remove(TileSide.North);
-                    sides.Add(TileSide.North, false);
-                }
-            }
-
-            if (southGraphic != null)
-            {
-                southPos = new Vector2(tilePos.X, tilePos.Y + 1);
-                southTile = layer.getTile(southPos);
-                if (southTile == null)
-                {
-                    sides.Remove(TileSide.South);
-                    sides.Add(TileSide.South, true);
-                } else
-                {
-                    sides.Remove(TileSide.South);
-                    sides.Add(TileSide.South, false);
-                }
-            }
-
-            if (westGraphic != null)
-            {
-                westPos = new Vector2(tilePos.X - 1, tilePos.Y);
-                westTile = layer.getTile(westPos);
-                if (westTile == null)
-                {
-                    sides.Remove(TileSide.West);
-                    sides.Add(TileSide.West, true);
-                }
-                else
-                {
-                    sides.Remove(TileSide.West);
-                    sides.Add(TileSide.West, false);
-                }
-            }
-
-            if (eastGraphic != null)
-            {
-                eastPos = new Vector2(tilePos.X + 1, tilePos.Y);
-                eastTile = layer.getTile(eastPos);
-                if (eastTile == null)
-                {
-                    sides.Remove(TileSide.East);
-                    sides.Add(TileSide.East, true);
-                }
-                else
-                {
-                    sides.Remove(TileSide.East);
-                    sides.Add(TileSide.East, false);
-                }
-            }
         }
 
         public void draw(SpriteBatch batch)

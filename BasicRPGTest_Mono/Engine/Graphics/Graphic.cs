@@ -15,6 +15,8 @@ namespace BasicRPGTest_Mono.Engine
         public Graphic(Texture2D texture)
         {
             this.texture = texture;
+            width = texture.Width;
+            height = texture.Height;
         }
         public Graphic()
         {

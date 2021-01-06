@@ -61,7 +61,8 @@ namespace BasicRPGTest_Mono
             loadGuis();
             loadHud();
 
-            loadMap();
+            if (loadMap())
+                Save.save(MapManager.activeMap, worldName);
 
 
             Texture2D texture;
@@ -69,18 +70,16 @@ namespace BasicRPGTest_Mono
             texture = Content.Load<Texture2D>("player_spriteset");
             player = new Player(texture, _graphics);
 
-            loadPlayer();
+            if (loadPlayer())
+                Save.save(player, worldName);
             Camera.camera.Position = player.Position;
             Camera.camera.CameraLimits = new Rectangle(0, 0, MapManager.activeMap.widthInPixels, MapManager.activeMap.heightInPixels);
 
 
-            // Saving functionality
-            Save.save(MapManager.activeMap, worldName);
-            Save.save(player, worldName);
-
-
             base.LoadContent();
             System.Diagnostics.Debug.WriteLine("## Loaded game content!");
+
+            GC.Collect();
         }
         public override void UnloadContent()
         {
@@ -98,6 +97,8 @@ namespace BasicRPGTest_Mono
             MapManager.clear();
 
             base.UnloadContent();
+
+            GC.Collect();
         }
 
 
@@ -105,7 +106,7 @@ namespace BasicRPGTest_Mono
         private void loadTiles()
         {
             Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
-            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), true, false, false));
+            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false));
             TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false));
             TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false));
             TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false));
@@ -163,7 +164,7 @@ namespace BasicRPGTest_Mono
             Vector2 hotbar2Pos = new Vector2(hotbar1.screenPos.X, hotbar1.screenPos.Y - 40);
             HudManager.add(new HotbarSecondary(hotbar2Pos));
         }
-        private void loadMap()
+        private bool loadMap()
         {
             string path = $"save\\{worldName}";
 
@@ -172,30 +173,37 @@ namespace BasicRPGTest_Mono
             if (Directory.Exists(path))
             {
                 // Load map data
-                MapManager.add(new Map("overworld", size, Load.loadMap(worldName)));
+                MapManager.add(new Map("overworld", size, Load.loadMap(worldName, "overworld")));
 
 
-                return;
+                return false;
             }
 
 
             // Generate the actual map contents
             MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
 
+            return true;
+
         }
-        private void loadPlayer()
+        private bool loadPlayer()
         {
 
             string path = $"save\\{worldName}";
 
             if (Directory.Exists(path))
             {
+                
+                if (!File.Exists($"{path}\\player.json"))
+                    return true;
                 // Load player data
                 Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
                 player.Position = (Vector2)playerData["position"];
 
-                return;
+                return false;
             }
+
+            return true;
         }
 
 

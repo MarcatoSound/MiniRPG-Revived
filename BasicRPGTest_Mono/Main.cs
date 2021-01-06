@@ -94,7 +94,7 @@ namespace BasicRPGTest_Mono
 
                         foreach (Tile tile in tiles)
                         {
-                            System.Diagnostics.Debug.WriteLine($"Region tile sides: {tile.sideGraphics.Count}");
+                            System.Diagnostics.Debug.WriteLine($"Region tile sides: {tile.sides.Count}");
                         }
 
                         /*Random seedGenerator = new Random();

@@ -49,19 +49,20 @@ namespace BasicRPGTest_Mono.Engine
                 writer.Close();
             }
 
+            GC.Collect();
+
         }
 
         public static void save(Map map, string world)
         {
-            path = $"save\\{world}";
+            path = $"save\\{world}\\maps";
 
             if (!Directory.Exists(path))
             {
                 DirectoryInfo dInfo = Directory.CreateDirectory(path);
             }
 
-            writer = new StreamWriter(path + "\\map.json", false);
-            JObject json = new JObject();
+            JObject worldJson = new JObject();
 
             // Save the map's general info
             System.Diagnostics.Debug.WriteLine("## Saving map info!");
@@ -69,17 +70,29 @@ namespace BasicRPGTest_Mono.Engine
             JToken height = new JValue(map.height);
             JToken width = new JValue(map.width);
 
-            json.Add("name", name);
-            json.Add("height", height);
-            json.Add("width", width);
+            worldJson.Add("name", name);
+            worldJson.Add("height", height);
+            worldJson.Add("width", width);
 
-            JArray layers = new JArray();
+            writer = new StreamWriter($"save\\{world}\\world.json", false);
+
+            try
+            {
+                writer.Write(worldJson.ToString(Newtonsoft.Json.Formatting.Indented));
+            }
+            finally
+            {
+                writer.Close();
+            }
+
+            // Save the map's layer data
             JObject jsonLayer;
             JArray layerTiles;
 
             JObject tileData;
             foreach (TileLayer layer in map.layers)
             {
+                writer = new StreamWriter($"{path}\\{map.name}_{layer.name}.json", false);
                 jsonLayer = new JObject();
                 layerTiles = new JArray();
 
@@ -101,22 +114,25 @@ namespace BasicRPGTest_Mono.Engine
                     tileData.Add("y", tileY);
 
                     layerTiles.Add(tileData);
+
+                    tileData = null;
                 }
 
                 jsonLayer.Add("tiles", layerTiles);
-                layers.Add(jsonLayer);
-            }
 
-            json.Add("layers", layers);
+                try
+                {
+                    writer.Write(jsonLayer.ToString(Newtonsoft.Json.Formatting.Indented));
+                }
+                finally
+                {
+                    writer.Close();
+                }
 
-            try
-            {
-                writer.Write(json.ToString(Newtonsoft.Json.Formatting.Indented));
-                System.Diagnostics.Debug.WriteLine("Successfully saved map data!");
-            }
-            finally
-            {
-                writer.Close();
+                layerTiles = null;
+                jsonLayer = null;
+
+                GC.Collect();
             }
 
         }

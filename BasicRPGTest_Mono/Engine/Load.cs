@@ -37,19 +37,22 @@ namespace BasicRPGTest_Mono.Engine
 
             return playerData;
         }
-        public static List<TileLayer> loadMap(string world) 
+        public static List<TileLayer> loadMap(string world, string map) 
         {
             List<TileLayer> layers = new List<TileLayer>();
 
-            path = $"save\\{world}";
-            reader = new StreamReader(path + "\\map.json");
+            path = $"save\\{world}\\maps";
+            reader = new StreamReader($"save\\{world}\\world.json");
 
-            JObject mapJson = JObject.Parse(reader.ReadToEnd());
-            JArray jsonLayers = mapJson.Value<JArray>("layers");
+            DirectoryInfo dirInfo = new DirectoryInfo(path);
+            FileInfo[] files = dirInfo.GetFiles();
             List<Tile> tiles;
 
-            foreach (JObject jsonLayer in jsonLayers)
+            foreach (FileInfo file in files)
             {
+                reader = new StreamReader($"{path}\\{file.Name}");
+                JObject jsonLayer = JObject.Parse(reader.ReadToEnd());
+
                 tiles = new List<Tile>();
                 TileLayer layer = new TileLayer(jsonLayer.Value<string>("layer"));
                 JArray tileArray = jsonLayer.Value<JArray>("tiles");
@@ -66,13 +69,18 @@ namespace BasicRPGTest_Mono.Engine
                     tile = new Tile(template, new Vector2(x, y));
 
                     layer.setTile(tile.tilePos, tile);
+                    tile = null;
                 }
 
                 layers.Add(layer);
 
-            }
+                reader.Close();
 
-            reader.Close();
+                layer = null;
+
+                GC.Collect();
+
+            }
 
             return layers;
 

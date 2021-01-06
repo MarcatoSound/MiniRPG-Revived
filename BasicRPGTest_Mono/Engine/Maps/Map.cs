@@ -82,6 +82,7 @@ namespace BasicRPGTest_Mono.Engine
                     // Create a collidable box at the following true-map coordinate.
                     collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
                 }
+
             }
 
 
@@ -148,16 +149,16 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
-            foreach (TileLayer layer in layers)
+            batch.Begin(transformMatrix: Camera.camera.Transform);
+            foreach (Region region in regions.Values)
             {
-                foreach (Region region in regions.Values)
+                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                foreach (TileLayer layer in layers)
                 {
-                    if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                    batch.Begin(transformMatrix: Camera.camera.Transform);
                     region.draw(batch, layer);
-                    batch.End();
                 }
             }
+            batch.End();
         }
 
 
