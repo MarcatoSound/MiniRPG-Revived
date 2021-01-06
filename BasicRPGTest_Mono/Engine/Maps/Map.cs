@@ -52,11 +52,17 @@ namespace BasicRPGTest_Mono.Engine
             spawnTimer.Elapsed += trySpawn;
             spawnTimer.Start();
 
+            Vector2 regionTruePos = new Vector2();
+            Vector2 regionPos = new Vector2();
             for (int x = 0; x < width / 8; x++)
             {
                 for (int y = 0; y < height / 8; y++)
                 {
-                    Region region = new Region(new Vector2(x * (TileManager.dimensions * 8), y * (TileManager.dimensions * 8)));
+                    regionTruePos.X = x * (TileManager.dimensions * 8);
+                    regionTruePos.Y = y * (TileManager.dimensions * 8);
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    Region region = new Region(regionTruePos, regionPos);
                     regions.Add(new Vector2(x, y), region);
                 }
             }
@@ -70,9 +76,9 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    Vector2 regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
-                    tile.region = regionPos;
-                    regions[regionPos].addTile(tile);
+                    Vector2 tileRegionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    tile.region = tileRegionPos;
+                    regions[tileRegionPos].addTile(tile);
                     tile.update();
 
 
@@ -146,19 +152,55 @@ namespace BasicRPGTest_Mono.Engine
             }
             return true;
         }
+        public Region getRegionByTile(Tile tile)
+        {
+            return regions[tile.region];
+        }
+        public Region getRegionByTilePosition(Vector2 tilePos)
+        {
+            Vector2 regionPos = new Vector2((int)(tilePos.X / 8), (int)(tilePos.Y / 8));
+
+            return regions[regionPos];
+        }
+        public List<Region> getRegionsInRange(Vector2 tilePos, int radius)
+        {
+            List<Region> regions = new List<Region>();
+
+            Region centerRegion = getRegionByTilePosition(tilePos);
+            Vector2 topLeftRegion = new Vector2(centerRegion.regionPos.X - radius, centerRegion.regionPos.Y - radius);
+            Vector2 bottomLeftRegion = new Vector2(centerRegion.regionPos.X + radius, centerRegion.regionPos.Y + radius);
+
+            Vector2 regionPos = new Vector2();
+            for (int x = (int)topLeftRegion.X; x < bottomLeftRegion.X; x++)
+            {
+                for (int y = (int)topLeftRegion.Y; y < bottomLeftRegion.Y; y++)
+                {
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    if (this.regions.ContainsKey(regionPos))
+                        regions.Add(this.regions[regionPos]);
+                }
+            }
+
+            return regions;
+
+        }
 
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
-            batch.Begin(transformMatrix: Camera.camera.Transform);
-            foreach (Region region in regions.Values)
+
+            //int renderDist = Convert.ToInt32((double)camera.BoundingRectangle.Width / 7);
+            List<Region> regions = getRegionsInRange(Core.player.getPlayerTilePosition(), 7);
+
+            foreach (TileLayer layer in layers)
             {
-                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                foreach (TileLayer layer in layers)
+                batch.Begin(samplerState: SamplerState.PointClamp, sortMode: SpriteSortMode.BackToFront, transformMatrix: Camera.camera.Transform);
+                foreach (Region region in regions)
                 {
                     region.draw(batch, layer);
                 }
+                batch.End();
             }
-            batch.End();
         }
 
 

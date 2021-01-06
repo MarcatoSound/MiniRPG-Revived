@@ -20,6 +20,7 @@ namespace RPGEngine
         public Dictionary<TileSide, Graphic> sideGraphics { get; set; }
         public Rectangle box { get; set; }
         public bool isCollidable { get; set; }
+        public int zIndex { get; set; }
 
         // Instance variables
         public bool isInstance { get; set; }
@@ -31,17 +32,18 @@ namespace RPGEngine
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
 
-        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true)
+        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1)
         {
             id = TileManager.tiles.Count;
             this.name = name;
-            graphic = new Graphic(texture);
+            this.zIndex = z;
             isCollidable = collidable;
             isInstance = instance;
             sideGraphics = new Dictionary<TileSide, Graphic>();
 
             if (texture.Width > dimensions)
             {
+                graphic = new Graphic(Util.getSpriteFromSet(texture, 1, 1));
                 sideGraphics.Add(TileSide.NorthWest, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
                 sideGraphics.Add(TileSide.North, new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
                 sideGraphics.Add(TileSide.NorthEast, new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
@@ -51,6 +53,10 @@ namespace RPGEngine
                 sideGraphics.Add(TileSide.South, new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
                 sideGraphics.Add(TileSide.SouthEast, new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
             }
+            else
+            {
+                graphic = new Graphic(texture);
+            }
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
         }
@@ -59,9 +65,11 @@ namespace RPGEngine
         public Tile(Tile tile, Vector2 tilePos)
         {
             this.parent = tile;
+            this.name = tile.name;
             this.id = tile.id;
             this.isCollidable = tile.isCollidable;
             this.isInstance = true;
+            this.zIndex = tile.zIndex;
             this.tilePos = tilePos;
             this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
@@ -82,7 +90,7 @@ namespace RPGEngine
 
         public void drawAdjacentTiles(SpriteBatch batch)
         {
-
+            if (sideGraphics.Count == 0) return;
             Vector2 drawPos;
             foreach (KeyValuePair<TileSide, bool> pair in sides)
             {
@@ -90,7 +98,7 @@ namespace RPGEngine
                 if (!draw) continue;
                 TileSide side = pair.Key;
                 if (getSideGraphic(side) == null) continue;
-                drawPos = this.drawPos;
+                drawPos = pos;
 
                 switch (side)
                 {
@@ -123,7 +131,8 @@ namespace RPGEngine
                         drawPos.Y = drawPos.Y + TileManager.dimensions;
                         break;
                 }
-                sideGraphics[side].draw(batch, drawPos, false);
+
+                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
             }
 
@@ -133,7 +142,7 @@ namespace RPGEngine
 
         public void update()
         {
-
+            if (sideGraphics.Count == 0) return;
             Graphic graphic;
             Vector2 checkPos;
             Tile checkTile;
@@ -174,10 +183,16 @@ namespace RPGEngine
                         break;
                 }
                 checkTile = layer.getTile(checkPos);
-                if (checkTile == null)
+                if (checkTile == null || checkTile.zIndex < zIndex)
+                {
+                    sides.Remove(side);
                     sides.Add(side, true);
+                }
                 else
+                {
+                    sides.Remove(side);
                     sides.Add(side, false);
+                }
             }
 
             return;
@@ -186,7 +201,7 @@ namespace RPGEngine
         public void draw(SpriteBatch batch)
         {
             if (!isInstance) return;
-            parent.graphic.draw(batch, drawPos, false);
+            parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.2f);
             drawAdjacentTiles(batch);
         }
 

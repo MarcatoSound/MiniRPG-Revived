@@ -37,12 +37,12 @@ namespace BasicRPGTest_Mono.Engine
             if (newBatch)
                 spriteBatch.End();
         }
-        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, float rotation, Vector2 origin, float scale = 1, bool newBatch = true)
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, float rotation, Vector2 origin, float scale = 1, bool newBatch = true, float z = 1)
         {
             if (newBatch)
                 spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
 
-            spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, scale, SpriteEffects.None, 0f);
+            spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, scale, SpriteEffects.None, z);
 
             if (newBatch)
                 spriteBatch.End();

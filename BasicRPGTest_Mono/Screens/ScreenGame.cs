@@ -49,6 +49,8 @@ namespace BasicRPGTest_Mono
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Core.graphics = _graphics.GraphicsDevice;
 
+            Game.renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
+
             font = Content.Load<SpriteFont>("arial");
 
 
@@ -107,10 +109,10 @@ namespace BasicRPGTest_Mono
         {
             Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
             TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false));
-            TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false));
-            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false));
-            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false));
-            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false));
+            TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false, 0));
+            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false, 0));
+            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false, 0));
+            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false, 2));
             TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
         }
         private void loadBiomes()
@@ -237,8 +239,7 @@ namespace BasicRPGTest_Mono
 
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.End();
+            GraphicsDevice.SetRenderTarget(Game.renderTarget);
 
             MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
 
@@ -264,6 +265,13 @@ namespace BasicRPGTest_Mono
                 GuiWindowManager.activeWindow.Draw(_spriteBatch);
             }
 
+            GraphicsDevice.SetRenderTarget(null);
+
+            Texture2D screen = Game.renderTarget;
+
+            _spriteBatch.Begin();
+            _spriteBatch.Draw(screen, Vector2.Zero, Microsoft.Xna.Framework.Color.White);
+            _spriteBatch.End();
 
 
         }

@@ -23,6 +23,7 @@ using SharpNoise.Modules;
 using SharpNoise.Utilities.Imaging;
 using SharpNoise.Builders;
 using System.Drawing.Imaging;
+using BasicRPGTest_Mono.Engine.Maps;
 
 namespace BasicRPGTest_Mono
 {
@@ -38,6 +39,8 @@ namespace BasicRPGTest_Mono
         private Texture2D cursorTexture;
 
         private GameScreen activeScreen;
+
+        public RenderTarget2D renderTarget;
 
         public Main()
         {
@@ -89,12 +92,15 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        List<Tile> tiles = MapManager.activeMap.regions[new Vector2(5, 1)].tiles;
-                        System.Diagnostics.Debug.WriteLine($"Region size: {tiles.Count}");
-
-                        foreach (Tile tile in tiles)
+                        System.Diagnostics.Debug.WriteLine("SIDES: ");
+                        TileLayer layer = MapManager.activeMap.layers[1];
+                        Tile tile = layer.getTile(Core.player.getPlayerTilePosition());
+                        System.Diagnostics.Debug.WriteLine($"Tile :: {tile.name}");
+                        System.Diagnostics.Debug.WriteLine($"Layer :: {tile.layer.name}");
+                        System.Diagnostics.Debug.WriteLine($"zIndex :: {tile.zIndex}");
+                        foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
                         {
-                            System.Diagnostics.Debug.WriteLine($"Region tile sides: {tile.sides.Count}");
+                            System.Diagnostics.Debug.WriteLine($"{pair.Key} :: {pair.Value}");
                         }
 
                         /*Random seedGenerator = new Random();
@@ -306,6 +312,7 @@ namespace BasicRPGTest_Mono
                 System.Diagnostics.Debug.WriteLine("Client Height: " + Window.ClientBounds.Height);
                 _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
                 _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+                renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
                 Camera.camera.Initialize();
             };
 

@@ -14,12 +14,14 @@ namespace BasicRPGTest_Mono.Engine.Maps
         public const int regionSize = 8;
 
         public Vector2 pos { get; set; }
+        public Vector2 regionPos { get; set; }
         public Rectangle box { get; set; }
         public List<Tile> tiles;
 
-        public Region(Vector2 pos)
+        public Region(Vector2 pos, Vector2 regionPos)
         {
             this.pos = pos;
+            this.regionPos = regionPos;
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), regionSize * TileManager.dimensions, regionSize * TileManager.dimensions);
             tiles = new List<Tile>();
         }

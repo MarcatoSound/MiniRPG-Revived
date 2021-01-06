@@ -50,6 +50,7 @@ namespace BasicRPGTest_Mono.Engine
 
             foreach (FileInfo file in files)
             {
+                // TODO Account for incorrect layer loading order.
                 reader = new StreamReader($"{path}\\{file.Name}");
                 JObject jsonLayer = JObject.Parse(reader.ReadToEnd());
 
@@ -73,6 +74,7 @@ namespace BasicRPGTest_Mono.Engine
                 }
 
                 layers.Add(layer);
+                System.Diagnostics.Debug.WriteLine("Loaded layer: " + layer.name);
 
                 reader.Close();
 
