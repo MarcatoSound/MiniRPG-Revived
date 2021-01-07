@@ -189,7 +189,6 @@ namespace BasicRPGTest_Mono.Engine
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
 
-            //int renderDist = Convert.ToInt32((double)camera.BoundingRectangle.Width / 7);
             List<Region> regions = getRegionsInRange(Core.player.getPlayerTilePosition(), 7);
 
             foreach (TileLayer layer in layers)

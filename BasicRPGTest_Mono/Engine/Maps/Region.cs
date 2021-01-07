@@ -11,7 +11,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
     public class Region
     {
         // Region sizes should be in multiples of 4
-        public const int regionSize = 8;
+        public const int regionSize = 16;
 
         public Vector2 pos { get; set; }
         public Vector2 regionPos { get; set; }
