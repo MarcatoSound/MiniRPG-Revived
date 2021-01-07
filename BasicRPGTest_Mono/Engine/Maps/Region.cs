@@ -40,7 +40,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
             foreach (Tile tile in tiles)
             {
                 if (tile.layer == layer)
-                    tile.draw(batch);
+                    tile.drawAdjacentTiles(batch);
 
             }
             batch.DrawRectangle(box, Color.White);

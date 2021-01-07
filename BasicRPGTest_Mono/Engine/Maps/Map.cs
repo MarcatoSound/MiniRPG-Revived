@@ -47,7 +47,7 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
         // CONSTRUCTOR
         //====================================================================================
-        public Map(string name, int size, List<TileLayer> layers) 
+        public Map(string name, int size, List<TileLayer> layers)
         {
             this.name = name;
             this.layers = layers;
@@ -90,11 +90,13 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    Vector2 regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
                     tile.region = regionPos;
                     tile.map = this;  // Tile remembers the Map it belongs to
                     tile.layer = layer;  // Tile remembers Map's Layer it belongs to
                     regions[regionPos].addTile(tile);
+
+                    tile.update();
 
 
                     if (layer.name == "water") continue;
@@ -105,13 +107,14 @@ namespace BasicRPGTest_Mono.Engine
                 }
 
             }
+        }
 
 
         //====================================================================================
         // PROPERTIES
         //====================================================================================
 
-        public long getTilesTotalCount ()
+        public long getTilesTotalCount()
         {
             int tCount = 0;
 
@@ -201,25 +204,28 @@ namespace BasicRPGTest_Mono.Engine
             return regions[regionPos];
         }
         public List<Region> getRegionsInRange(Vector2 tilePos, int radius)
+        {
+            List<Region> regions = new List<Region>();
+
+            Region centerRegion = getRegionByTilePosition(tilePos);
+            Vector2 topLeftRegion = new Vector2(centerRegion.regionPos.X - radius, centerRegion.regionPos.Y - radius);
+            Vector2 bottomLeftRegion = new Vector2(centerRegion.regionPos.X + radius, centerRegion.regionPos.Y + radius);
+
+            Vector2 regionPos = new Vector2();
+            for (int x = (int)topLeftRegion.X; x < bottomLeftRegion.X; x++)
             {
-                List<Region> regions = new List<Region>();
-
-                Region centerRegion = getRegionByTilePosition(tilePos);
-                Vector2 topLeftRegion = new Vector2(centerRegion.regionPos.X - radius, centerRegion.regionPos.Y - radius);
-                Vector2 bottomLeftRegion = new Vector2(centerRegion.regionPos.X + radius, centerRegion.regionPos.Y + radius);
-
-                Vector2 regionPos = new Vector2();
-                for (int x = (int)topLeftRegion.X; x < bottomLeftRegion.X; x++)
+                for (int y = (int)topLeftRegion.Y; y < bottomLeftRegion.Y; y++)
                 {
-                    for (int y = (int)topLeftRegion.Y; y < bottomLeftRegion.Y; y++)
-                    {
-                        regionPos.X = x;
-                        regionPos.Y = y;
-                        if (this.regions.ContainsKey(regionPos))
-                            regions.Add(this.regions[regionPos]);
-                    }
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    if (this.regions.ContainsKey(regionPos))
+                        regions.Add(this.regions[regionPos]);
                 }
             }
+
+            return regions;
+
+        }
 
 
         public void update_VisibleRegions (Camera2D camera)
@@ -267,12 +273,15 @@ namespace BasicRPGTest_Mono.Engine
             // Clear Drawn Tiles Count (new fresh frame)
             //v_drawnTileCount = 0;
 
-            batch.Begin(transformMatrix: Camera.camera.Transform);
-            foreach (Region region in v_regionsVisible)
+            foreach (TileLayer layer in layers)
             {
-                region.draw(batch);
+                batch.Begin(transformMatrix: Camera.camera.Transform);
+                foreach (Region region in v_regionsVisible)
+                {
+                    region.draw(batch, layer);
+                }
+                batch.End();
             }
-            batch.End();
 
             // Report Total # of Tiles Drawn
             //Utility.Util.myDebug("Map.cs Draw()", "TILES DRAWN:  " + this.v_drawnTileCount + " of " + getTilesTotalCount());
@@ -307,7 +316,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (!camera.BoundingRectangle.Intersects(region.box)) continue;
                 batch.Begin(transformMatrix: Camera.camera.Transform);
-                region.draw(batch);
+                //region.draw(batch);
                 batch.End();
             }
         }
@@ -347,6 +356,16 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             //batch.End();
+
+            foreach (TileLayer layer in layers)
+            {
+                batch.Begin(transformMatrix: Camera.camera.Transform);
+                foreach (Region region in v_regionsVisible)
+                {
+                    region.draw(batch, layer);
+                }
+                batch.End();
+            }
 
         }
 

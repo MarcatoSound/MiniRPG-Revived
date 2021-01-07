@@ -17,9 +17,7 @@ namespace RPGEngine
         //====================================================================================
 
         public Map map;
-        public TileLayer layer;
 
-        public Tile parent;
         public const int dimensions = 32;
         public string name { get; set; }
         public int id { get; set; }
@@ -208,7 +206,7 @@ namespace RPGEngine
         public void draw(SpriteBatch batch)
         {
             if (!isInstance) return;
-            parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.2f);
+            parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.1f);
             drawAdjacentTiles(batch);
         }
 

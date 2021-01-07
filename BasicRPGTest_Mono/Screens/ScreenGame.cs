@@ -291,7 +291,7 @@ namespace BasicRPGTest_Mono
 
             GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
 
-            GraphicsDevice.SetRenderTarget(Game.renderTarget);
+            //GraphicsDevice.SetRenderTarget(Game.renderTarget);
 
 
             if (!v_NotNewDraw)
