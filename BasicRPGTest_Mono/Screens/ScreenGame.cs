@@ -266,7 +266,6 @@ namespace BasicRPGTest_Mono
                 MapManager.activeMap.update_VisibleRegions(Camera.camera);
             }
 
-
         }
 
         public override void Draw(GameTime gameTime)
@@ -290,9 +289,18 @@ namespace BasicRPGTest_Mono
             //return;  // Stop Function Here (for testing)
 
 
-            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            //MapManager.activeMap.Draw_OLD(Camera.camera, _spriteBatch);
+            // Below function is for hard speed testing function
+            //MapManager.activeMap.Draw_SpeedTest_OLD(Camera.camera, _spriteBatch, 1000);
+
+            //MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
+
+            MapManager.activeMap.Draw_TileCache(Camera.camera, _spriteBatch);
+            // Below function is for hard speed testing function
+            //MapManager.activeMap.Draw_TileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
+
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);

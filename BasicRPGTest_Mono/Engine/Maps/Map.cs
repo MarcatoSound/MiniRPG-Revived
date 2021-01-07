@@ -41,6 +41,7 @@ namespace BasicRPGTest_Mono.Engine
         private long v_drawnTileCount;
 
         private List<Region> v_regionsVisible = new List<Region>();
+        private Dictionary<String, List<Vector2>> v_TileCache = new Dictionary<String, List<Vector2>>();
 
 
         //====================================================================================
@@ -218,7 +219,8 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
-
+            // Build Tile Cache for Drawing
+            buildTileCache();
 
         }
 
@@ -254,7 +256,7 @@ namespace BasicRPGTest_Mono.Engine
             for (int i = 0; i < mIterationsCount; i++)
             {
                 // Draw code
-                this.Draw(camera, batch);
+                Draw(camera, batch);
             }
 
             // End Code Timer for speed test
@@ -263,11 +265,124 @@ namespace BasicRPGTest_Mono.Engine
             Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
         }
 
+
+        public void Draw_OLD(Camera2D camera, SpriteBatch batch)
+        {
+            // Draw code
+            foreach (Region region in regions.Values)
+            {
+                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                batch.Begin(transformMatrix: Camera.camera.Transform);
+                region.draw(batch);
+                batch.End();
+            }
+        }
+
+        public void Draw_SpeedTest_OLD(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        {
+            // Start Code Timer for speed test
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
+
+            // If No Interation count as given, use Default of 1000
+            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
+
+            for (int i = 0; i < mIterationsCount; i++)
+            {
+                // Draw code
+                Draw(camera, batch);
+            }
+
+            // End Code Timer for speed test
+            codeTimer.endTimer();
+            // Report function's speed
+            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+        }
+
+
+        public void Draw_TileCache (Camera2D camera, SpriteBatch batch)
+        {
+            //batch.Begin(transformMatrix: Camera.camera.Transform);
+
+            foreach (String parentTileName in v_TileCache.Keys)
+            {
+                // Get Parent Tile Template
+                Tile parentTile = TileManager.getByName(parentTileName);
+
+                parentTile.graphic.draw_Tiles(batch, v_TileCache[parentTileName]);
+            }
+
+            //batch.End();
+
+        }
+
+
+        public void Draw_TileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        {
+            // Start Code Timer for speed test
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
+
+            // If No Interation count as given, use Default of 1000
+            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
+
+            for (int i = 0; i < mIterationsCount; i++)
+            {
+                // Draw code
+                Draw_TileCache(camera, batch);
+            }
+
+            // End Code Timer for speed test
+            codeTimer.endTimer();
+            // Report function's speed
+            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+        }
+
+
         public void Clear()
         {
             entities.Clear();
             livingEntities.Clear();
             spawnTimer.Stop();
         }
+
+
+        private void buildTileCache()
+        {
+            // Clear Collection
+            v_TileCache.Clear();
+            
+            // Go through Visible Regions
+            foreach (Region region in v_regionsVisible)
+            {
+                // Go through each Tile in Region
+                foreach (Tile tile in region.tiles)
+                {
+                    String tileParentName = tile.parent.name;
+
+                    // If TileCache does NOT have this Tile Template
+                    if (!v_TileCache.ContainsKey(tileParentName))
+                    {
+                        // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
+                        List<Vector2> list = new List<Vector2>();
+                        // Add Position to TileCache List
+                        list.Add(tile.drawPos);
+
+                        // Add Tile template with this Tile's Position to Collection
+                        v_TileCache.Add(tileParentName, list);
+
+                    } else
+                    {
+                        // Get Parent Tile's sub-tile position List
+                        List<Vector2> list = v_TileCache[tileParentName];
+                        // Add Position to TileCache List
+                        list.Add(tile.drawPos);
+                    }
+
+                }
+            }
+
+        }
+
     }
 }
