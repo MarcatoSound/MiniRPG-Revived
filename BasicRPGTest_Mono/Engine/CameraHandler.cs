@@ -143,8 +143,8 @@ namespace BasicRPGTest_Mono.Engine
 
             ScreenCenter = new Vector2(_viewportWidth / 2, _viewportHeight / 2);
             maxZoom = 1.5f;
-            //minZoom = 0.8f;
-            minZoom = 0.3f;
+            minZoom = 0.8f;
+            //minZoom = 0.3f;
             Scale = 1.25f;
             _oldScale = 1.25f;
             MoveSpeed = 5f;
@@ -172,7 +172,7 @@ namespace BasicRPGTest_Mono.Engine
                         Matrix.CreateScale(new Vector3(newScale, newScale, newScale));
 
 
-
+            // FIXME: Fix handling of camera going outside the map bounds.
             Vector2 newPos = new Vector2(_position.X, _position.Y);
             newPos.X += (Focus.Position.X - Position.X) * MoveSpeed * delta;
             newPos.Y += (Focus.Position.Y - Position.Y) * MoveSpeed * delta;

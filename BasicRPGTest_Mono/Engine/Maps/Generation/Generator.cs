@@ -52,7 +52,7 @@ namespace BasicRPGTest_Mono.Engine
                     {
                         groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(3)), new Vector2(x, y)));
                     }
-                    else if (noise[x, y] >= 0.07)
+                    else if (noise[x, y] >= 0)
                     {
                         groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(0)), new Vector2(x, y)));
                     }

@@ -218,7 +218,7 @@
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:main_font.spritefont;font_main.spritefont
+/build:main_font.spritefont
 
 #begin player_spriteset.png
 /importer:TextureImporter

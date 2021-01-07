@@ -11,13 +11,17 @@ namespace BasicRPGTest_Mono.Engine.Maps
     public class Region
     {
         // Region sizes should be in multiples of 4
-        public const int regionSize = 8;
+        public const int regionSize = 16;
 
+        public Vector2 pos { get; set; }
+        public Vector2 regionPos { get; set; }
         public Rectangle box { get; set; }
         public List<Tile> tiles;
 
-        public Region(Vector2 pos)
+        public Region(Vector2 pos, Vector2 regionPos)
         {
+            this.pos = pos;
+            this.regionPos = regionPos;
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), regionSize * TileManager.dimensions, regionSize * TileManager.dimensions);
             tiles = new List<Tile>();
         }
@@ -31,15 +35,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
             this.tiles.Add(tile);
         }
 
-        public void draw(SpriteBatch batch)
+        public void draw(SpriteBatch batch, TileLayer layer)
         {
             foreach (Tile tile in tiles)
             {
-
-                tile.draw(batch);
+                if (tile.layer == layer)
+                    tile.drawAdjacentTiles(batch);
 
             }
-            //batch.DrawRectangle(box, Color.White);
+            batch.DrawRectangle(box, Color.White);
         }
 
     }

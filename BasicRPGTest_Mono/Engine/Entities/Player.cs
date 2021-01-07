@@ -414,10 +414,10 @@ namespace BasicRPGTest_Mono.Engine
         }
         public override void draw(SpriteBatch batch)
         {
-            Vector2 screenPos = Position;
-            graphic.draw(batch, screenPos, tintColor);
-
             batch.Begin(transformMatrix: Camera.camera.Transform);
+            Vector2 screenPos = Position;
+            graphic.draw(batch, screenPos, tintColor, false);
+
             batch.DrawRectangle(boundingBox, Color.LightGray);
             batch.End();
 
