@@ -56,7 +56,7 @@ namespace BasicRPGTest_Mono.Engine
 
             foreach (FileInfo file in files)
             {
-                // TODO Account for incorrect layer loading order.
+                // TODO: Account for incorrect layer loading order.
                 reader = new StreamReader($"{path}\\{file.Name}");
                 JObject jsonLayer = JObject.Parse(reader.ReadToEnd());
 

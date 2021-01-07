@@ -242,7 +242,7 @@ namespace BasicRPGTest_Mono.Engine
         public override Rectangle getBox(Vector2 pos)
         {
             int x = (int)(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
-            int y = (int)(pos.Y - (boundingBox.Height - (graphic.height / 2.5)));
+            int y = (int)(pos.Y - (boundingBox.Height - (graphic.texture.Height / 2.5)));
 
             Rectangle box = new Rectangle(x, y, boundingBox.Width, boundingBox.Height);
 

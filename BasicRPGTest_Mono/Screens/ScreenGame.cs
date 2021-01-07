@@ -133,8 +133,8 @@ namespace BasicRPGTest_Mono
             Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
             TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false));
             TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false, 0));
-            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, 0, 2), false, false, 0));
-            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, 0, 3), false, false, 0));
+            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), false, false, 0));
+            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0));
             TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false, 2));
             TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
         }

@@ -8,7 +8,7 @@ namespace BasicRPGTest_Mono.Engine
     {
         public static List<Entity> entities;
         public static List<LivingEntity> livingEntities { get; set; }
-        // TODO Eventually add lists for monsters, animals, and NPCs
+        // TODO: Eventually add lists for monsters, animals, and NPCs
 
         static EntityManager()
         {

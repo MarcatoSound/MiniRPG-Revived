@@ -48,11 +48,11 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
-                    /*if (noise[x, y] >= 0 && noise[x, y] < 0.07)
+                    if (noise[x, y] >= 0 && noise[x, y] < 0.07)
                     {
                         groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(3)), new Vector2(x, y)));
                     }
-                    else*/ if (noise[x, y] >= 0)
+                    else if (noise[x, y] >= 0)
                     {
                         groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(0)), new Vector2(x, y)));
                     }

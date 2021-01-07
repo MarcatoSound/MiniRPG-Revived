@@ -22,7 +22,6 @@ namespace BasicRPGTest_Mono.Engine
         public string name { get; set; }
         public List<TileLayer> layers { get; set; }
         public Dictionary<Vector2, Region> regions { get; set; }
-        // TODO implement regions so we loop through regions for rendering instead of all tiles.
         public int width { get; set; }
         public int height { get; set; }
         public int widthInPixels { get; set; }

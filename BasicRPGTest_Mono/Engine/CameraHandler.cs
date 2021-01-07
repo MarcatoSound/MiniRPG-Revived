@@ -172,7 +172,7 @@ namespace BasicRPGTest_Mono.Engine
                         Matrix.CreateScale(new Vector3(newScale, newScale, newScale));
 
 
-
+            // FIXME: Fix handling of camera going outside the map bounds.
             Vector2 newPos = new Vector2(_position.X, _position.Y);
             newPos.X += (Focus.Position.X - Position.X) * MoveSpeed * delta;
             newPos.Y += (Focus.Position.Y - Position.Y) * MoveSpeed * delta;

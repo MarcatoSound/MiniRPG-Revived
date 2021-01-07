@@ -248,7 +248,7 @@ namespace BasicRPGTest_Mono
                             {
                                 int slotIndex;
                                 Item item = playerInv.getItemAt(args.Position, out slotIndex);
-                                // TODO Prevent inventory from closing while item is in cursor
+                                // TODO: Prevent inventory from closing while item is in cursor
                                 if (item != null)
                                 {
                                     if (slotIndex > 13)
