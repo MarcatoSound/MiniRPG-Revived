@@ -300,7 +300,7 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public void Draw_TileCache (Camera2D camera, SpriteBatch batch)
+        public void Draw_VisibleMapTileCache (Camera2D camera, SpriteBatch batch)
         {
             //batch.Begin(transformMatrix: Camera.camera.Transform);
 
@@ -317,7 +317,7 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public void Draw_TileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        public void Draw_VisibleMapTileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
         {
             // Start Code Timer for speed test
             Utility.CodeTimer codeTimer = new Utility.CodeTimer();
@@ -329,7 +329,7 @@ namespace BasicRPGTest_Mono.Engine
             for (int i = 0; i < mIterationsCount; i++)
             {
                 // Draw code
-                Draw_TileCache(camera, batch);
+                Draw_VisibleMapTileCache(camera, batch);
             }
 
             // End Code Timer for speed test
@@ -383,6 +383,7 @@ namespace BasicRPGTest_Mono.Engine
             }
 
         }
+
 
     }
 }

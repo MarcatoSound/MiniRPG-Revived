@@ -45,6 +45,8 @@ namespace BasicRPGTest_Mono
 
         private Rectangle cameraRectangle = new Rectangle();
 
+        private bool v_NotNewDraw;
+
 
         //====================================================================================
         // CONSTRUCTORS
@@ -255,7 +257,6 @@ namespace BasicRPGTest_Mono
 
             Camera.camera.Update(gameTime);
 
-
             // If Camera position has changed
             if (Camera.camera.BoundingRectangle != cameraRectangle)
             {
@@ -286,8 +287,13 @@ namespace BasicRPGTest_Mono
             _spriteBatch.End();
 
 
-            //return;  // Stop Function Here (for testing)
-
+            if (!v_NotNewDraw)
+            {
+                // Just in case this doesn't happen automatically. This ensures it happens right away.
+                // Update Map's Visible Regions
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
+                v_NotNewDraw = true;
+            }
 
             //MapManager.activeMap.Draw_OLD(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
@@ -297,9 +303,9 @@ namespace BasicRPGTest_Mono
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
-            MapManager.activeMap.Draw_TileCache(Camera.camera, _spriteBatch);
+            MapManager.activeMap.Draw_VisibleMapTileCache(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
-            //MapManager.activeMap.Draw_TileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
+            //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -360,5 +366,6 @@ namespace BasicRPGTest_Mono
             Engine.Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
 
         }
+
     }
 }

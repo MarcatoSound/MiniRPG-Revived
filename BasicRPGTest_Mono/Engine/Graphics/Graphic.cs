@@ -16,9 +16,6 @@ namespace BasicRPGTest_Mono.Engine
         public int height { get; set; }
         public int width { get; set; }
 
-        // Stores centre point of Texture (when Texture is set)
-        private Vector2 v_Origin = new Vector2();
-
 
         //====================================================================================
         // CONSTRUCTORS
@@ -39,14 +36,7 @@ namespace BasicRPGTest_Mono.Engine
         public Texture2D texture 
         {
             get { return v_texture; }
-            set {
-                v_texture = value;
-                
-                // Store Origin (centre point of Texture)
-                // Will speed up Draw functions because isn't calculated every Drawn frame
-                v_Origin.X = value.Width / 2;
-                v_Origin.Y = value.Height / 2;
-            }
+            set {v_texture = value; }
         }
 
 
@@ -65,13 +55,11 @@ namespace BasicRPGTest_Mono.Engine
             // Slightly more efficient because one less IF check
             if (!newBatch)
             {
-                //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-                spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
             } else
             {
                 spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
-                //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-                spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
                 spriteBatch.End();
             }
 
@@ -79,8 +67,8 @@ namespace BasicRPGTest_Mono.Engine
             if (newBatch)
                 spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
 
-            //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
+            //spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
 
             if (newBatch)
                 spriteBatch.End();
@@ -100,7 +88,6 @@ namespace BasicRPGTest_Mono.Engine
                 spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, scale, SpriteEffects.None, 0f);
                 spriteBatch.End();
             }
-
 
             /*
             if (newBatch)
@@ -128,8 +115,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 foreach (Vector2 location in locations)
                 {
-                    //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-                    spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
+                    spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
                 }
             }
             else
@@ -138,8 +124,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 foreach (Vector2 location in locations)
                 {
-                    //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-                    spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
+                    spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
                 }
 
                 spriteBatch.End();
