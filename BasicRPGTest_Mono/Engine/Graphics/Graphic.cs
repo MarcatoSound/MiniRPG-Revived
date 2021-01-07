@@ -111,12 +111,14 @@ namespace BasicRPGTest_Mono.Engine
 
         public virtual void draw_Tiles(SpriteBatch spriteBatch, List<Vector2> locations, Color tintColor, bool newBatch = true)
         {
+
             // Slightly more efficient because one less IF check
             if (!newBatch)
             {
                 foreach (Vector2 location in locations)
                 {
-                    spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
+                    draw(spriteBatch, location, tintColor, false);
+                    //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
                 }
             }
             else
@@ -125,7 +127,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 foreach (Vector2 location in locations)
                 {
-                    spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
+                    draw(spriteBatch, location, tintColor, true);
+                    //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
                 }
 
                 spriteBatch.End();

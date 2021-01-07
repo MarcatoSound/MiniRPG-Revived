@@ -113,20 +113,56 @@ namespace BasicRPGTest_Mono.Engine
         // PROPERTIES
         //====================================================================================
 
-        public long getTilesTotalCount()
+        // Total # of Tiles on entire Map
+        public long TilesTotalCount
         {
-            int tCount = 0;
-
-            foreach (TileLayer tileLayer in layers)
+            get 
             {
-                tCount += tileLayer.tiles.Count;
-            }
+                long tCount = 0;
 
-            return tCount;
+                foreach (TileLayer tileLayer in layers)
+                {
+                    tCount += tileLayer.tiles.Count;
+                }
+
+                return tCount;
+            }
         }
 
-        public long getTilesTotalCountDrawn () { return this.v_drawnTileCount; }
-        public void setTilesTotalCountDrawn (long mValue) { this.v_drawnTileCount += mValue;  }
+        // Tracks # of Tiles drawn last frame
+        public long TilesDrawnCount
+        {
+            get { return v_drawnTileCount; }
+            set { v_drawnTileCount = value; }
+        }
+
+        // Calculates the number of Cached Tiles (visible for drawing)
+        public long TilesCachedCount
+        {
+            get
+            {
+                long tCount = 0;
+
+                // Go through each CachedTiles Layer
+                foreach (TileLayer tLayer in layers)
+                {
+                    Dictionary<String, List<Vector2>> templateList = v_TileCache[tLayer.name];
+
+                    // Go through each Tile Template in the Layer
+                    foreach (String parentTileName in templateList.Keys)
+                    {
+                        // Get Parent Tile Template
+                        Tile parentTile = TileManager.getByName(parentTileName);
+                        // Get Sub-Tile Locations
+                        tCount += templateList[parentTileName].Count;
+                    }
+                }
+
+                return tCount;
+            }
+
+        }
+
 
 
         //====================================================================================
@@ -348,36 +384,53 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Draw_VisibleMapTileCache (Camera2D camera, SpriteBatch batch)
         {
-            //batch.Begin(transformMatrix: Camera.camera.Transform);
+            batch.Begin(transformMatrix: Camera.camera.Transform);
 
             // Go through each CachedTiles Layer
             foreach (TileLayer tLayer in layers)
             {
-                Dictionary<String, List<Vector2>> templateList = this.v_TileCache[tLayer.name];
+                // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
+                Dictionary<String, List<Vector2>> templateList = v_TileCache[tLayer.name];
 
-                // Go through each Tile Template in the Layer
-                foreach (String parentTileName in templateList.Keys)
+
+                // If this Layer is the Decorations Layer
+                if (tLayer.name == "decorations")
                 {
-                    // Get Parent Tile Template
-                    Tile parentTile = TileManager.getByName(parentTileName);
-                    // Get Sub-Tile Locations
-                    List<Vector2> list = templateList[parentTileName];
-    
-                parentTile.graphic.draw_Tiles(batch, list);
+                    // Draw Ground Edge Tiles first (before Decorations Layer)
+                    foreach (TileLayer layer in layers)
+                    {
+                        foreach (Region region in v_regionsVisible)
+                        {
+                            region.draw(batch, layer);
+                        }
+                    }
+                }
+
+
+                // Draw Tile Templates at Locations of Cached matching Map Tiles
+                if (templateList != null)
+                {
+                    // Go through each Tile Template in the Layer
+                    foreach (String parentTileName in templateList.Keys)
+                    {
+                        // Get Parent Tile Template
+                        Tile parentTile = TileManager.getByName(parentTileName);
+                        // Get Sub-Tile Locations
+                        List<Vector2> list = templateList[parentTileName];
+
+                        parentTile.graphic.draw_Tiles(batch, list, false);
+
+                        // Count drawn Tiles
+                        TilesDrawnCount += list.Count;
+                    }
+                
+                } else
+                {
+                    Utility.Util.myDebug(true, "Map.cs Draw_VisibleMapTileCache()", "(" + tLayer.name + ") Layer key does not exist in Diciontary (v_TileCache). This should never happen!");
                 }
             }
 
-            //batch.End();
-
-            foreach (TileLayer layer in layers)
-            {
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                foreach (Region region in v_regionsVisible)
-                {
-                    region.draw(batch, layer);
-                }
-                batch.End();
-            }
+            batch.End();
 
         }
 
@@ -462,6 +515,12 @@ namespace BasicRPGTest_Mono.Engine
 
                 }
             }
+
+        }
+
+
+        public void generateTileEdges()
+        {
 
         }
 
