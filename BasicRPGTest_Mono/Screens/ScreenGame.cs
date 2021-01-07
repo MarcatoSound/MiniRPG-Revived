@@ -27,6 +27,10 @@ namespace BasicRPGTest_Mono
 {
     public class ScreenGame : GameScreen
     {
+        //====================================================================================
+        // VARIABLES
+        //====================================================================================
+
         private new Main Game => (Main)base.Game;
 
         public Player player;
@@ -38,11 +42,25 @@ namespace BasicRPGTest_Mono
         private SpriteBatch _spriteBatch;
 
         private FrameCounter _frameCounter = new FrameCounter();
+
+        private Rectangle cameraRectangle = new Rectangle();
+
+        private bool v_NotNewDraw;
+
+
+        //====================================================================================
+        // CONSTRUCTORS
+        //====================================================================================
+
         public ScreenGame(Main game, string worldName) : base(game)
         {
             this.worldName = worldName;
         }
 
+
+        //====================================================================================
+        // FUNCTIONS
+        //====================================================================================
         public override void LoadContent()
         {
             _graphics = Game._graphics;
@@ -83,6 +101,12 @@ namespace BasicRPGTest_Mono
 
             GC.Collect();
         }
+
+
+        //====================================================================================
+        // FUNCTIONS - LOAD / UNLOAD Content
+        //====================================================================================
+
         public override void UnloadContent()
         {
             Save.save(MapManager.activeMap, worldName);
@@ -104,7 +128,6 @@ namespace BasicRPGTest_Mono
         }
 
 
-
         private void loadTiles()
         {
             Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
@@ -115,11 +138,13 @@ namespace BasicRPGTest_Mono
             TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false, 2));
             TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
         }
+
         private void loadBiomes()
         {
             BiomeManager.add(new Biome("ocean", TileManager.getByName("water"), null));
             BiomeManager.add(new Biome("field", TileManager.getByName("grass"), TileManager.getByName("stone")));
         }
+
         private void loadItems()
         {
             Texture2D sprite;
@@ -136,6 +161,7 @@ namespace BasicRPGTest_Mono
             sprite = Content.Load<Texture2D>("iron_root");
             ItemManager.add(new Item("Iron Root", sprite));
         }
+
         private void loadEntities()
         {
             Texture2D texture = Content.Load<Texture2D>("enemy1");
@@ -150,12 +176,14 @@ namespace BasicRPGTest_Mono
                 System.Diagnostics.Debug.WriteLine("Entity: " + entity.name);
             }
         }
+
         private void loadGuis()
         {
             Texture2D texture = Content.Load<Texture2D>("gui_tileset");
             GuiWindowManager.tileset = texture;
             GuiWindowManager.add(new GuiPlayerInventory());
         }
+
         private void loadHud()
         {
             Texture2D texture = Content.Load<Texture2D>("hud_tileset");
@@ -209,8 +237,16 @@ namespace BasicRPGTest_Mono
         }
 
 
+        //====================================================================================
+        // FUNCTIONS - UPDATE & DRAW
+        //====================================================================================
+
         public override void Update(GameTime gameTime)
         {
+
+            //return;  // Stop Function Here (for testing)
+            
+
             if (MapManager.activeMap == null) return;
             
             if (!Core.paused)
@@ -229,10 +265,26 @@ namespace BasicRPGTest_Mono
 
             Camera.camera.Update(gameTime);
 
+            // If Camera position has changed
+            if (Camera.camera.BoundingRectangle != cameraRectangle)
+            {
+                //Engine.Utility.Util.myDebug("Camera Changed!");
+
+                cameraRectangle = Camera.camera.BoundingRectangle;
+                // Update Map's Visible Regions
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
+            }
+
         }
 
         public override void Draw(GameTime gameTime)
         {
+
+            // Start Code Timer. Can be used for testing different sections of the code
+            //Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+            //codeTimer.startTimer();
+
+
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
@@ -241,11 +293,35 @@ namespace BasicRPGTest_Mono
 
             GraphicsDevice.SetRenderTarget(Game.renderTarget);
 
-            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+
+            if (!v_NotNewDraw)
+            {
+                // Just in case this doesn't happen automatically. This ensures it happens right away.
+                // Update Map's Visible Regions
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
+                v_NotNewDraw = true;
+            }
+
+            //MapManager.activeMap.Draw_OLD(Camera.camera, _spriteBatch);
+            // Below function is for hard speed testing function
+            //MapManager.activeMap.Draw_SpeedTest_OLD(Camera.camera, _spriteBatch, 1000);
+
+            //MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            // Below function is for hard speed testing function
+            //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
+
+            MapManager.activeMap.Draw_VisibleMapTileCache(Camera.camera, _spriteBatch);
+            // Below function is for hard speed testing function
+            //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
+
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
+
+
+            //return;  // Stop Function Here (for testing)
+
 
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
@@ -265,16 +341,17 @@ namespace BasicRPGTest_Mono
                 GuiWindowManager.activeWindow.Draw(_spriteBatch);
             }
 
-            GraphicsDevice.SetRenderTarget(null);
 
-            Texture2D screen = Game.renderTarget;
 
-            _spriteBatch.Begin();
-            _spriteBatch.Draw(screen, Vector2.Zero, Microsoft.Xna.Framework.Color.White);
-            _spriteBatch.End();
+            // End Code Timer for speed test
+            //codeTimer.endTimer();
+            // Report function's speed
+            //Engine.Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
 
 
         }
+
+
 
     }
 }

@@ -39,6 +39,12 @@ namespace BasicRPGTest_Mono.Engine
         }
         public static List<TileLayer> loadMap(string world, string map) 
         {
+
+            // Track how long this function takes to run
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
+
+
             List<TileLayer> layers = new List<TileLayer>();
 
             path = $"save\\{world}\\maps";

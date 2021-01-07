@@ -12,7 +12,14 @@ namespace RPGEngine
 {
     public class Tile
     {
-        // General variables
+        //====================================================================================
+        // VARIABLES
+        //====================================================================================
+
+        public Map map;
+        public TileLayer layer;
+
+        public Tile parent;
         public const int dimensions = 32;
         public string name { get; set; }
         public int id { get; set; }
