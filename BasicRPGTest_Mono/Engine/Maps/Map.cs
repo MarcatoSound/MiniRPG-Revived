@@ -229,7 +229,10 @@ namespace BasicRPGTest_Mono.Engine
 
         public void update_VisibleRegions (Camera2D camera)
         {
-            foreach (Region region in regions.Values)
+
+            List<Region> regions = getRegionsInRange(Core.player.getPlayerTilePosition(), 7);
+
+            foreach (Region region in regions)
             {
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
                 if (camera.BoundingRectangle.Intersects(region.box))
