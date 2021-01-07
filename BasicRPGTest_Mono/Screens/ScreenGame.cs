@@ -238,9 +238,9 @@ namespace BasicRPGTest_Mono
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.End();
 
-            //MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
-            MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
+            //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
