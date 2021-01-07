@@ -20,7 +20,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
         // Investigate if these methods are based on memory pointers or the key object's data
         public void setTile(Vector2 pos, Tile tile)
         {
+            tile.layer = this;
             tiles[pos] = tile;
+        }
+        public Tile getTile(Vector2 pos)
+        {
+            if (tiles.ContainsKey(pos))
+                return tiles[pos];
+            else
+                return null;
         }
         public void clearTile(Vector2 pos)
         {

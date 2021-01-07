@@ -105,7 +105,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (entries.Count / 2.0)));
                         pos = new Vector2(0, vertOffset);
                     }
-                    // TODO Bottom align is broken.
+                    // FIXME: Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
                         vertOffset = (int)(box.Bottom - (lineHeight * entries.Count));
@@ -152,7 +152,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (entries.Count / 2.0)));
                         pos = new Vector2(box.Left + padding, vertOffset);
                     }
-                    // TODO Bottom align is broken.
+                    // FIXME: Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
                         vertOffset = (int)(box.Bottom - (lineHeight * entries.Count));
@@ -191,7 +191,7 @@ namespace BasicRPGTest_Mono.Engine.Menus
                         vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (entries.Count / 2.0)));
                         pos = new Vector2(box.Right - padding, vertOffset);
                     }
-                    // TODO Bottom align is broken.
+                    // FIXME: Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
                         vertOffset = (int)(box.Bottom - (lineHeight * entries.Count));

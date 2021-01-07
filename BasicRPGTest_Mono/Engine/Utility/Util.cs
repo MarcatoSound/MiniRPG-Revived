@@ -212,7 +212,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
                         vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (str.Count / 2.0)));
                         pos = new Vector2(0, vertOffset);
                     }
-                    // TODO Bottom align is broken.
+                    // FIXME: Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
                         vertOffset = (int)(box.Bottom - (lineHeight * str.Count));
@@ -254,7 +254,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
                         vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (str.Count / 2.0)));
                         pos = new Vector2(box.Left + padding, vertOffset);
                     }
-                    // TODO Bottom align is broken.
+                    // FIXME: Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
                         vertOffset = (int)(box.Bottom - (lineHeight * str.Count));
@@ -286,7 +286,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
                         vertOffset = (int)(box.Top + (box.Height / 2) - (lineHeight * (str.Count / 2.0)));
                         pos = new Vector2(box.Right - padding, vertOffset);
                     }
-                    // TODO Bottom align is broken.
+                    // FIXME: Bottom align is broken.
                     if (vertAlign == Alignment.Bottom)
                     {
                         vertOffset = (int)(box.Bottom - (lineHeight * str.Count));
@@ -375,6 +375,16 @@ namespace BasicRPGTest_Mono.Engine.Utility
             int y = row * dimensions;
 
             Rectangle sourceRectangle = new Rectangle(x, y, dimensions, dimensions);
+
+            Texture2D cropTexture = new Texture2D(Core.graphics, sourceRectangle.Width, sourceRectangle.Height);
+            Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];
+            spriteset.GetData(0, sourceRectangle, data, 0, data.Length);
+            cropTexture.SetData(data);
+
+            return cropTexture;
+        }
+        public static Texture2D getSpriteFromSet(Texture2D spriteset, Rectangle sourceRectangle)
+        {
 
             Texture2D cropTexture = new Texture2D(Core.graphics, sourceRectangle.Width, sourceRectangle.Height);
             Color[] data = new Color[sourceRectangle.Width * sourceRectangle.Height];

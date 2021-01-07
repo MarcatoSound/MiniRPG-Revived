@@ -23,6 +23,7 @@ using SharpNoise.Modules;
 using SharpNoise.Utilities.Imaging;
 using SharpNoise.Builders;
 using System.Drawing.Imaging;
+using BasicRPGTest_Mono.Engine.Maps;
 
 namespace BasicRPGTest_Mono
 {
@@ -38,6 +39,8 @@ namespace BasicRPGTest_Mono
         private Texture2D cursorTexture;
 
         private GameScreen activeScreen;
+
+        public RenderTarget2D renderTarget;
 
         public Main()
         {
@@ -89,7 +92,18 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        Random seedGenerator = new Random();
+                        System.Diagnostics.Debug.WriteLine("SIDES: ");
+                        TileLayer layer = MapManager.activeMap.layers[1];
+                        Tile tile = layer.getTile(Core.player.getPlayerTilePosition());
+                        System.Diagnostics.Debug.WriteLine($"Tile :: {tile.name}");
+                        System.Diagnostics.Debug.WriteLine($"Layer :: {tile.layer.name}");
+                        System.Diagnostics.Debug.WriteLine($"zIndex :: {tile.zIndex}");
+                        foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"{pair.Key} :: {pair.Value}");
+                        }
+
+                        /*Random seedGenerator = new Random();
                         int seed = seedGenerator.Next(0, 9999999);
                         System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
                         Perlin gen = new Perlin();
@@ -120,7 +134,7 @@ namespace BasicRPGTest_Mono
                         renderer.BuildGrayscaleGradient();
                         renderer.Render();
 
-                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);
+                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);*/
 
                     }
                     if (args.Key == Keys.Escape) mainMenu();
@@ -234,7 +248,7 @@ namespace BasicRPGTest_Mono
                             {
                                 int slotIndex;
                                 Item item = playerInv.getItemAt(args.Position, out slotIndex);
-                                // TODO Prevent inventory from closing while item is in cursor
+                                // TODO: Prevent inventory from closing while item is in cursor
                                 if (item != null)
                                 {
                                     if (slotIndex > 13)
@@ -298,6 +312,7 @@ namespace BasicRPGTest_Mono
                 System.Diagnostics.Debug.WriteLine("Client Height: " + Window.ClientBounds.Height);
                 _graphics.PreferredBackBufferWidth = Window.ClientBounds.Width;
                 _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
+                renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
                 Camera.camera.Initialize();
             };
 

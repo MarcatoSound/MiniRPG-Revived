@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using RPGEngine;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
@@ -51,9 +52,10 @@ namespace BasicRPGTest_Mono.Engine
         public bool isColliding(Rectangle box)
         {
             if (MapManager.activeMap == null) return true;
-            foreach (Rectangle tileBox in MapManager.activeMap.collidables.Values)
+            ConcurrentDictionary<int, Rectangle> pairs = MapManager.activeMap.collidables;
+            foreach (KeyValuePair<int, Rectangle> pair in pairs)
             {
-                if (box.Intersects(tileBox))
+                if (box.Intersects(pair.Value))
                     return true;
             }
 

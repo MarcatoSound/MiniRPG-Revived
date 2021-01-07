@@ -15,10 +15,13 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Map
     {
+        //====================================================================================
+        // VARIABLES
+        //====================================================================================
+
         public string name { get; set; }
         public List<TileLayer> layers { get; set; }
         public Dictionary<Vector2, Region> regions { get; set; }
-        // TODO implement regions so we loop through regions for rendering instead of all tiles.
         public int width { get; set; }
         public int height { get; set; }
         public int widthInPixels { get; set; }
@@ -33,7 +36,17 @@ namespace BasicRPGTest_Mono.Engine
         //public int totalSpawnWeights { get; set; }
         public int livingEntityCap = 50;
         public Timer spawnTimer;
-        public Map(string name, int size, List<TileLayer> layers) 
+
+        private long v_drawnTileCount;
+
+        private List<Region> v_regionsVisible = new List<Region>();
+        private Dictionary<String, List<Vector2>> v_TileCache = new Dictionary<String, List<Vector2>>();
+
+
+        //====================================================================================
+        // CONSTRUCTOR
+        //====================================================================================
+        public Map(string name, int size, List<TileLayer> layers)
         {
             this.name = name;
             this.layers = layers;
@@ -52,11 +65,17 @@ namespace BasicRPGTest_Mono.Engine
             spawnTimer.Elapsed += trySpawn;
             spawnTimer.Start();
 
+            Vector2 regionTruePos = new Vector2();
+            Vector2 regionPos = new Vector2();
             for (int x = 0; x < width / 8; x++)
             {
                 for (int y = 0; y < height / 8; y++)
                 {
-                    Region region = new Region(new Vector2(x * (TileManager.dimensions * 8), y * (TileManager.dimensions * 8)));
+                    regionTruePos.X = x * (TileManager.dimensions * 8);
+                    regionTruePos.Y = y * (TileManager.dimensions * 8);
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    Region region = new Region(regionTruePos, regionPos);
                     regions.Add(new Vector2(x, y), region);
                 }
             }
@@ -70,9 +89,13 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    Vector2 regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
                     tile.region = regionPos;
+                    tile.map = this;  // Tile remembers the Map it belongs to
+                    tile.layer = layer;  // Tile remembers Map's Layer it belongs to
                     regions[regionPos].addTile(tile);
+
+                    tile.update();
 
 
                     if (layer.name == "water") continue;
@@ -81,10 +104,34 @@ namespace BasicRPGTest_Mono.Engine
                     // Create a collidable box at the following true-map coordinate.
                     collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
                 }
+
+            }
+        }
+
+
+        //====================================================================================
+        // PROPERTIES
+        //====================================================================================
+
+        public long getTilesTotalCount()
+        {
+            int tCount = 0;
+
+            foreach (TileLayer tileLayer in layers)
+            {
+                tCount += tileLayer.tiles.Count;
             }
 
-
+            return tCount;
         }
+
+        public long getTilesTotalCountDrawn () { return this.v_drawnTileCount; }
+        public void setTilesTotalCountDrawn (long mValue) { this.v_drawnTileCount += mValue;  }
+
+
+        //====================================================================================
+        // FUNCTIONS
+        //====================================================================================
 
         public void initSpawns()
         {
@@ -135,6 +182,7 @@ namespace BasicRPGTest_Mono.Engine
 
             return pos;
         }
+
         public bool isLocationSafe(Rectangle location)
         {
             foreach (Rectangle collidable in collidables.Values)
@@ -144,17 +192,98 @@ namespace BasicRPGTest_Mono.Engine
             }
             return true;
         }
+        public Region getRegionByTile(Tile tile)
+        {
+            return regions[tile.region];
+        }
+        public Region getRegionByTilePosition(Vector2 tilePos)
+        {
+            Vector2 regionPos = new Vector2((int)(tilePos.X / 8), (int)(tilePos.Y / 8));
+
+            return regions[regionPos];
+        }
+        public List<Region> getRegionsInRange(Vector2 tilePos, int radius)
+        {
+            List<Region> regions = new List<Region>();
+
+            Region centerRegion = getRegionByTilePosition(tilePos);
+            Vector2 topLeftRegion = new Vector2(centerRegion.regionPos.X - radius, centerRegion.regionPos.Y - radius);
+            Vector2 bottomLeftRegion = new Vector2(centerRegion.regionPos.X + radius, centerRegion.regionPos.Y + radius);
+
+            Vector2 regionPos = new Vector2();
+            for (int x = (int)topLeftRegion.X; x < bottomLeftRegion.X; x++)
+            {
+                for (int y = (int)topLeftRegion.Y; y < bottomLeftRegion.Y; y++)
+                {
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    if (this.regions.ContainsKey(regionPos))
+                        regions.Add(this.regions[regionPos]);
+                }
+            }
+
+            return regions;
+
+        }
+
+
+        public void update_VisibleRegions (Camera2D camera)
+        {
+            foreach (Region region in regions.Values)
+            {
+                // If THIS Region is INSIDE Camera's view (BoundingRectangle)
+                if (camera.BoundingRectangle.Intersects(region.box))
+                {
+                    // If List Does NOT Contain this Region
+                    if (!v_regionsVisible.Contains(region))
+                    {
+                        // Add this Region to Collection
+                        v_regionsVisible.Add(region);
+
+                        //Utility.Util.myDebug("Region Added:  " + region.box);
+                    }
+
+                }
+                // If THIS Region is OUTSIDE Camera's view (BoundingRectangle)
+                else
+                {
+                    // If List DOES Contain this Region
+                    if (v_regionsVisible.Contains(region))
+                    {
+                        // Add this Region to Collection
+                        v_regionsVisible.Remove(region);
+
+                        //Utility.Util.myDebug("Region Removed:  " + region.box);
+                    }
+                }
+            }
+
+            // Build Tile Cache for Drawing
+            buildTileCache();
+
+        }
+
+
 
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
-            // Draw code
-            foreach (Region region in regions.Values)
+            // Drawing code (Draw by Map Region, one tile at a time)
+
+            // Clear Drawn Tiles Count (new fresh frame)
+            //v_drawnTileCount = 0;
+
+            foreach (TileLayer layer in layers)
             {
-                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
                 batch.Begin(transformMatrix: Camera.camera.Transform);
-                region.draw(batch);
+                foreach (Region region in v_regionsVisible)
+                {
+                    region.draw(batch, layer);
+                }
                 batch.End();
             }
+
+            // Report Total # of Tiles Drawn
+            //Utility.Util.myDebug("Map.cs Draw()", "TILES DRAWN:  " + this.v_drawnTileCount + " of " + getTilesTotalCount());
         }
 
         public void Draw_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
@@ -169,7 +298,7 @@ namespace BasicRPGTest_Mono.Engine
             for (int i = 0; i < mIterationsCount; i++)
             {
                 // Draw code
-                this.Draw(camera, batch);
+                Draw(camera, batch);
             }
 
             // End Code Timer for speed test
@@ -178,11 +307,135 @@ namespace BasicRPGTest_Mono.Engine
             Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
         }
 
+
+        public void Draw_OLD(Camera2D camera, SpriteBatch batch)
+        {
+            // Draw code
+            foreach (Region region in regions.Values)
+            {
+                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
+                batch.Begin(transformMatrix: Camera.camera.Transform);
+                //region.draw(batch);
+                batch.End();
+            }
+        }
+
+        public void Draw_SpeedTest_OLD(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        {
+            // Start Code Timer for speed test
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
+
+            // If No Interation count as given, use Default of 1000
+            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
+
+            for (int i = 0; i < mIterationsCount; i++)
+            {
+                // Draw code
+                Draw(camera, batch);
+            }
+
+            // End Code Timer for speed test
+            codeTimer.endTimer();
+            // Report function's speed
+            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+        }
+
+
+        public void Draw_VisibleMapTileCache (Camera2D camera, SpriteBatch batch)
+        {
+            //batch.Begin(transformMatrix: Camera.camera.Transform);
+
+            foreach (String parentTileName in v_TileCache.Keys)
+            {
+                // Get Parent Tile Template
+                Tile parentTile = TileManager.getByName(parentTileName);
+
+                parentTile.graphic.draw_Tiles(batch, v_TileCache[parentTileName]);
+            }
+
+            //batch.End();
+
+            foreach (TileLayer layer in layers)
+            {
+                batch.Begin(transformMatrix: Camera.camera.Transform);
+                foreach (Region region in v_regionsVisible)
+                {
+                    region.draw(batch, layer);
+                }
+                batch.End();
+            }
+
+        }
+
+
+        public void Draw_VisibleMapTileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        {
+            // Start Code Timer for speed test
+            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            codeTimer.startTimer();
+
+            // If No Interation count as given, use Default of 1000
+            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
+
+            for (int i = 0; i < mIterationsCount; i++)
+            {
+                // Draw code
+                Draw_VisibleMapTileCache(camera, batch);
+            }
+
+            // End Code Timer for speed test
+            codeTimer.endTimer();
+            // Report function's speed
+            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+        }
+
+
         public void Clear()
         {
             entities.Clear();
             livingEntities.Clear();
             spawnTimer.Stop();
         }
+
+
+        private void buildTileCache()
+        {
+            // Clear Collection
+            v_TileCache.Clear();
+            
+            // Go through Visible Regions
+            foreach (Region region in v_regionsVisible)
+            {
+                // Go through each Tile in Region
+                foreach (Tile tile in region.tiles)
+                {
+                    String tileParentName = tile.parent.name;
+
+                    // If TileCache does NOT have this Tile Template
+                    if (!v_TileCache.ContainsKey(tileParentName))
+                    {
+                        // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
+                        List<Vector2> list = new List<Vector2>();
+                        // Add Position to TileCache List
+                        list.Add(tile.drawPos);
+
+                        // Add Tile template with this Tile's Position to Collection
+                        v_TileCache.Add(tileParentName, list);
+
+                    } else
+                    {
+                        // Get Parent Tile's sub-tile position List
+                        List<Vector2> list = v_TileCache[tileParentName];
+                        // Add Position to TileCache List
+                        list.Add(tile.drawPos);
+                    }
+
+                }
+            }
+
+        }
+
+
     }
 }
