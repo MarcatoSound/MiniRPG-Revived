@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -306,14 +306,13 @@ namespace BasicRPGTest_Mono
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest_OLD(Camera.camera, _spriteBatch, 1000);
 
-            //MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
             MapManager.activeMap.Draw_VisibleMapTileCache(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
-
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
