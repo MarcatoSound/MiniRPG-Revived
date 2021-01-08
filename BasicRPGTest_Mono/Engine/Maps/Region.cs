@@ -11,7 +11,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
     public class Region
     {
         // Region sizes should be in multiples of 4
-        public const int regionSize = 16;
+        public const int regionSize = 8;
 
         public Vector2 pos { get; set; }
         public Vector2 regionPos { get; set; }
@@ -43,7 +43,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
                     tile.drawAdjacentTiles(batch);
 
             }
-            batch.DrawRectangle(box, Color.White);
+            //batch.DrawRectangle(box, Color.White);
         }
 
     }

@@ -306,7 +306,7 @@ namespace BasicRPGTest_Mono
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest_OLD(Camera.camera, _spriteBatch, 1000);
 
-            MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
+            //MapManager.activeMap.Draw(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
 

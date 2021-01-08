@@ -90,9 +90,10 @@ namespace BasicRPGTest_Mono.Engine
             JArray layerTiles;
 
             JObject tileData;
+            int layerNumber = 0;
             foreach (TileLayer layer in map.layers)
             {
-                writer = new StreamWriter($"{path}\\{map.name}_{layer.name}.json", false);
+                writer = new StreamWriter($"{path}\\{map.name}_{layerNumber}.json", false);
                 jsonLayer = new JObject();
                 layerTiles = new JArray();
 
@@ -133,6 +134,8 @@ namespace BasicRPGTest_Mono.Engine
                 jsonLayer = null;
 
                 GC.Collect();
+
+                layerNumber++;
             }
 
         }

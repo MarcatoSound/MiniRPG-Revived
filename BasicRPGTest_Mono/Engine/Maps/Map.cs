@@ -40,7 +40,7 @@ namespace BasicRPGTest_Mono.Engine
         private long v_drawnTileCount;
 
         private List<Region> v_regionsVisible = new List<Region>();
-        private Dictionary<String, List<Vector2>> v_TileCache = new Dictionary<String, List<Vector2>>();
+        private Dictionary<String, Dictionary<String, List<Vector2>>> v_TileCache = new Dictionary<String, Dictionary<String, List<Vector2>>>();
 
 
         //====================================================================================
@@ -229,7 +229,10 @@ namespace BasicRPGTest_Mono.Engine
 
         public void update_VisibleRegions (Camera2D camera)
         {
-            foreach (Region region in regions.Values)
+
+            List<Region> regions = getRegionsInRange(Core.player.getPlayerTilePosition(), 7);
+
+            foreach (Region region in regions)
             {
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
                 if (camera.BoundingRectangle.Intersects(region.box))
@@ -241,6 +244,8 @@ namespace BasicRPGTest_Mono.Engine
                         v_regionsVisible.Add(region);
 
                         //Utility.Util.myDebug("Region Added:  " + region.box);
+
+                        // TODO: Add Event for on Region ADDED to regionsVisible List
                     }
 
                 }
@@ -254,6 +259,8 @@ namespace BasicRPGTest_Mono.Engine
                         v_regionsVisible.Remove(region);
 
                         //Utility.Util.myDebug("Region Removed:  " + region.box);
+
+                        // TODO: Add Event for on Region REMOVED from regionsVisible List
                     }
                 }
             }
@@ -346,12 +353,21 @@ namespace BasicRPGTest_Mono.Engine
         {
             //batch.Begin(transformMatrix: Camera.camera.Transform);
 
-            foreach (String parentTileName in v_TileCache.Keys)
+            // Go through each CachedTiles Layer
+            foreach (TileLayer tLayer in layers)
             {
-                // Get Parent Tile Template
-                Tile parentTile = TileManager.getByName(parentTileName);
+                Dictionary<String, List<Vector2>> templateList = this.v_TileCache[tLayer.name];
 
-                parentTile.graphic.draw_Tiles(batch, v_TileCache[parentTileName]);
+                // Go through each Tile Template in the Layer
+                foreach (String parentTileName in templateList.Keys)
+                {
+                    // Get Parent Tile Template
+                    Tile parentTile = TileManager.getByName(parentTileName);
+                    // Get Sub-Tile Locations
+                    List<Vector2> list = templateList[parentTileName];
+    
+                parentTile.graphic.draw_Tiles(batch, list);
+                }
             }
 
             //batch.End();
@@ -403,7 +419,19 @@ namespace BasicRPGTest_Mono.Engine
         {
             // Clear Collection
             v_TileCache.Clear();
-            
+
+            Dictionary<String, List<Vector2>> tileTemplate;
+
+            // Create top most level of CachedTiles collection (the Map Layer Names), in order of appearance in Map.layers
+            // Layer Name is first Level of multi-dimensional v_TileCache collection
+            foreach (TileLayer tileLayer in layers)
+            {
+                tileTemplate = new Dictionary<String, List<Vector2>>();
+
+                v_TileCache.Add(tileLayer.name, tileTemplate);
+            }
+
+
             // Go through Visible Regions
             foreach (Region region in v_regionsVisible)
             {
@@ -411,22 +439,26 @@ namespace BasicRPGTest_Mono.Engine
                 foreach (Tile tile in region.tiles)
                 {
                     String tileParentName = tile.parent.name;
+                    string layerName = tile.layer.name;
 
-                    // If TileCache does NOT have this Tile Template
-                    if (!v_TileCache.ContainsKey(tileParentName))
-                    {
+                    // Get Tile Template Dictionary matching layerName (Layer Key)
+                    tileTemplate = v_TileCache[layerName];
+
+                    // If tileTemplate Dictionary does NOT have this Tile Template Name (key) already
+                    if (!tileTemplate.ContainsKey(tileParentName))
+                        {
                         // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
                         List<Vector2> list = new List<Vector2>();
                         // Add Position to TileCache List
                         list.Add(tile.drawPos);
 
                         // Add Tile template with this Tile's Position to Collection
-                        v_TileCache.Add(tileParentName, list);
+                        tileTemplate.Add(tileParentName, list);
 
                     } else
                     {
                         // Get Parent Tile's sub-tile position List
-                        List<Vector2> list = v_TileCache[tileParentName];
+                        List<Vector2> list = tileTemplate[tileParentName];
                         // Add Position to TileCache List
                         list.Add(tile.drawPos);
                     }
