@@ -265,14 +265,29 @@ namespace BasicRPGTest_Mono
 
             Camera.camera.Update(gameTime);
 
+
             // If Camera position has changed
             if (Camera.camera.BoundingRectangle != cameraRectangle)
             {
                 //Engine.Utility.Util.myDebug("Camera Changed!");
 
                 cameraRectangle = Camera.camera.BoundingRectangle;
-                // Update Map's Visible Regions
-                MapManager.activeMap.update_VisibleRegions(Camera.camera);
+
+
+                //Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+                //codeTimer.startTimer();
+
+                //for (int i = 0; i < 1000; i++)
+                //{
+                    // Update Map's Visible Regions
+                    MapManager.activeMap.update_VisibleRegions(Camera.camera);
+                //}
+
+                // End Code Timer for speed test
+                //codeTimer.endTimer();
+                // Report function's speed
+                //Engine.Utility.Util.myDebug("ScreenGame.cs Update()", "Tile Cache Update CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+
             }
 
         }

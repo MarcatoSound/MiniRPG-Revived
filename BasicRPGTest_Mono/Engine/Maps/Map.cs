@@ -41,13 +41,12 @@ namespace BasicRPGTest_Mono.Engine
 
         private long v_drawnTileCount;
 
-        private List<Region> v_VisibleRegions = new List<Region>();
+        public List<Region> VisibleRegions = new List<Region>();
         private List<Tile> v_TileTemplates = new List<Tile>();
         private Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>> v_VisibleTiles = new Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>>();
 
         private Dictionary<Graphic, List<Vector2>> v_TileEdges = new Dictionary<Graphic, List<Vector2>>();
         private Dictionary<Graphic, List<Vector2>> v_VisibleEdges = new Dictionary<Graphic, List<Vector2>>();
-
 
 
         //====================================================================================
@@ -173,7 +172,6 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-
         //====================================================================================
         // FUNCTIONS
         //====================================================================================
@@ -247,6 +245,7 @@ namespace BasicRPGTest_Mono.Engine
 
             return regions[regionPos];
         }
+
         public List<Region> getRegionsInRange(Vector2 tilePos, int radius)
         {
             List<Region> regions = new List<Region>();
@@ -274,16 +273,32 @@ namespace BasicRPGTest_Mono.Engine
 
         public void update_VisibleRegions (Camera2D camera)
         {
+            
+            // Clear Visible Regions collection
+            VisibleRegions.Clear();
+
+            //v_VisibleRegions = getRegionsInRange(Core.player.getPlayerTilePosition(), 4);
+            //Build Tile Cache (including Edges) for Drawing Map
+            //buildVisibleTileCache();
+            //return;
+
+            // Go through each Region on Map  (to re-populate Visible Regions collection)
             foreach (Region region in regions.Values)
             {
+
+                //Rectangle viewBox = camera.BoundingRectangle;
+                // Use a slightly shrunken ViewPort instead  (full Camera BoundingRectangle is good, but for some reason grabs one X and Y Region row earlier than it should)
+                Rectangle viewBox = new Rectangle(camera.BoundingRectangle.X + 256, camera.BoundingRectangle.Y + 256, camera.BoundingRectangle.Width - 256, camera.BoundingRectangle.Height - 256);
+
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
-                if (camera.BoundingRectangle.Intersects(region.box))
+                if (viewBox.Intersects(region.box))
+                //if (camera.BoundingRectangle.Intersects(region.box))
                 {
                     // If List Does NOT Contain this Region
-                    if (!v_VisibleRegions.Contains(region))
+                    if (!VisibleRegions.Contains(region))
                     {
                         // Add this Region to Collection
-                        v_VisibleRegions.Add(region);
+                        VisibleRegions.Add(region);
 
                         //Utility.Util.myDebug("Region Added:  " + region.box);
 
@@ -291,23 +306,13 @@ namespace BasicRPGTest_Mono.Engine
                     }
 
                 }
-                // If THIS Region is OUTSIDE Camera's view (BoundingRectangle)
-                else
-                {
-                    // If List DOES Contain this Region
-                    if (v_VisibleRegions.Contains(region))
-                    {
-                        // Add this Region to Collection
-                        v_VisibleRegions.Remove(region);
-
-                        //Utility.Util.myDebug("Region Removed:  " + region.box);
-
-                        // TODO: Add Event for on Region REMOVED from regionsVisible List
-                    }
-                }
             }
 
-            // Build Tile Cache for Drawing
+
+            //Utility.Util.myDebug("Visible Regions of Total:  " + VisibleRegions.Count + " / " + regions.Count);
+
+
+            // Build Tile Cache (including Edges) for Drawing Map
             buildVisibleTileCache();
 
         }
@@ -355,7 +360,7 @@ namespace BasicRPGTest_Mono.Engine
             Dictionary<Tile, List<Vector2>> tileTemplate;
 
             // Go through Visible Regions
-            foreach (Region region in v_VisibleRegions)
+            foreach (Region region in VisibleRegions)
             {
                 // Go through each Tile in Region
                 foreach (Tile tile in region.tiles)
@@ -717,8 +722,18 @@ namespace BasicRPGTest_Mono.Engine
 
 
             // Draw Visible Regions Borders
-            if (DrawRegionBorders) { foreach (Region region in v_VisibleRegions) { batch.DrawRectangle(region.box, Color.White); } }
+            if (DrawRegionBorders)
+            {
+                foreach (Region region in VisibleRegions) 
+                {
+                    batch.DrawRectangle(region.box, Color.White);
+                    // Draw Region position to screen  (for testing)
+                    //batch.DrawString(Core.mainFont, region.regionPos.X + ", " + region.regionPos.Y, region.pos, Color.Aqua);
+                } 
+            }
 
+            // Draw Test Red Square at Camera Bounds view  (for testing)
+            //batch.DrawRectangle(new Rectangle(Camera.camera.BoundingRectangle.X + Camera.camera.BoundingRectangle.Width - 50, Camera.camera.BoundingRectangle.Y + Camera.camera.BoundingRectangle.Height - 50, 50,50), Color.Red);
 
             batch.End();
 
@@ -743,7 +758,7 @@ namespace BasicRPGTest_Mono.Engine
             // End Code Timer for speed test
             codeTimer.endTimer();
             // Report function's speed
-            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+            Utility.Util.myDebug("Map.cs Draw()", "Draw Tiles CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
         }
 
 
@@ -751,7 +766,7 @@ namespace BasicRPGTest_Mono.Engine
         {
 
             // Clear Tile Caches
-            this.v_VisibleRegions.Clear();
+            this.VisibleRegions.Clear();
             this.v_TileTemplates.Clear();
             this.v_VisibleTiles.Clear();
             this.v_VisibleEdges.Clear();
