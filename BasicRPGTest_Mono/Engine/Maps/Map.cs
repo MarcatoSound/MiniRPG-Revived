@@ -37,14 +37,16 @@ namespace BasicRPGTest_Mono.Engine
         public int livingEntityCap = 50;
         public Timer spawnTimer;
 
+        public bool DrawRegionBorders { get; set; }
+
         private long v_drawnTileCount;
 
-        private List<Region> v_regionsVisible = new List<Region>();
-        private Dictionary<String, Dictionary<String, List<Vector2>>> v_VisibleTiles = new Dictionary<String, Dictionary<String, List<Vector2>>>();
-        private Dictionary<Graphic, List<Vector2>> v_VisibleEdges = new Dictionary<Graphic, List<Vector2>>();
-
+        private List<Region> v_VisibleRegions = new List<Region>();
         private List<Tile> v_TileTemplates = new List<Tile>();
-        private Dictionary<Graphic, List<Vector2>> v_EdgeTiles = new Dictionary<Graphic, List<Vector2>>();
+        private Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>> v_VisibleTiles = new Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>>();
+
+        private Dictionary<Graphic, List<Vector2>> v_TileEdges = new Dictionary<Graphic, List<Vector2>>();
+        private Dictionary<Graphic, List<Vector2>> v_VisibleEdges = new Dictionary<Graphic, List<Vector2>>();
 
 
 
@@ -60,6 +62,7 @@ namespace BasicRPGTest_Mono.Engine
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
             regions = new Dictionary<Vector2, Region>();
+            this.DrawRegionBorders = true;
             collidables = new ConcurrentDictionary<int, Rectangle>();
 
             this.entities = new ConcurrentDictionary<int, Entity>();
@@ -156,15 +159,11 @@ namespace BasicRPGTest_Mono.Engine
                 // Go through each CachedTiles Layer
                 foreach (TileLayer tLayer in layers)
                 {
-                    Dictionary<String, List<Vector2>> templateList = v_VisibleTiles[tLayer.name];
-
-                    // Go through each Tile Template in the Layer
-                    foreach (String parentTileName in templateList.Keys)
+                    // Go through each Tile Template's Locations List in the Layer
+                    foreach (List<Vector2> locations in v_VisibleTiles[tLayer].Values)
                     {
-                        // Get Parent Tile Template
-                        Tile parentTile = TileManager.getByName(parentTileName);
                         // Get Sub-Tile Locations
-                        tCount += templateList[parentTileName].Count;
+                        tCount += locations.Count;
                     }
                 }
 
@@ -281,10 +280,10 @@ namespace BasicRPGTest_Mono.Engine
                 if (camera.BoundingRectangle.Intersects(region.box))
                 {
                     // If List Does NOT Contain this Region
-                    if (!v_regionsVisible.Contains(region))
+                    if (!v_VisibleRegions.Contains(region))
                     {
                         // Add this Region to Collection
-                        v_regionsVisible.Add(region);
+                        v_VisibleRegions.Add(region);
 
                         //Utility.Util.myDebug("Region Added:  " + region.box);
 
@@ -296,10 +295,10 @@ namespace BasicRPGTest_Mono.Engine
                 else
                 {
                     // If List DOES Contain this Region
-                    if (v_regionsVisible.Contains(region))
+                    if (v_VisibleRegions.Contains(region))
                     {
                         // Add this Region to Collection
-                        v_regionsVisible.Remove(region);
+                        v_VisibleRegions.Remove(region);
 
                         //Utility.Util.myDebug("Region Removed:  " + region.box);
 
@@ -344,32 +343,30 @@ namespace BasicRPGTest_Mono.Engine
             }
 
 
-            Dictionary<String, List<Vector2>> tileTemplate;
-
             // Create top most level of CachedTiles collection (the Map Layer Names), in order of appearance in Map.layers
             // Layer Name is first Level of multi-dimensional v_TileCache collection
             foreach (TileLayer tileLayer in layers)
             {
-                tileTemplate = new Dictionary<String, List<Vector2>>();
-
-                v_VisibleTiles.Add(tileLayer.name, tileTemplate);
+                // Add New Empty Item to Collection for this Layer with Layer as Key
+                v_VisibleTiles.Add(tileLayer, new Dictionary<Tile, List<Vector2>>());
             }
 
 
+            Dictionary<Tile, List<Vector2>> tileTemplate;
+
             // Go through Visible Regions
-            foreach (Region region in v_regionsVisible)
+            foreach (Region region in v_VisibleRegions)
             {
                 // Go through each Tile in Region
                 foreach (Tile tile in region.tiles)
                 {
-                    String tileParentName = tile.parent.name;
-                    string layerName = tile.layer.name;
-
+                    TileLayer layer = tile.layer;
                     // Get Tile Template Dictionary matching layerName (Layer Key)
-                    tileTemplate = v_VisibleTiles[layerName];
+                    tileTemplate = v_VisibleTiles[layer];
+
 
                     // If tileTemplate Dictionary does NOT have this Tile Template Name (key) already
-                    if (!tileTemplate.ContainsKey(tileParentName))
+                    if (!tileTemplate.ContainsKey(tile.parent))
                     {
                         // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
                         List<Vector2> list = new List<Vector2>();
@@ -377,13 +374,13 @@ namespace BasicRPGTest_Mono.Engine
                         list.Add(tile.drawPos);
 
                         // Add Tile template with this Tile's Position to Collection
-                        tileTemplate.Add(tileParentName, list);
+                        tileTemplate.Add(tile.parent, list);
 
                     }
                     else
                     {
                         // Get Parent Tile's sub-tile position List
-                        List<Vector2> list = tileTemplate[tileParentName];
+                        List<Vector2> list = tileTemplate[tile.parent];
                         // Add Position to TileCache List
                         list.Add(tile.drawPos);
                     }
@@ -666,9 +663,6 @@ namespace BasicRPGTest_Mono.Engine
             // Go through each CachedTiles Layer
             foreach (TileLayer tLayer in layers)
             {
-                // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
-                Dictionary<String, List<Vector2>> templateList = v_VisibleTiles[tLayer.name];
-                
 
                 // If this Layer is the Decorations Layer
                 if (tLayer.name == "decorations")
@@ -676,11 +670,14 @@ namespace BasicRPGTest_Mono.Engine
                     // Go through all Visible Tile Edges to draw
                     foreach (KeyValuePair<Graphic, List<Vector2>> pair in v_VisibleEdges)
                     {
-                        Graphic graphic = pair.Key;
-                        List<Vector2> locations = pair.Value;
+                        //Graphic graphic = pair.Key;
+                        //List<Vector2> locations = pair.Value;
 
                         // Draw ALL matching Visible Edges at once
-                        graphic.draw_Tiles(batch, locations, false);
+                        pair.Key.draw_Tiles(batch, pair.Value, false);
+
+                        // Count drawn Tiles
+                        TilesDrawnCount += pair.Value.Count;
                     }
 
                     /*
@@ -695,22 +692,21 @@ namespace BasicRPGTest_Mono.Engine
                     */
                 }
 
+                
+                // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
+                Dictionary<Tile, List<Vector2>> templateList = v_VisibleTiles[tLayer];
+
 
                 // Draw Tile Templates at Locations of Cached matching Map Tiles
                 if (templateList != null)
                 {
                     // Go through each Tile Template in the Layer
-                    foreach (String parentTileName in templateList.Keys)
+                    foreach (KeyValuePair<Tile, List<Vector2>> pair in templateList)
                     {
-                        // Get Parent Tile Template
-                        Tile parentTile = TileManager.getByName(parentTileName);
-                        // Get Sub-Tile Locations
-                        List<Vector2> list = templateList[parentTileName];
-
-                        parentTile.graphic.draw_Tiles(batch, list, false);
+                        pair.Key.graphic.draw_Tiles(batch, pair.Value, false);
 
                         // Count drawn Tiles
-                        TilesDrawnCount += list.Count;
+                        TilesDrawnCount += pair.Value.Count;
                     }
                 
                 } else
@@ -721,7 +717,7 @@ namespace BasicRPGTest_Mono.Engine
 
 
             // Draw Visible Regions Borders
-            foreach (Region region in v_regionsVisible) { batch.DrawRectangle(region.box, Color.White); }
+            if (DrawRegionBorders) { foreach (Region region in v_VisibleRegions) { batch.DrawRectangle(region.box, Color.White); } }
 
 
             batch.End();
@@ -755,11 +751,11 @@ namespace BasicRPGTest_Mono.Engine
         {
 
             // Clear Tile Caches
-            this.v_regionsVisible.Clear();
+            this.v_VisibleRegions.Clear();
             this.v_TileTemplates.Clear();
             this.v_VisibleTiles.Clear();
             this.v_VisibleEdges.Clear();
-            this.v_EdgeTiles.Clear();
+            this.v_TileEdges.Clear();
 
             entities.Clear();
             livingEntities.Clear();

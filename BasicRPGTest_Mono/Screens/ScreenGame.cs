@@ -294,7 +294,6 @@ namespace BasicRPGTest_Mono
             //GraphicsDevice.SetRenderTarget(Game.renderTarget);
 
 
-
             if (!v_NotNewDraw)
             {
                 // Just in case this doesn't happen automatically. This ensures it happens right away.
@@ -302,6 +301,7 @@ namespace BasicRPGTest_Mono
                 MapManager.activeMap.update_VisibleRegions(Camera.camera);
                 v_NotNewDraw = true;
             }
+
 
             //MapManager.activeMap.Draw_OLD(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
