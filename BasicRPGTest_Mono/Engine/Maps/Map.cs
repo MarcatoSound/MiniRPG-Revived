@@ -114,7 +114,7 @@ namespace BasicRPGTest_Mono.Engine
 
 
             buildTileTemplateCache();
-            generateTileEdgesCache();
+            //generateTileEdgesCache();
 
         }
 
@@ -314,6 +314,273 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
+        private void buildVisibleTileCache()
+        {
+            // Clear Collection
+            v_VisibleTiles.Clear();
+            v_VisibleEdges.Clear();
+
+
+            // Generate all Edge Templates
+            // Go through each Tile Template on This Map
+            foreach (Tile tile in v_TileTemplates)
+            {
+                // Go through Edges (if any)
+                foreach (KeyValuePair<TileSide, Graphic> pair in tile.sideGraphics)
+                {
+                    TileSide side = pair.Key;
+                    Graphic graphic = pair.Value;
+
+                    if (graphic != null)
+                    {
+                        // If this Graphic does NOT already exist in Collection
+                        if (!v_VisibleEdges.ContainsKey(graphic))
+                        {
+                            // Add Graphic and Tile Vector2 position to List
+                            v_VisibleEdges.Add(graphic, new List<Vector2>());
+                        }
+                    }
+                }
+            }
+
+
+            Dictionary<String, List<Vector2>> tileTemplate;
+
+            // Create top most level of CachedTiles collection (the Map Layer Names), in order of appearance in Map.layers
+            // Layer Name is first Level of multi-dimensional v_TileCache collection
+            foreach (TileLayer tileLayer in layers)
+            {
+                tileTemplate = new Dictionary<String, List<Vector2>>();
+
+                v_VisibleTiles.Add(tileLayer.name, tileTemplate);
+            }
+
+
+            // Go through Visible Regions
+            foreach (Region region in v_regionsVisible)
+            {
+                // Go through each Tile in Region
+                foreach (Tile tile in region.tiles)
+                {
+                    String tileParentName = tile.parent.name;
+                    string layerName = tile.layer.name;
+
+                    // Get Tile Template Dictionary matching layerName (Layer Key)
+                    tileTemplate = v_VisibleTiles[layerName];
+
+                    // If tileTemplate Dictionary does NOT have this Tile Template Name (key) already
+                    if (!tileTemplate.ContainsKey(tileParentName))
+                    {
+                        // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
+                        List<Vector2> list = new List<Vector2>();
+                        // Add Position to TileCache List
+                        list.Add(tile.drawPos);
+
+                        // Add Tile template with this Tile's Position to Collection
+                        tileTemplate.Add(tileParentName, list);
+
+                    }
+                    else
+                    {
+                        // Get Parent Tile's sub-tile position List
+                        List<Vector2> list = tileTemplate[tileParentName];
+                        // Add Position to TileCache List
+                        list.Add(tile.drawPos);
+                    }
+
+
+                    // Go through Edges (if any)
+                    foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
+                    {
+
+                        if (!pair.Value) continue;
+
+                        TileSide side = pair.Key;
+                        Graphic graphic = tile.sideGraphics[side];
+                        Vector2 drawPos = new Vector2(tile.drawPos.X, tile.drawPos.Y);
+                        int tileSize = TileManager.dimensions;
+
+                        if (graphic != null)
+                        {
+                            if (v_VisibleEdges.ContainsKey(graphic))
+                            {
+                                switch (side)
+                                {
+                                    case TileSide.NorthWest:
+                                        drawPos.X -= tileSize;
+                                        drawPos.Y -= tileSize;
+                                        break;
+                                    case TileSide.North:
+                                        drawPos.Y -= tileSize;
+                                        break;
+                                    case TileSide.NorthEast:
+                                        drawPos.X += tileSize;
+                                        drawPos.Y -= tileSize;
+                                        break;
+                                    case TileSide.West:
+                                        drawPos.X -= tileSize;
+                                        break;
+                                    case TileSide.East:
+                                        drawPos.X += tileSize;
+                                        break;
+                                    case TileSide.SouthWest:
+                                        drawPos.X -= tileSize;
+                                        drawPos.Y += tileSize;
+                                        break;
+                                    case TileSide.South:
+                                        drawPos.Y += tileSize;
+                                        break;
+                                    case TileSide.SouthEast:
+                                        drawPos.X += tileSize;
+                                        drawPos.Y += tileSize;
+                                        break;
+                                }
+
+
+                                v_VisibleEdges[graphic].Add(drawPos);
+                            }
+                            else
+                            {
+                                Utility.Util.myDebug(true, "Map.cs generateTileEdgesCache()", "Missing graphic from (v_EdgeTiles)");
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+
+        // Stores what Tile Templates this Map uses
+        public void buildTileTemplateCache()
+        {
+
+            // Clear the Collection
+            v_TileTemplates.Clear();
+
+            // Go through map Layers
+            foreach (TileLayer layer in layers)
+            {
+                // Go through Tiles in Layer
+                foreach (Tile tile in layer.tiles.Values)
+                {
+                    // If Collection does NOT contain this Tile Parent (template)
+                    if (!v_TileTemplates.Contains(tile.parent))
+                    {
+                        // Add this Parent Tile to Cache
+                        v_TileTemplates.Add(tile.parent);
+                    }
+                }
+            }
+        }
+
+
+        // NOT USED  (but might be helpful in the future)
+        /*
+        // Goes through entire Map and generates and stores all needed Edge Tiles and their Positions
+        public void generateTileEdgesCache ()
+        {
+
+            v_EdgeTiles.Clear();
+
+            // Generate Dictionary of TileEdges
+
+
+            // Fill TileEdges Dictionary with valid Tile Location data (where to draw each Edge texture)
+
+            // Generate all Edge Templates
+            // Go through each Tile Template on This Map
+            foreach (Tile tile in v_TileTemplates)
+            {
+                // Go through Edges (if any)
+                foreach (KeyValuePair<TileSide, Graphic> pair in tile.sideGraphics)
+                {
+                    TileSide side = pair.Key;
+                    Graphic graphic = pair.Value;
+
+                    if (graphic != null)
+                    {
+                        // If this Graphic does NOT already exist in Collection
+                        if (!v_EdgeTiles.ContainsKey(graphic))
+                        {
+                            // Add Graphic and Tile Vector2 position to List
+                            v_EdgeTiles.Add(graphic, new List<Vector2>());
+                        }
+                    }
+                }
+            }
+
+            // Fill Edge Templates with Vector2 position data of ALL matching Map Tiles
+
+            foreach (TileLayer layer in layers)
+            {
+                foreach (Tile tile in layer.tiles.Values)
+                {
+                    // Go through Edges (if any)
+                    foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
+                    {
+
+                        if (!pair.Value) continue;
+                        
+                        TileSide side = pair.Key;
+                        Graphic graphic = tile.sideGraphics[side];
+                        Vector2 drawPos = new Vector2(tile.drawPos.X, tile.drawPos.Y);
+                        int tileSize = TileManager.dimensions;
+
+                        if (graphic != null)
+                        {
+                            if (v_EdgeTiles.ContainsKey(graphic))
+                            {
+
+                                switch (side)
+                                {
+                                    case TileSide.NorthWest:
+                                        drawPos.X -= tileSize;
+                                        drawPos.Y -= tileSize;
+                                        break;
+                                    case TileSide.North:
+                                        drawPos.Y -= tileSize;
+                                        break;
+                                    case TileSide.NorthEast:
+                                        drawPos.X += tileSize;
+                                        drawPos.Y -= tileSize;
+                                        break;
+                                    case TileSide.West:
+                                        drawPos.X -= tileSize;
+                                        break;
+                                    case TileSide.East:
+                                        drawPos.X += tileSize;
+                                        break;
+                                    case TileSide.SouthWest:
+                                        drawPos.X -= tileSize;
+                                        drawPos.Y += tileSize;
+                                        break;
+                                    case TileSide.South:
+                                        drawPos.Y += tileSize;
+                                        break;
+                                    case TileSide.SouthEast:
+                                        drawPos.X += tileSize;
+                                        drawPos.Y += tileSize;
+                                        break;
+                                }
+
+
+                                v_EdgeTiles[graphic].Add(drawPos);
+                            }
+                            else
+                            {
+                                Utility.Util.myDebug(true, "Map.cs generateTileEdgesCache()", "Missing graphic from (v_EdgeTiles)");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        */
+
+
+
         /*
         public void Draw(Camera2D camera, SpriteBatch batch)
         {
@@ -401,7 +668,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
                 Dictionary<String, List<Vector2>> templateList = v_VisibleTiles[tLayer.name];
-
+                
 
                 // If this Layer is the Decorations Layer
                 if (tLayer.name == "decorations")
@@ -452,59 +719,10 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
-            batch.End();
 
-        }
+            // Draw Visible Regions Borders
+            foreach (Region region in v_regionsVisible) { batch.DrawRectangle(region.box, Color.White); }
 
-
-        public void Draw_VisibleMapTileCache2(Camera2D camera, SpriteBatch batch)
-        {
-            batch.Begin(transformMatrix: Camera.camera.Transform);
-
-            // Go through each CachedTiles Layer
-            foreach (TileLayer tLayer in layers)
-            {
-                // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
-                Dictionary<String, List<Vector2>> templateList = v_VisibleTiles[tLayer.name];
-
-
-                // If this Layer is the Decorations Layer
-                if (tLayer.name == "decorations")
-                {
-                    // Draw Ground Edge Tiles first (before Decorations Layer)
-                    foreach (TileLayer layer in layers)
-                    {
-                        foreach (Region region in v_regionsVisible)
-                        {
-                            region.draw(batch, layer);
-                        }
-                    }
-                }
-
-
-                // Draw Tile Templates at Locations of Cached matching Map Tiles
-                if (templateList != null)
-                {
-                    // Go through each Tile Template in the Layer
-                    foreach (String parentTileName in templateList.Keys)
-                    {
-                        // Get Parent Tile Template
-                        Tile parentTile = TileManager.getByName(parentTileName);
-                        // Get Sub-Tile Locations
-                        List<Vector2> list = templateList[parentTileName];
-
-                        parentTile.graphic.draw_Tiles(batch, list, false);
-
-                        // Count drawn Tiles
-                        TilesDrawnCount += list.Count;
-                    }
-
-                }
-                else
-                {
-                    Utility.Util.myDebug(true, "Map.cs Draw_VisibleMapTileCache()", "(" + tLayer.name + ") Layer key does not exist in Diciontary (v_TileCache). This should never happen!");
-                }
-            }
 
             batch.End();
 
@@ -535,237 +753,19 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Clear()
         {
+
+            // Clear Tile Caches
+            this.v_regionsVisible.Clear();
+            this.v_TileTemplates.Clear();
+            this.v_VisibleTiles.Clear();
+            this.v_VisibleEdges.Clear();
+            this.v_EdgeTiles.Clear();
+
             entities.Clear();
             livingEntities.Clear();
             spawnTimer.Stop();
         }
 
-
-        private void buildVisibleTileCache()
-        {
-            // Clear Collection
-            v_VisibleTiles.Clear();
-            v_VisibleEdges.Clear();
-
-
-            // Generate all Edge Templates
-            // Go through each Tile Template on This Map
-            foreach (Tile tile in v_TileTemplates)
-            {
-                // Go through Edges (if any)
-                foreach (KeyValuePair<TileSide, Graphic> pair in tile.sideGraphics)
-                {
-                    TileSide side = pair.Key;
-                    Graphic graphic = pair.Value;
-
-                    if (graphic != null)
-                    {
-                        // If this Graphic does NOT already exist in Collection
-                        if (!v_VisibleEdges.ContainsKey(graphic))
-                        {
-                            // Add Graphic and Tile Vector2 position to List
-                            v_VisibleEdges.Add(graphic, new List<Vector2>());
-                        }
-                    }
-                }
-            }
-
-
-            Dictionary<String, List<Vector2>> tileTemplate;
-
-            // Create top most level of CachedTiles collection (the Map Layer Names), in order of appearance in Map.layers
-            // Layer Name is first Level of multi-dimensional v_TileCache collection
-            foreach (TileLayer tileLayer in layers)
-            {
-                tileTemplate = new Dictionary<String, List<Vector2>>();
-
-                v_VisibleTiles.Add(tileLayer.name, tileTemplate);
-            }
-
-
-            // Go through Visible Regions
-            foreach (Region region in v_regionsVisible)
-            {
-                // Go through each Tile in Region
-                foreach (Tile tile in region.tiles)
-                {
-                    String tileParentName = tile.parent.name;
-                    string layerName = tile.layer.name;
-
-                    // Get Tile Template Dictionary matching layerName (Layer Key)
-                    tileTemplate = v_VisibleTiles[layerName];
-
-                    // If tileTemplate Dictionary does NOT have this Tile Template Name (key) already
-                    if (!tileTemplate.ContainsKey(tileParentName))
-                        {
-                        // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
-                        List<Vector2> list = new List<Vector2>();
-                        // Add Position to TileCache List
-                        list.Add(tile.drawPos);
-
-                        // Add Tile template with this Tile's Position to Collection
-                        tileTemplate.Add(tileParentName, list);
-
-                    } else
-                    {
-                        // Get Parent Tile's sub-tile position List
-                        List<Vector2> list = tileTemplate[tileParentName];
-                        // Add Position to TileCache List
-                        list.Add(tile.drawPos);
-                    }
-
-
-                    // Go through Edges (if any)
-                    foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
-                    {
-
-                        if (!pair.Value) continue;
-
-                        TileSide side = pair.Key;
-                        Graphic graphic = tile.sideGraphics[side];
-                        Vector2 drawPos = new Vector2(tile.drawPos.X, tile.drawPos.Y);
-                        int tileSize = TileManager.dimensions;
-
-                        if (graphic != null)
-                        {
-                            if (v_VisibleEdges.ContainsKey(graphic))
-                            {
-
-                                switch (side)
-                                {
-                                    case TileSide.NorthWest:
-                                        drawPos.X -= tileSize;
-                                        drawPos.Y -= tileSize;
-                                        break;
-                                    case TileSide.North:
-                                        drawPos.Y -= tileSize;
-                                        break;
-                                    case TileSide.NorthEast:
-                                        drawPos.X += tileSize;
-                                        drawPos.Y -= tileSize;
-                                        break;
-                                    case TileSide.West:
-                                        drawPos.X -= tileSize;
-                                        break;
-                                    case TileSide.East:
-                                        drawPos.X += tileSize;
-                                        break;
-                                    case TileSide.SouthWest:
-                                        drawPos.X -= tileSize;
-                                        drawPos.Y += tileSize;
-                                        break;
-                                    case TileSide.South:
-                                        drawPos.Y += tileSize;
-                                        break;
-                                    case TileSide.SouthEast:
-                                        drawPos.X += tileSize;
-                                        drawPos.Y += tileSize;
-                                        break;
-                                }
-
-
-                                v_VisibleEdges[graphic].Add(drawPos);
-                            }
-                            else
-                            {
-                                Utility.Util.myDebug(true, "Map.cs generateTileEdgesCache()", "Missing graphic from (v_EdgeTiles)");
-                            }
-                        }
-                    }
-
-                }
-            }
-
-        }
-
-
-        // Stores what Tile Templates this Map uses
-        public void buildTileTemplateCache ()
-        {
-
-            // Clear the Collection
-            v_TileTemplates.Clear();
-
-            // Go through map Layers
-            foreach (TileLayer layer in layers)
-            {
-                // Go through Tiles in Layer
-                foreach (Tile tile in layer.tiles.Values)
-                {
-                    // If Collection does NOT contain this Tile Parent (template)
-                    if (!v_TileTemplates.Contains(tile.parent))
-                    {
-                        // Add this Parent Tile to Cache
-                        v_TileTemplates.Add(tile.parent);
-                    }
-                }
-            }
-        }
-
-
-        // Goes through entire Map and generates and stores all needed Edge Tiles
-        public void generateTileEdgesCache ()
-        {
-
-            v_EdgeTiles.Clear();
-
-            // Generate Dictionary of TileEdges
-
-
-            // Fill TileEdges Dictionary with valid Tile Location data (where to draw each Edge texture)
-
-            // Generate all Edge Templates
-            // Go through each Tile Template on This Map
-            foreach (Tile tile in v_TileTemplates)
-            {
-                // Go through Edges (if any)
-                foreach (KeyValuePair<TileSide, Graphic> pair in tile.sideGraphics)
-                {
-                    TileSide side = pair.Key;
-                    Graphic graphic = pair.Value;
-
-                    if (graphic != null)
-                    {
-                        // If this Graphic does NOT already exist in Collection
-                        if (!v_EdgeTiles.ContainsKey(graphic))
-                        {
-                            // Add Graphic and Tile Vector2 position to List
-                            v_EdgeTiles.Add(graphic, new List<Vector2>());
-                        }
-                    }
-                }
-            }
-
-            // Fill Edge Templates with Vector2 position data of ALL matching Map Tiles
-
-            foreach (TileLayer layer in layers)
-            {
-                foreach (Tile tile in layer.tiles.Values)
-                {
-                    // Go through Edges (if any)
-                    foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
-                    {
-
-                        if (!pair.Value) continue;
-                        
-                        TileSide side = pair.Key;
-                        Graphic graphic = tile.sideGraphics[side];
-
-                        if (graphic != null)
-                        {
-                            if (v_EdgeTiles.ContainsKey(graphic))
-                            {
-                                v_EdgeTiles[graphic].Add(tile.drawPos);
-                            }
-                            else
-                            {
-                                Utility.Util.myDebug(true, "Map.cs generateTileEdgesCache()", "Missing graphic from (v_EdgeTiles)");
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
     }
 }
