@@ -35,13 +35,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
             this.tiles.Add(tile);
         }
 
+
         public void draw(SpriteBatch batch, TileLayer layer)
         {
             foreach (Tile tile in tiles)
             {
                 if (tile.layer == layer)
+                {
                     tile.drawAdjacentTiles(batch);
-
+                }
             }
             batch.DrawRectangle(box, Color.White);
         }

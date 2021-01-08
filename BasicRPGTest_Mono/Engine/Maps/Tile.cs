@@ -37,6 +37,11 @@ namespace RPGEngine
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
 
+
+        //====================================================================================
+        // CONSTRUCTORS
+        //====================================================================================
+
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1)
         {
             id = TileManager.tiles.Count;
@@ -85,6 +90,28 @@ namespace RPGEngine
 
         }
 
+
+        //====================================================================================
+        // PROPERTIES
+        //====================================================================================
+
+        public bool hasEdges
+        {
+            get
+            {
+                // If NO edges exist
+                if (sideGraphics.Count == 0) { return false; }
+                // Otherwise...
+                return true;
+            }
+        }
+
+
+
+        //====================================================================================
+        // FUNCTIONS
+        //====================================================================================
+
         private Graphic getSideGraphic(TileSide side)
         {
             if (sideGraphics.ContainsKey(side))
@@ -96,48 +123,62 @@ namespace RPGEngine
         public void drawAdjacentTiles(SpriteBatch batch)
         {
             if (sideGraphics.Count == 0) return;
+            // Otherwise...
+
             Vector2 drawPos;
             foreach (KeyValuePair<TileSide, bool> pair in sides)
             {
-                bool draw = pair.Value;
-                if (!draw) continue;
+
+                // If NO Value (skip to next)
+                if (!pair.Value) continue;
+                // Otherwise...
+
                 TileSide side = pair.Key;
-                if (getSideGraphic(side) == null) continue;
+                // Get SideGraphic object  (slightly faster grabbing it once than grabbing it repeatedly)
+                Graphic sideGraphic = getSideGraphic(side);
+
+                // If NO SideGraphic (skip to next)
+                if (sideGraphic == null) continue;
+                // Otherwise...
+
                 drawPos = pos;
+                // Get Tile Dimension  (slightly faster grabbing it once than grabbing it repeatedly)
+                int tileSize = TileManager.dimensions;
 
                 switch (side)
                 {
                     case TileSide.NorthWest:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.X -= tileSize;
+                        drawPos.Y -= tileSize;
                         break;
                     case TileSide.North:
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.Y -= tileSize;
                         break;
                     case TileSide.NorthEast:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.X += tileSize;
+                        drawPos.Y -= tileSize;
                         break;
                     case TileSide.West:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
+                        drawPos.X -= tileSize;
                         break;
                     case TileSide.East:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
+                        drawPos.X += tileSize;
                         break;
                     case TileSide.SouthWest:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.X -= tileSize;
+                        drawPos.Y += tileSize;
                         break;
                     case TileSide.South:
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.Y += tileSize;
                         break;
                     case TileSide.SouthEast:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.X += tileSize;
+                        drawPos.Y += tileSize;
                         break;
                 }
 
-                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
+                sideGraphic.draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
+                //sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
             }
 
