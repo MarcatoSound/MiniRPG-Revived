@@ -21,13 +21,15 @@ namespace BasicRPGTest_Mono.Engine
             Random rand = new Random();
             int id;
 
-            List<int> groundTileChances = new List<int>();
-            groundTileChances.Add(15);
-            groundTileChances.Add(1);
-            groundTileChances.Add(5);
-            groundTileChances.Add(3);
 
-            NoiseMap noise = createLandNoise();
+            Random seedGenerator = new Random();
+            int seed = seedGenerator.Next(0, 9999999);
+            System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
+
+            //NoiseMap biomeNoise = createBiomeNoise(seed);
+            //Biome[,] biomeTiles;
+
+            NoiseMap noise = createLandNoise(seed, size);
 
             TileLayer waterLayer = new TileLayer("water");
             for (int x = 0; x < size; x++)
@@ -97,11 +99,32 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public static NoiseMap createLandNoise()
+        public static NoiseMap createBiomeNoise(int seed)
         {
-            Random seedGenerator = new Random();
-            int seed = seedGenerator.Next(0, 9999999);
-            System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
+
+            Cell gen1 = new Cell();
+            gen1.Seed = seed;
+            gen1.Frequency = 0.015;
+            gen1.Type = Cell.CellType.Minkowsky;
+        
+            PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
+            builder.SourceModule = gen1;
+            builder.SetBounds(0, 512, 0, 512);
+            NoiseMap map = new NoiseMap(512, 512);
+            builder.DestNoiseMap = map;
+            builder.SetDestSize(512, 512);
+            builder.Build();
+
+            return map;
+        }
+
+        /// <summary>
+        /// Generates perlin noise for determining the distribution of tile layers.
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <returns></returns>
+        public static NoiseMap createLandNoise(int seed, int size)
+        {
             Perlin gen = new Perlin();
             gen.Seed = seed;
             gen.Frequency = 0.015;
@@ -116,26 +139,15 @@ namespace BasicRPGTest_Mono.Engine
 
             PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
             builder.SourceModule = mod;
-            builder.SetBounds(0, 512, 0, 512);
-            NoiseMap map = new NoiseMap(512, 512);
+            builder.SetBounds(0, size, 0, size);
+            NoiseMap map = new NoiseMap(size, size);
             builder.DestNoiseMap = map;
-            builder.SetDestSize(512, 512);
+            builder.SetDestSize(size, size);
             builder.Build();
 
             return map;
         }
-        public static float[,] createNoise()
-        {
-            Random seedGenerator = new Random();
-            SimplexNoise.Noise.Seed = seedGenerator.Next(0, 9999999);
-            float[,] values = SimplexNoise.Noise.Calc2D(128, 128, 0.025f);
 
-            return values;
-        }
-        public static void testNoise()
-        {
-
-        }
 
     }
 }

@@ -227,12 +227,10 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public void update_VisibleRegions (Camera2D camera)
+        public void updateVisibleRegions(Camera2D camera)
         {
 
-            List<Region> regions = getRegionsInRange(Core.player.getPlayerTilePosition(), 7);
-
-            foreach (Region region in regions)
+            foreach (Region region in regions.Values)
             {
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
                 if (camera.BoundingRectangle.Intersects(region.box))
@@ -293,7 +291,7 @@ namespace BasicRPGTest_Mono.Engine
             //Utility.Util.myDebug("Map.cs Draw()", "TILES DRAWN:  " + this.v_drawnTileCount + " of " + getTilesTotalCount());
         }
 
-        public void Draw_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        public void DrawSpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
         {
             // Start Code Timer for speed test
             Utility.CodeTimer codeTimer = new Utility.CodeTimer();
@@ -327,7 +325,7 @@ namespace BasicRPGTest_Mono.Engine
             }
         }
 
-        public void Draw_SpeedTest_OLD(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        public void DrawSpeedTest_OLD(Camera2D camera, SpriteBatch batch, int mIterationsCount)
         {
             // Start Code Timer for speed test
             Utility.CodeTimer codeTimer = new Utility.CodeTimer();
@@ -349,17 +347,17 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public void Draw_VisibleMapTileCache (Camera2D camera, SpriteBatch batch)
+        public void DrawVisibleMapCache (Camera2D camera, SpriteBatch batch)
         {
             //batch.Begin(transformMatrix: Camera.camera.Transform);
 
             // Go through each CachedTiles Layer
             foreach (TileLayer tLayer in layers)
             {
-                Dictionary<String, List<Vector2>> templateList = this.v_TileCache[tLayer.name];
+                Dictionary<string, List<Vector2>> templateList = v_TileCache[tLayer.name];
 
                 // Go through each Tile Template in the Layer
-                foreach (String parentTileName in templateList.Keys)
+                foreach (string parentTileName in templateList.Keys)
                 {
                     // Get Parent Tile Template
                     Tile parentTile = TileManager.getByName(parentTileName);
@@ -385,7 +383,7 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public void Draw_VisibleMapTileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
+        public void DrawVisibleMapTileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
         {
             // Start Code Timer for speed test
             Utility.CodeTimer codeTimer = new Utility.CodeTimer();
@@ -397,7 +395,7 @@ namespace BasicRPGTest_Mono.Engine
             for (int i = 0; i < mIterationsCount; i++)
             {
                 // Draw code
-                Draw_VisibleMapTileCache(camera, batch);
+                DrawVisibleMapCache(camera, batch);
             }
 
             // End Code Timer for speed test

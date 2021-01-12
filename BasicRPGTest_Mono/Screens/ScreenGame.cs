@@ -171,7 +171,7 @@ namespace BasicRPGTest_Mono
             texture = Content.Load<Texture2D>("enemy3");
             EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26), _graphics));
 
-            foreach (LivingEntity entity in EntityManager.livingEntities)
+            foreach (LivingEntity entity in EntityManager.livingEntities.Values)
             {
                 System.Diagnostics.Debug.WriteLine("Entity: " + entity.name);
             }
@@ -272,7 +272,7 @@ namespace BasicRPGTest_Mono
 
                 cameraRectangle = Camera.camera.BoundingRectangle;
                 // Update Map's Visible Regions
-                MapManager.activeMap.update_VisibleRegions(Camera.camera);
+                MapManager.activeMap.updateVisibleRegions(Camera.camera);
             }
 
         }
@@ -298,7 +298,7 @@ namespace BasicRPGTest_Mono
             {
                 // Just in case this doesn't happen automatically. This ensures it happens right away.
                 // Update Map's Visible Regions
-                MapManager.activeMap.update_VisibleRegions(Camera.camera);
+                MapManager.activeMap.updateVisibleRegions(Camera.camera);
                 v_NotNewDraw = true;
             }
 
@@ -310,7 +310,7 @@ namespace BasicRPGTest_Mono
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
-            MapManager.activeMap.Draw_VisibleMapTileCache(Camera.camera, _spriteBatch);
+            MapManager.activeMap.DrawVisibleMapCache(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
 

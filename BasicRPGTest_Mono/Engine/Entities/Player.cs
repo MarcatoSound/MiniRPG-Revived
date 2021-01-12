@@ -106,6 +106,7 @@ namespace BasicRPGTest_Mono.Engine
         }
         public void swapHotbars()
         {
+            // TODO: A bit of extra overhead... maybe find a way to avoid the temporary variables?
             Hotbar oldPrimary = inventory.hotbarPrimary;
             Hotbar oldSecondary = inventory.hotbarSecondary;
 
@@ -123,8 +124,8 @@ namespace BasicRPGTest_Mono.Engine
             Item mainhand = inventory.hotbarPrimary.hand;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 150, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
-            attackTimer = new Timer(150);
+            itemSwing = new ItemSwing(direction, 200, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
+            attackTimer = new Timer(200);
             attackTimer.Elapsed += (sender, args) =>
             {
                 isAttacking = false;
@@ -412,6 +413,8 @@ namespace BasicRPGTest_Mono.Engine
             };
             knockbackTimer.Start();
         }
+
+
         public override void draw(SpriteBatch batch)
         {
             batch.Begin(transformMatrix: Camera.camera.Transform);

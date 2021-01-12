@@ -92,16 +92,47 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        System.Diagnostics.Debug.WriteLine("SIDES: ");
-                        TileLayer layer = MapManager.activeMap.layers[1];
-                        Tile tile = layer.getTile(Core.player.getPlayerTilePosition());
-                        System.Diagnostics.Debug.WriteLine($"Tile :: {tile.name}");
-                        System.Diagnostics.Debug.WriteLine($"Layer :: {tile.layer.name}");
-                        System.Diagnostics.Debug.WriteLine($"zIndex :: {tile.zIndex}");
-                        foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"{pair.Key} :: {pair.Value}");
-                        }
+                        Random seedGenerator = new Random();
+                        int seed = seedGenerator.Next(0, 9999999);
+
+                        Cell gen1 = new Cell();
+                        gen1.Seed = seed;
+                        gen1.Frequency = 0.015;
+                        gen1.Type = Cell.CellType.Minkowsky;
+
+                        //gen.Type = Cell.CellType.Manhattan;
+
+                        /*Cell gen2 = new Cell();
+                        gen2.Seed = seed;
+                        gen2.Frequency = 0.04;
+                        gen2.Displacement = 0.2;
+                        gen2.Type = Cell.CellType.Minkowsky;
+
+                        Add mod1 = new Add();
+                        mod1.Source0 = gen1;
+                        mod1.Source1 = gen2;
+
+                        ScaleBias mod2 = new ScaleBias();
+                        mod2.Source0 = mod1;
+                        mod2.Bias = 0.2;
+                        mod2.Scale = 0.68;*/
+
+                        PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
+                        builder.SourceModule = gen1;
+                        builder.SetBounds(0, 512, 0, 512);
+                        SharpNoise.NoiseMap map = new SharpNoise.NoiseMap(512, 512);
+                        builder.DestNoiseMap = map;
+                        builder.SetDestSize(512, 512);
+                        builder.Build();
+
+                        Image img = new Image();
+                        ImageRenderer renderer = new ImageRenderer();
+                        renderer.DestinationImage = img;
+                        renderer.SourceNoiseMap = map;
+                        renderer.BuildGrayscaleGradient();
+                        renderer.Render();
+
+                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);
 
                         /*Random seedGenerator = new Random();
                         int seed = seedGenerator.Next(0, 9999999);
