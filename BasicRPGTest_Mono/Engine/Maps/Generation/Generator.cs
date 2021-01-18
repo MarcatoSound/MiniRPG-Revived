@@ -26,8 +26,9 @@ namespace BasicRPGTest_Mono.Engine
             int seed = seedGenerator.Next(0, 9999999);
             System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
 
-            //NoiseMap biomeNoise = createBiomeNoise(seed);
-            //Biome[,] biomeTiles;
+            NoiseMap biomeNoise = createBiomeNoise(seed);
+            Biome biome;
+            Biome[,] biomeTiles;
 
             NoiseMap noise = createLandNoise(seed, size);
 
@@ -36,9 +37,19 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
+                    {
+                        // Determine what biome this is.
+                        if (biomeNoise[x, y] < 0)
+                            biome = BiomeManager.getByName("field");
+                        else if (biomeNoise[x, y] >= 0 && biomeNoise[x, y] < 0.5)
+                            biome = BiomeManager.getByName("swamp");
+                        else
+                            biome = BiomeManager.getByName("desert");
+                    }
+
                     if (noise[x, y] < 0)
                     {
-                        waterLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(5)), new Vector2(x, y)));
+                        waterLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("water"), new Vector2(x, y), biome));
                         continue;
                     }
                 }
@@ -50,13 +61,23 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
+                    {
+                        // Determine what biome this is.
+                        if (biomeNoise[x, y] < -0.1)
+                            biome = BiomeManager.getByName("field");
+                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
+                            biome = BiomeManager.getByName("swamp");
+                        else
+                            biome = BiomeManager.getByName("desert");
+                    }
+
                     if (noise[x, y] >= 0 && noise[x, y] < 0.07)
                     {
-                        groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(3)), new Vector2(x, y)));
+                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.coastTile, new Vector2(x, y), biome));
                     }
                     else if (noise[x, y] >= 0)
                     {
-                        groundLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(0)), new Vector2(x, y)));
+                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.groundTile, new Vector2(x, y), biome));
                     }
                 }
             }
@@ -67,9 +88,19 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
+                    {
+                        // Determine what biome this is.
+                        if (biomeNoise[x, y] < -0.1)
+                            biome = BiomeManager.getByName("field");
+                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
+                            biome = BiomeManager.getByName("swamp");
+                        else
+                            biome = BiomeManager.getByName("desert");
+                    }
+
                     if (noise[x, y] > 0.5)
                     {
-                        stoneLayer.setTile(new Vector2(x, y), new Tile(TileManager.get(Convert.ToInt32(2)), new Vector2(x, y)));
+                        stoneLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("stone"), new Vector2(x, y), biome));
                         continue;
                     }
                 }
@@ -82,14 +113,25 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
+                    {
+                        // Determine what biome this is.
+                        if (biomeNoise[x, y] < -0.1)
+                            biome = BiomeManager.getByName("field");
+                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
+                            biome = BiomeManager.getByName("swamp");
+                        else
+                            biome = BiomeManager.getByName("desert");
+                    }
+
+                    if (biome.name.Equals("desert")) continue;
+
                     treePos.X = x;
                     treePos.Y = y;
                     if (stoneLayer.tiles.ContainsKey(treePos)) continue;
                     if (waterLayer.tiles.ContainsKey(treePos)) continue;
                     if (rand.Next(0, 100) > 5) continue;
-                    id = 4;
 
-                    decoration.setTile(new Vector2(x, y), new Tile(TileManager.get(id), new Vector2(x, y)));
+                    decoration.setTile(new Vector2(x, y), new Tile(TileManager.getByName("tree"), new Vector2(x, y), biome));
 
                 }
             }

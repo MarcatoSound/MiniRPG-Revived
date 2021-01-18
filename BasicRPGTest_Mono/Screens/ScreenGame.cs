@@ -131,18 +131,33 @@ namespace BasicRPGTest_Mono
         private void loadTiles()
         {
             Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
-            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false));
+            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2));
+            TileManager.add(new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1));
             TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false, 0));
             TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), false, false, 0));
             TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0));
-            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 1, 0), true, false, 2));
+            TileManager.add(new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0));
+            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5));
             TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
         }
 
         private void loadBiomes()
         {
-            BiomeManager.add(new Biome("ocean", TileManager.getByName("water"), null));
-            BiomeManager.add(new Biome("field", TileManager.getByName("grass"), TileManager.getByName("stone")));
+            Biome biome;
+            biome = new Biome("field", TileManager.getByName("grass"));
+            biome.undergroundTile = TileManager.getByName("dirt");
+            biome.coastTile = TileManager.getByName("sand");
+            BiomeManager.add(biome);
+
+            biome = new Biome("desert", TileManager.getByName("sand"));
+            biome.undergroundTile = TileManager.getByName("hardened_sand");
+            biome.coastTile = TileManager.getByName("sand");
+            BiomeManager.add(biome);
+
+            biome = new Biome("swamp", TileManager.getByName("swamp_grass"));
+            biome.undergroundTile = TileManager.getByName("dirt");
+            biome.coastTile = TileManager.getByName("sand");
+            BiomeManager.add(biome);
         }
 
         private void loadItems()

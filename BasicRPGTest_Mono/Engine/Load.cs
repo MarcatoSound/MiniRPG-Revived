@@ -72,8 +72,9 @@ namespace BasicRPGTest_Mono.Engine
 
                     int x = tileJson.Value<int>("x");
                     int y = tileJson.Value<int>("y");
+                    string biome = tileJson.Value<string>("biome");
 
-                    tile = new Tile(template, new Vector2(x, y));
+                    tile = new Tile(template, new Vector2(x, y), BiomeManager.getByName(biome));
 
                     layer.setTile(tile.tilePos, tile);
                     tile = null;

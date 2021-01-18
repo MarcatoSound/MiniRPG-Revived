@@ -36,6 +36,7 @@ namespace RPGEngine
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
+        public Biome biome { get; set; }
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1)
         {
@@ -67,7 +68,7 @@ namespace RPGEngine
         }
 
         // For instantiating an existing tile
-        public Tile(Tile tile, Vector2 tilePos)
+        public Tile(Tile tile, Vector2 tilePos, Biome biome)
         {
             this.parent = tile;
             this.name = tile.name;
@@ -76,6 +77,7 @@ namespace RPGEngine
             this.isInstance = true;
             this.zIndex = tile.zIndex;
             this.tilePos = tilePos;
+            this.biome = biome;
             this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
             sideGraphics = tile.sideGraphics;

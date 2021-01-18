@@ -7,27 +7,30 @@ namespace BasicRPGTest_Mono.Engine.Maps
 {
     public class Biome
     {
-        public string name;
-        public Tile groundTile;
-        public Tile stoneTile;
+        public string name { get; private set; }
+        public Tile groundTile { get; set; }
+        public Tile undergroundTile { get; set; }
+        public Tile coastTile { get; set; }
 
-        public List<Tile> decorations;
+        public List<Tile> decorations { get; private set; }
 
-        public Biome(string name, Tile groundTile, Tile stoneTile)
+
+        public Biome(string name, Tile groundTile)
         {
             this.name = name;
             this.groundTile = groundTile;
-            this.stoneTile = stoneTile;
 
             decorations = new List<Tile>();
         }
-        public Biome(string name, Tile groundTile, Tile stoneTile, List<Tile> decorations)
+        public Biome(string name, Tile groundTile, List<Tile> decorations)
         {
             this.name = name;
             this.groundTile = groundTile;
-            this.stoneTile = stoneTile;
 
             this.decorations = decorations;
         }
+
+
+
     }
 }
