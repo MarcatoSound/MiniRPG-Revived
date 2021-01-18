@@ -8,6 +8,7 @@ using System.Text;
 using SharpNoise;
 using SharpNoise.Modules;
 using SharpNoise.Builders;
+using BasicRPGTest_Mono.Engine.Maps.Generation;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -108,7 +109,7 @@ namespace BasicRPGTest_Mono.Engine
             layers.Add(stoneLayer);
 
             TileLayer decoration = new TileLayer("decorations");
-            Vector2 treePos = new Vector2();
+            Vector2 decoPos = new Vector2();
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
@@ -125,13 +126,19 @@ namespace BasicRPGTest_Mono.Engine
 
                     if (biome.name.Equals("desert")) continue;
 
-                    treePos.X = x;
-                    treePos.Y = y;
-                    if (stoneLayer.tiles.ContainsKey(treePos)) continue;
-                    if (waterLayer.tiles.ContainsKey(treePos)) continue;
-                    if (rand.Next(0, 100) > 5) continue;
+                    decoPos.X = x;
+                    decoPos.Y = y;
+                    if (decoration.tiles.ContainsKey(decoPos)) continue;
+                    if (stoneLayer.tiles.ContainsKey(decoPos)) continue;
+                    if (waterLayer.tiles.ContainsKey(decoPos)) continue;
+                    if (groundLayer.getTile(decoPos) != null && groundLayer.getTile(decoPos).name.Equals("sand")) continue;
 
-                    decoration.setTile(new Vector2(x, y), new Tile(TileManager.getByName("tree"), new Vector2(x, y), biome));
+                    if (rand.Next(0, 100) > biome.decoChance) continue;
+
+                    Decoration deco = biome.chooseDecoration();
+                    deco.place(decoration, decoPos, biome);
+
+                    //decoration.setTile(new Vector2(x, y), new Tile(TileManager.getByName("tree"), new Vector2(x, y), biome));
 
                 }
             }

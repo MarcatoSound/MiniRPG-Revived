@@ -147,6 +147,8 @@ namespace BasicRPGTest_Mono
             biome = new Biome("field", TileManager.getByName("grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
+            biome.decorations.Add(new Engine.Maps.Generation.Decoration("bush", 5, TileManager.getByName("tree")));
+            biome.decoChance = 5;
             BiomeManager.add(biome);
 
             biome = new Biome("desert", TileManager.getByName("sand"));
@@ -157,6 +159,7 @@ namespace BasicRPGTest_Mono
             biome = new Biome("swamp", TileManager.getByName("swamp_grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
+            biome.decorations.Add(new Engine.Maps.Generation.Decoration("bush", 1, TileManager.getByName("tree")));
             BiomeManager.add(biome);
         }
 

@@ -317,6 +317,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
         public static int weightedRandom(List<int> chances)
         {
+            // O(n) performance
             int totalRatio = 0;
 
             foreach (int c in chances)
@@ -338,6 +339,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
         }
         public static Spawn randomizeSpawn(ConcurrentDictionary<int, Spawn> spawns)
         {
+            // O(n) performance
             int totalRatio = 0;
 
             foreach (Spawn s in spawns.Values)
