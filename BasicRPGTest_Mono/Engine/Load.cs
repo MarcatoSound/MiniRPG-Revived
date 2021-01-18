@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using RPGEngine;
 using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Utility;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -37,11 +38,11 @@ namespace BasicRPGTest_Mono.Engine
 
             return playerData;
         }
-        public static List<TileLayer> loadMap(string world, string map) 
+        public static List<TileLayer> loadMap(string world, string map)
         {
 
             // Track how long this function takes to run
-            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
+            CodeTimer codeTimer = new CodeTimer();
             codeTimer.startTimer();
 
 
@@ -90,6 +91,9 @@ namespace BasicRPGTest_Mono.Engine
                 GC.Collect();
 
             }
+
+            codeTimer.endTimer();
+            Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to LOAD the world.");
 
             return layers;
 

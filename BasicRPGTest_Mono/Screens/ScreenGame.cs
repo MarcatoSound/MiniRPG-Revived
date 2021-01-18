@@ -229,7 +229,14 @@ namespace BasicRPGTest_Mono
 
 
             // Generate the actual map contents
-            MapManager.add(new Map("overworld", size, Generator.generateOverworldTiles(size)));
+            CodeTimer codeTimer = new CodeTimer();
+            codeTimer.startTimer();
+
+            MapManager.add(new Map("overworld", size, Generator.generateOverworld(size)));
+
+            codeTimer.endTimer();
+            Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to generate world.");
+
 
             return true;
 

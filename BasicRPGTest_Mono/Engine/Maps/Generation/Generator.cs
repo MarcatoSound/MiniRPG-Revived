@@ -15,14 +15,11 @@ namespace BasicRPGTest_Mono.Engine
     public static class Generator
     {
 
-        public static List<TileLayer> generateOverworldTiles(int size)
+        public static List<TileLayer> generateOverworld(int size)
         {
             List<TileLayer> layers = new List<TileLayer>();
 
             Random rand = new Random();
-            int id;
-
-
             Random seedGenerator = new Random();
             int seed = seedGenerator.Next(0, 9999999);
             System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
@@ -33,7 +30,14 @@ namespace BasicRPGTest_Mono.Engine
 
             NoiseMap noise = createLandNoise(seed, size);
 
+
             TileLayer waterLayer = new TileLayer("water");
+            TileLayer groundLayer = new TileLayer("ground");
+            TileLayer stoneLayer = new TileLayer("stone");
+            TileLayer decorations = new TileLayer("decorations");
+
+            Vector2 decoPos = new Vector2();
+
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
@@ -48,43 +52,60 @@ namespace BasicRPGTest_Mono.Engine
                             biome = BiomeManager.getByName("desert");
                     }
 
+                    // Water layer
                     if (noise[x, y] < 0)
-                    {
                         waterLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("water"), new Vector2(x, y), biome));
-                        continue;
-                    }
+
+                    // Ground layer
+                    if (noise[x, y] >= 0 && noise[x, y] < 0.07)
+                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.coastTile, new Vector2(x, y), biome));
+                    else if (noise[x, y] >= 0 && noise[x, y] <= 0.5)
+                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.groundTile, new Vector2(x, y), biome));
+                    else if (noise [x, y] > 0.5)
+                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.undergroundTile, new Vector2(x, y), biome));
+
+                    // Stone layer
+                    if (noise[x, y] > 0.5)
+                        stoneLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("stone"), new Vector2(x, y), biome));
+
+                    // Decorations layer
+                    if (biome.name.Equals("desert")) continue;
+
+                    decoPos.X = x;
+                    decoPos.Y = y;
+                    if (decorations.tiles.ContainsKey(decoPos)) continue;
+                    if (stoneLayer.tiles.ContainsKey(decoPos)) continue;
+                    if (waterLayer.tiles.ContainsKey(decoPos)) continue;
+                    if (groundLayer.getTile(decoPos) != null && groundLayer.getTile(decoPos).name.Equals("sand")) continue;
+
+                    if (rand.Next(0, 100) > biome.decoChance) continue;
+
+                    Decoration deco = biome.chooseDecoration();
+                    deco.place(decorations, decoPos, biome);
                 }
             }
             layers.Add(waterLayer);
-
-            TileLayer groundLayer = new TileLayer("ground");
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    {
-                        // Determine what biome this is.
-                        if (biomeNoise[x, y] < -0.1)
-                            biome = BiomeManager.getByName("field");
-                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
-                            biome = BiomeManager.getByName("swamp");
-                        else
-                            biome = BiomeManager.getByName("desert");
-                    }
-
-                    if (noise[x, y] >= 0 && noise[x, y] < 0.07)
-                    {
-                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.coastTile, new Vector2(x, y), biome));
-                    }
-                    else if (noise[x, y] >= 0)
-                    {
-                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.groundTile, new Vector2(x, y), biome));
-                    }
-                }
-            }
             layers.Add(groundLayer);
+            layers.Add(stoneLayer);
+            layers.Add(decorations);
 
-            TileLayer stoneLayer = new TileLayer("stone");
+            /*
+            for (int x = 0; x < size; x++)
+            {
+                for (int y = 0; y < size; y++)
+                {
+                    {
+                        // Determine what biome this is.
+                        if (biomeNoise[x, y] < -0.1)
+                            biome = BiomeManager.getByName("field");
+                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
+                            biome = BiomeManager.getByName("swamp");
+                        else
+                            biome = BiomeManager.getByName("desert");
+                    }
+                }
+            }
+
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
@@ -99,16 +120,9 @@ namespace BasicRPGTest_Mono.Engine
                             biome = BiomeManager.getByName("desert");
                     }
 
-                    if (noise[x, y] > 0.5)
-                    {
-                        stoneLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("stone"), new Vector2(x, y), biome));
-                        continue;
-                    }
                 }
             }
-            layers.Add(stoneLayer);
 
-            TileLayer decoration = new TileLayer("decorations");
             Vector2 decoPos = new Vector2();
             for (int x = 0; x < size; x++)
             {
@@ -124,25 +138,10 @@ namespace BasicRPGTest_Mono.Engine
                             biome = BiomeManager.getByName("desert");
                     }
 
-                    if (biome.name.Equals("desert")) continue;
-
-                    decoPos.X = x;
-                    decoPos.Y = y;
-                    if (decoration.tiles.ContainsKey(decoPos)) continue;
-                    if (stoneLayer.tiles.ContainsKey(decoPos)) continue;
-                    if (waterLayer.tiles.ContainsKey(decoPos)) continue;
-                    if (groundLayer.getTile(decoPos) != null && groundLayer.getTile(decoPos).name.Equals("sand")) continue;
-
-                    if (rand.Next(0, 100) > biome.decoChance) continue;
-
-                    Decoration deco = biome.chooseDecoration();
-                    deco.place(decoration, decoPos, biome);
-
                     //decoration.setTile(new Vector2(x, y), new Tile(TileManager.getByName("tree"), new Vector2(x, y), biome));
 
                 }
-            }
-            layers.Add(decoration);
+            }*/
 
             return layers;
         }

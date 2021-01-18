@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.Xna.Framework;
 using RPGEngine;
 using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Utility;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -55,6 +56,8 @@ namespace BasicRPGTest_Mono.Engine
 
         public static void save(Map map, string world)
         {
+            CodeTimer codeTimer = new CodeTimer();
+            codeTimer.startTimer();
             path = $"save\\{world}\\maps";
 
             if (!Directory.Exists(path))
@@ -137,6 +140,9 @@ namespace BasicRPGTest_Mono.Engine
 
                 layerNumber++;
             }
+
+            codeTimer.endTimer();
+            Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to SAVE the world.");
 
         }
 
