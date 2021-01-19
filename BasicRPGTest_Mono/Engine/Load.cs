@@ -15,11 +15,27 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class Load
     {
+        private static int _mapTileCount;
+
+        public static int mapTotalTiles { get; private set; }
+        public static int mapTileCount
+        {
+            get { return _mapTileCount; }
+            private set
+            {
+                mapProgress = (double)value / (double)mapTotalTiles;
+                _mapTileCount = value;
+            }
+        }
+        private static int maxLayerTiles { get; set; }
+        public static double mapProgress { get; private set; }
+
         public static string path { get; set; }
         public static StreamReader reader { get; set; }
 
         static Load()
         {
+            mapProgress = 0;
         }
 
         public static Dictionary<string, Object> loadPlayer(string world)
@@ -55,8 +71,15 @@ namespace BasicRPGTest_Mono.Engine
             FileInfo[] files = dirInfo.GetFiles();
             List<Tile> tiles;
 
+            JObject worldInfo = JObject.Parse(reader.ReadToEnd());
+            int size = worldInfo.Value<int>("height");
+            mapTileCount = 0;
+            maxLayerTiles = size * size;
+            mapTotalTiles = files.Length * maxLayerTiles;
+
             foreach (FileInfo file in files)
             {
+                int layerTileCount = 0;
                 // TODO: Account for incorrect layer loading order.
                 reader = new StreamReader($"{path}\\{file.Name}");
                 JObject jsonLayer = JObject.Parse(reader.ReadToEnd());
@@ -68,6 +91,8 @@ namespace BasicRPGTest_Mono.Engine
 
                 foreach (JObject tileJson in tileArray)
                 {
+                    layerTileCount++;
+                    mapTileCount++;
                     Tile template = TileManager.get(tileJson.Value<int>("id"));
                     if (template == null) continue;
 
@@ -80,6 +105,9 @@ namespace BasicRPGTest_Mono.Engine
                     layer.setTile(tile.tilePos, tile);
                     tile = null;
                 }
+
+                mapTotalTiles -= maxLayerTiles - layerTileCount;
+                mapTileCount += 0;
 
                 layers.Add(layer);
                 System.Diagnostics.Debug.WriteLine("Loaded layer: " + layer.name);
@@ -94,6 +122,9 @@ namespace BasicRPGTest_Mono.Engine
 
             codeTimer.endTimer();
             Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to LOAD the world.");
+
+            System.Diagnostics.Debug.WriteLine($"Total tiles: {mapTotalTiles}");
+            System.Diagnostics.Debug.WriteLine($"Total tiles: {mapTileCount}");
 
             return layers;
 

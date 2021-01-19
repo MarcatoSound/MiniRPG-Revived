@@ -36,7 +36,7 @@ namespace BasicRPGTest_Mono.Screens
         }
         public void generate()
         {
-            Game.loadWorld(worldName);
+            Game.loadWorld(worldName, true);
         }
 
         public override void LoadContent()

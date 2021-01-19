@@ -43,7 +43,7 @@ namespace BasicRPGTest_Mono.Screens
                 worldMenu.add(new MenuItem(dir.Name)
                 {
                     run = () => {
-                        Game.loadWorld(dir.Name);
+                        Game.loadWorld(dir.Name, false);
                     }
                 });
             }

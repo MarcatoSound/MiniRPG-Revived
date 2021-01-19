@@ -18,6 +18,8 @@ namespace BasicRPGTest_Mono.Screens
 {
     class ScreenLoading : GameScreen
     {
+        private bool isGenerating;
+
         private new Main Game => (Main)base.Game;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -26,7 +28,11 @@ namespace BasicRPGTest_Mono.Screens
 
         private Thread loading { get; set; }
 
-        public ScreenLoading(Main game, string worldName) : base(game) { this.worldName = worldName; }
+        public ScreenLoading(Main game, string worldName, bool generate) : base(game) 
+        {
+            this.worldName = worldName;
+            isGenerating = generate;
+        }
 
 
         public override void LoadContent()
@@ -182,8 +188,17 @@ namespace BasicRPGTest_Mono.Screens
         }
         public override void Draw(GameTime gameTime)
         {
+            string progress;
+            if (isGenerating)
+                progress = (Generator.mapProgress * 100).ToString("#.##");
+            else
+                progress = (Load.mapProgress * 100).ToString("#.##");
+
+
+            GraphicsDevice.Clear(Color.Black);
+
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(Core.mainFont, "Loading...", new Vector2(560, 25), Color.White);
+            _spriteBatch.DrawString(Core.mainFont, $"Loading... {progress}%", new Vector2(500, 25), Color.White);
             _spriteBatch.End();
         }
     }

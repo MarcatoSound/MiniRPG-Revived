@@ -14,9 +14,28 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class Generator
     {
+        private static int _mapTileCount;
+
+        public static int mapTotalTiles { get; private set; }
+        public static int mapTileCount
+        {
+            get { return _mapTileCount; }
+            private set
+            {
+                mapProgress = (double)value / (double)mapTotalTiles;
+                _mapTileCount = value;
+            }
+        }
+        private static int maxLayerTiles { get; set; }
+        public static double mapProgress { get; private set; }
 
         public static List<TileLayer> generateOverworld(int size)
         {
+            mapTileCount = 0;
+            maxLayerTiles = size * size;
+            mapTotalTiles = maxLayerTiles; 
+
+
             List<TileLayer> layers = new List<TileLayer>();
 
             Random rand = new Random();
@@ -26,7 +45,6 @@ namespace BasicRPGTest_Mono.Engine
 
             NoiseMap biomeNoise = createBiomeNoise(seed);
             Biome biome;
-            Biome[,] biomeTiles;
 
             NoiseMap noise = createLandNoise(seed, size);
 
@@ -42,6 +60,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
+                    mapTileCount++;
                     {
                         // Determine what biome this is.
                         if (biomeNoise[x, y] < 0)
@@ -147,6 +166,11 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
+        /// <summary>
+        /// Generates cell noise for determining the distribution of tile biomes.
+        /// </summary>
+        /// <param name="seed"></param>
+        /// <returns></returns>
         public static NoiseMap createBiomeNoise(int seed)
         {
 

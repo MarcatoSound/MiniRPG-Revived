@@ -386,9 +386,9 @@ namespace BasicRPGTest_Mono
             activeScreen = new ScreenWorldsMenu(this);
             screenManager.LoadScreen(activeScreen);
         }
-        public void loadWorld(string worldName)
+        public void loadWorld(string worldName, bool generate)
         {
-            activeScreen = new ScreenLoading(this, worldName);
+            activeScreen = new ScreenLoading(this, worldName, generate);
             screenManager.LoadScreen(activeScreen);
         }
         public void startGame(string worldName)
