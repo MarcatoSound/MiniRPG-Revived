@@ -65,14 +65,13 @@ namespace BasicRPGTest_Mono
         {
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Core.graphics = _graphics.GraphicsDevice;
+            font = Content.Load<SpriteFont>("arial");
 
             Game.renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
 
-            font = Content.Load<SpriteFont>("arial");
 
 
-
+            /*
             // Load the general game objects
             loadTiles();
             loadBiomes();
@@ -82,8 +81,9 @@ namespace BasicRPGTest_Mono
             loadHud();
 
             if (loadMap())
-                Save.save(MapManager.activeMap, worldName);
+                Save.save(MapManager.activeMap, worldName);*/
 
+            loadHud();
 
             Texture2D texture;
 

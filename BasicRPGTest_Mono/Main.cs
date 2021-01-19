@@ -61,16 +61,16 @@ namespace BasicRPGTest_Mono
                     return;
                 }
 
-                if (activeScreen is ScreenLoadMenu)
+                if (activeScreen is ScreenWorldsMenu)
                 {
                     if (args.Key == Keys.Escape) mainMenu();
-                    if (args.Key == Keys.Down) ((ScreenLoadMenu)activeScreen).down();
-                    if (args.Key == Keys.Up) ((ScreenLoadMenu)activeScreen).up();
-                    if (args.Key == Keys.Enter) ((ScreenLoadMenu)activeScreen).select();
+                    if (args.Key == Keys.Down) ((ScreenWorldsMenu)activeScreen).down();
+                    if (args.Key == Keys.Up) ((ScreenWorldsMenu)activeScreen).up();
+                    if (args.Key == Keys.Enter) ((ScreenWorldsMenu)activeScreen).select();
                     return;
                 }
 
-                if (activeScreen is ScreenGenerate)
+                if (activeScreen is ScreenNewWorld)
                 {
                     if (args.Key == Keys.Escape)
                     {
@@ -78,11 +78,11 @@ namespace BasicRPGTest_Mono
                         return;
                     }
                     if (args.Key == Keys.Back)
-                        ((ScreenGenerate)activeScreen).delChar();
+                        ((ScreenNewWorld)activeScreen).delChar();
                     else if (args.Key == Keys.Enter)
-                        ((ScreenGenerate)activeScreen).generate();
+                        ((ScreenNewWorld)activeScreen).generate();
                     else
-                        ((ScreenGenerate)activeScreen).enterChar(Util.getCharacter(Keyboard.GetState(), args.Key));
+                        ((ScreenNewWorld)activeScreen).enterChar(Util.getCharacter(Keyboard.GetState(), args.Key));
                     return;
                 }
 
@@ -174,7 +174,7 @@ namespace BasicRPGTest_Mono
                     {
                         if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
                         {
-                            ((ScreenGame)activeScreen).player.Dash();
+                            Core.player.Dash();
                         }
 
                         if (args.Key == Keys.W) Core.player.setDirection(Direction.Up);
@@ -182,12 +182,12 @@ namespace BasicRPGTest_Mono
                         if (args.Key == Keys.A) Core.player.setDirection(Direction.Left);
                         if (args.Key == Keys.D) Core.player.setDirection(Direction.Right);
 
-                        if (args.Key == Keys.Up) ((ScreenGame)activeScreen).player.attack(Direction.Up);
-                        if (args.Key == Keys.Down) ((ScreenGame)activeScreen).player.attack(Direction.Down);
-                        if (args.Key == Keys.Left) ((ScreenGame)activeScreen).player.attack(Direction.Left);
-                        if (args.Key == Keys.Right) ((ScreenGame)activeScreen).player.attack(Direction.Right);
+                        if (args.Key == Keys.Up) Core.player.attack(Direction.Up);
+                        if (args.Key == Keys.Down) Core.player.attack(Direction.Down);
+                        if (args.Key == Keys.Left) Core.player.attack(Direction.Left);
+                        if (args.Key == Keys.Right) Core.player.attack(Direction.Right);
 
-                        if (args.Key == Keys.F) ((ScreenGame)activeScreen).player.swapHotbars();
+                        if (args.Key == Keys.F) Core.player.swapHotbars();
                         if (args.Key == Keys.E) Core.player.toggleInv();
 
                         if (args.Key == Keys.NumPad1) Core.player.inventory.hotbarPrimary.setSlot(0);
@@ -247,12 +247,12 @@ namespace BasicRPGTest_Mono
                     previousScrollValue = currentState.ScrollWheelValue;
                 }
 
-                if (activeScreen is ScreenLoadMenu)
+                if (activeScreen is ScreenWorldsMenu)
                 {
-                    if (!((ScreenLoadMenu)activeScreen).worldMenu.box.Contains(Mouse.GetState().Position)) return;
+                    if (!((ScreenWorldsMenu)activeScreen).worldMenu.box.Contains(Mouse.GetState().Position)) return;
                     MouseState currentState = args.CurrentState;
-                    if (currentState.ScrollWheelValue < previousScrollValue) ((ScreenLoadMenu)activeScreen).down();
-                    else if (currentState.ScrollWheelValue > previousScrollValue) ((ScreenLoadMenu)activeScreen).up();
+                    if (currentState.ScrollWheelValue < previousScrollValue) ((ScreenWorldsMenu)activeScreen).down();
+                    else if (currentState.ScrollWheelValue > previousScrollValue) ((ScreenWorldsMenu)activeScreen).up();
                     previousScrollValue = currentState.ScrollWheelValue;
                 }
 
@@ -378,12 +378,17 @@ namespace BasicRPGTest_Mono
         }
         public void newWorldMenu()
         {
-            activeScreen = new ScreenGenerate(this);
+            activeScreen = new ScreenNewWorld(this);
             screenManager.LoadScreen(activeScreen);
         }
         public void loadWorldMenu()
         {
-            activeScreen = new ScreenLoadMenu(this);
+            activeScreen = new ScreenWorldsMenu(this);
+            screenManager.LoadScreen(activeScreen);
+        }
+        public void loadWorld(string worldName)
+        {
+            activeScreen = new ScreenLoading(this, worldName);
             screenManager.LoadScreen(activeScreen);
         }
         public void startGame(string worldName)

@@ -10,10 +10,10 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Screens
 {
-    public class ScreenLoadMenu : GameScreen
+    public class ScreenWorldsMenu : GameScreen
     {
         private new Main Game => (Main)base.Game;
-        public ScreenLoadMenu(Main game) : base(game) { }
+        public ScreenWorldsMenu(Main game) : base(game) { }
 
 
         private GraphicsDeviceManager _graphics;
@@ -43,7 +43,7 @@ namespace BasicRPGTest_Mono.Screens
                 worldMenu.add(new MenuItem(dir.Name)
                 {
                     run = () => {
-                        Game.startGame(dir.Name);
+                        Game.loadWorld(dir.Name);
                     }
                 });
             }

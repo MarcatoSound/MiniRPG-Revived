@@ -9,16 +9,16 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Screens
 {
-    public class ScreenGenerate : GameScreen
+    public class ScreenNewWorld : GameScreen
     {
         private new Main Game => (Main)base.Game;
-        public ScreenGenerate(Main game) : base(game) { }
+        public ScreenNewWorld(Main game) : base(game) { }
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private SpriteFont font;
 
-        string worldName;
+        private string worldName;
 
         public void enterChar(char letter)
         {
@@ -36,7 +36,7 @@ namespace BasicRPGTest_Mono.Screens
         }
         public void generate()
         {
-            Game.startGame(worldName);
+            Game.loadWorld(worldName);
         }
 
         public override void LoadContent()
