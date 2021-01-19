@@ -212,6 +212,57 @@ namespace RPGEngine
             drawAdjacentTiles(batch);
         }
 
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                //System.Diagnostics.Debug.WriteLine("Provided tile is NULL!");
+                return false;
+            }
+            if (obj.GetType() != typeof(Tile))
+            {
+                //System.Diagnostics.Debug.WriteLine("Provided tile is not a tile at all!");
+                return false;
+            }
+            Tile compare = (Tile)obj;
+
+
+            if (this.tilePos != compare.tilePos)
+            {
+                //System.Diagnostics.Debug.WriteLine("TilePos is different!");
+                return false;
+            }
+
+            if (this.name != compare.name)
+            {
+                //System.Diagnostics.Debug.WriteLine("Name is different!");
+                return false;
+            }
+
+            if (this.parent != compare.parent)
+            {
+                //System.Diagnostics.Debug.WriteLine("Parent is different!");
+                return false;
+            }
+
+            if (this.layer != compare.layer)
+            {
+                //System.Diagnostics.Debug.WriteLine("Layer is different!");
+                return false;
+            }
+
+            if (this.graphic != compare.graphic)
+            {
+                //System.Diagnostics.Debug.WriteLine("Graphic is different!");
+                return false;
+            }
+
+
+            return true;
+
+        }
+
     }
 
 

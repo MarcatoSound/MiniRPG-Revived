@@ -93,6 +93,7 @@ namespace BasicRPGTest_Mono.Engine
                     tile.region = regionPos;
                     tile.map = this;  // Tile remembers the Map it belongs to
                     tile.layer = layer;  // Tile remembers Map's Layer it belongs to
+                    if (!regions.ContainsKey(regionPos)) continue;
                     regions[regionPos].addTile(tile);
 
                     tile.update();
@@ -106,6 +107,26 @@ namespace BasicRPGTest_Mono.Engine
                 }
 
             }
+
+            Save.oldMapStates.Add(name, new Map(this));
+
+        }
+
+        public Map(Map oldMap)
+        {
+            this.name = oldMap.name;
+            this.layers = oldMap.layers;
+            this.width = oldMap.width;
+            this.height = oldMap.height;
+            this.widthInPixels = oldMap.widthInPixels;
+            this.heightInPixels = oldMap.height;
+            regions = new Dictionary<Vector2, Region>(oldMap.regions);
+            collidables = new ConcurrentDictionary<int, Rectangle>(oldMap.collidables);
+
+            this.entities = new ConcurrentDictionary<int, Entity>(oldMap.entities);
+            this.livingEntities = new ConcurrentDictionary<int, LivingEntity>(oldMap.livingEntities);
+            this.spawns = new ConcurrentDictionary<int, Spawn>(oldMap.spawns);
+
         }
 
 
@@ -127,6 +148,16 @@ namespace BasicRPGTest_Mono.Engine
 
         public long getTilesTotalCountDrawn () { return this.v_drawnTileCount; }
         public void setTilesTotalCountDrawn (long mValue) { this.v_drawnTileCount += mValue;  }
+
+        public TileLayer getLayer(string name)
+        {
+            foreach (TileLayer layer in layers)
+            {
+                if (layer.name.Equals(name)) return layer;
+            }
+
+            return null;
+        }
 
 
         //====================================================================================

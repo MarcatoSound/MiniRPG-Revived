@@ -15,6 +15,7 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class Load
     {
+
         private static int _mapTileCount;
 
         public static int mapTotalTiles { get; private set; }
@@ -110,6 +111,7 @@ namespace BasicRPGTest_Mono.Engine
                 mapTileCount += 0;
 
                 layers.Add(layer);
+                Save.layerTiles.Add(layer.name, tileArray);
                 System.Diagnostics.Debug.WriteLine("Loaded layer: " + layer.name);
 
                 reader.Close();

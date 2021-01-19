@@ -3,6 +3,7 @@ using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Maps.Generation;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -78,10 +79,22 @@ namespace BasicRPGTest_Mono.Screens
         private void loadBiomes()
         {
             Biome biome;
+            Dictionary<Vector2, Tile> decoTiles = new Dictionary<Vector2, Tile>();
+
             biome = new Biome("field", TileManager.getByName("grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Engine.Maps.Generation.Decoration("bush", 5, TileManager.getByName("tree")));
+            biome.decorations.Add(new Decoration("bush", 10, TileManager.getByName("tree")));
+            decoTiles.Add(new Vector2(0, 0), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(0, 1), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(0, 2), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(1, 0), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(1, 1), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(1, 2), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(2, 0), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(2, 1), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(2, 2), TileManager.getByName("tree"));
+            biome.decorations.Add(new Decoration("bush_cluster", 1, decoTiles));
             biome.decoChance = 5;
             BiomeManager.add(biome);
 
@@ -93,7 +106,7 @@ namespace BasicRPGTest_Mono.Screens
             biome = new Biome("swamp", TileManager.getByName("swamp_grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Engine.Maps.Generation.Decoration("bush", 1, TileManager.getByName("tree")));
+            biome.decorations.Add(new Decoration("bush", 1, TileManager.getByName("tree")));
             BiomeManager.add(biome);
         }
 
