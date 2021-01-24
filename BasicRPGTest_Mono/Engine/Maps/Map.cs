@@ -63,7 +63,7 @@ namespace BasicRPGTest_Mono.Engine
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
-            //spawnTimer.Start();
+            spawnTimer.Start();
 
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
@@ -188,7 +188,7 @@ namespace BasicRPGTest_Mono.Engine
 
             Vector2 target = findSpawnLocation(spawn.entity);
 
-            LivingEntity ent = new LivingEntity(spawn.entity, target, livingEntities.Count);
+            LivingEntity ent = new LivingEntity(spawn.entity, target, livingEntities.Count, this);
             livingEntities.TryAdd(livingEntities.Keys.Count, ent);
 
         }
@@ -394,9 +394,24 @@ namespace BasicRPGTest_Mono.Engine
                     Tile parentTile = TileManager.getByName(parentTileName);
                     // Get Sub-Tile Locations
                     List<Vector2> list = templateList[parentTileName];
-    
-                parentTile.graphic.draw_Tiles(batch, list);
+
+                    parentTile.graphic.draw_Tiles(batch, list);
                 }
+
+                /*batch.Begin(transformMatrix: Camera.camera.Transform);
+                foreach (Rectangle rect in collidables.Values)
+                {
+                    batch.DrawRectangle(rect, Color.White);
+                }*/
+
+                /*batch.Begin(transformMatrix: Camera.camera.Transform);
+                foreach (TileLayer layer in layers)
+                {
+                    foreach (Tile tile in layer.tiles.Values)
+                    {
+                        tile.draw(batch);
+                    }
+                }*/
 
                 batch.Begin(transformMatrix: Camera.camera.Transform);
                 foreach (Region region in v_regionsVisible)

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using RPGEngine;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -29,6 +30,8 @@ namespace BasicRPGTest_Mono.Engine
         public bool isGettingKnockedBack { get; set; }
         public float kbResist = 0f;
 
+        public Map map;
+
         public LivingEntity(string name, Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
@@ -48,7 +51,7 @@ namespace BasicRPGTest_Mono.Engine
 
             //EntityManager.add(this);
         }
-        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
+        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
         {
             this.speed = entity.speed;
             this.Position = pos;
@@ -62,6 +65,8 @@ namespace BasicRPGTest_Mono.Engine
             moveCount = 0;
 
             maxVelocity = new Vector2(speed, speed);
+
+            this.map = map;
         }
 
         public override void update()
@@ -271,6 +276,31 @@ namespace BasicRPGTest_Mono.Engine
             Position = new Vector2(newPos.X, newPos.Y);
             boundingBox = new Rectangle(newBox.X, newBox.Y, newBox.Width, newBox.Height);
 
+        }
+
+
+        public bool isColliding(Rectangle box)
+        {
+            if (MapManager.activeMap == null) return true;
+            // TODO: MUST OPTIMIZE COLLIDABLE CHECKS
+            /*ConcurrentDictionary<int, Rectangle> pairs = MapManager.activeMap.collidables;
+            foreach (KeyValuePair<int, Rectangle> pair in pairs)
+            {
+                if (box.Intersects(pair.Value))
+                    return true;
+            }*/
+            List<Tile> tiles = getSurroundingTiles(map, 1, TilePosition);
+            foreach (Tile tile in tiles)
+            {
+                if (tile == null) continue;
+                if (!tile.isCollidable) continue;
+                //System.Diagnostics.Debug.WriteLine($"Tile box: {tile.box}");
+                if (box.Intersects(tile.box))
+                    return true;
+            }
+
+
+            return false;
         }
 
 

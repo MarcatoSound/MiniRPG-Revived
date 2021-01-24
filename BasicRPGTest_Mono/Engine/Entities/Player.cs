@@ -48,6 +48,7 @@ namespace BasicRPGTest_Mono.Engine
                 spawnPoint.Y = rand.Next(32, MapManager.activeMap.heightInPixels / 2 - 32);
             }
             Position = spawnPoint;
+            map = MapManager.activeMap;
 
             boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 24, 32);
             Camera.camPos = new Vector2(Position.X - (Camera.camera.BoundingRectangle.Width / 2), Position.Y - (Camera.camera.BoundingRectangle.Height / 2));

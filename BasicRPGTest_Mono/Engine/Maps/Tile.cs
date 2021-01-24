@@ -208,8 +208,9 @@ namespace RPGEngine
         public void draw(SpriteBatch batch)
         {
             if (!isInstance) return;
-            parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.1f);
-            drawAdjacentTiles(batch);
+            /*parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.1f);
+            drawAdjacentTiles(batch);*/
+            batch.DrawRectangle(box, Color.White);
         }
 
 

@@ -13,6 +13,8 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
         // A collection of tiles and their relative positions
         public Dictionary<Vector2, Tile> tiles;
+        
+        // Eventually we will need decorations to support LAYERS
 
         public Decoration(string name, int weight, Tile tile)
         {
@@ -42,7 +44,7 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
             Vector2 pos;
             Tile tile;
             Vector2 tilePos;
-            TileLayer decoLayer = layers[3]; // Make this more flexible!
+            TileLayer decoLayer = layers[3]; // TODO: Make this more flexible!
 
             foreach (KeyValuePair<Vector2, Tile> pair in tiles)
             {
