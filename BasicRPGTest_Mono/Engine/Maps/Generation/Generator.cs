@@ -53,6 +53,10 @@ namespace BasicRPGTest_Mono.Engine
             TileLayer groundLayer = new TileLayer("ground");
             TileLayer stoneLayer = new TileLayer("stone");
             TileLayer decorations = new TileLayer("decorations");
+            layers.Add(waterLayer);
+            layers.Add(groundLayer);
+            layers.Add(stoneLayer);
+            layers.Add(decorations);
 
             Vector2 decoPos = new Vector2();
 
@@ -80,7 +84,7 @@ namespace BasicRPGTest_Mono.Engine
                         groundLayer.setTile(new Vector2(x, y), new Tile(biome.coastTile, new Vector2(x, y), biome));
                     else if (noise[x, y] >= 0 && noise[x, y] <= 0.5)
                         groundLayer.setTile(new Vector2(x, y), new Tile(biome.groundTile, new Vector2(x, y), biome));
-                    else if (noise [x, y] > 0.5)
+                    else if (noise[x, y] > 0.5)
                         groundLayer.setTile(new Vector2(x, y), new Tile(biome.undergroundTile, new Vector2(x, y), biome));
 
                     // Stone layer
@@ -100,13 +104,10 @@ namespace BasicRPGTest_Mono.Engine
                     if (rand.Next(0, 100) > biome.decoChance) continue;
 
                     Decoration deco = biome.chooseDecoration();
-                    deco.place(decorations, decoPos, biome);
+
+                    deco.place(layers, decoPos, biome);
                 }
             }
-            layers.Add(waterLayer);
-            layers.Add(groundLayer);
-            layers.Add(stoneLayer);
-            layers.Add(decorations);
 
             /*
             for (int x = 0; x < size; x++)

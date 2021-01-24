@@ -63,7 +63,7 @@ namespace BasicRPGTest_Mono.Engine
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
-            spawnTimer.Start();
+            //spawnTimer.Start();
 
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
@@ -108,7 +108,7 @@ namespace BasicRPGTest_Mono.Engine
 
             }
 
-            Save.oldMapStates.Add(name, new Map(this));
+            //Save.oldMapStates.Add(name, new Map(this));
 
         }
 
@@ -397,16 +397,11 @@ namespace BasicRPGTest_Mono.Engine
     
                 parentTile.graphic.draw_Tiles(batch, list);
                 }
-            }
 
-            //batch.End();
-
-            foreach (TileLayer layer in layers)
-            {
                 batch.Begin(transformMatrix: Camera.camera.Transform);
                 foreach (Region region in v_regionsVisible)
                 {
-                    region.draw(batch, layer);
+                    region.draw(batch, tLayer);
                 }
                 batch.End();
             }

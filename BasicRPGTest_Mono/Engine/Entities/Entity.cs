@@ -52,6 +52,7 @@ namespace BasicRPGTest_Mono.Engine
         public bool isColliding(Rectangle box)
         {
             if (MapManager.activeMap == null) return true;
+            // TODO: MUST OPTIMIZE COLLIDABLE CHECKS
             ConcurrentDictionary<int, Rectangle> pairs = MapManager.activeMap.collidables;
             foreach (KeyValuePair<int, Rectangle> pair in pairs)
             {

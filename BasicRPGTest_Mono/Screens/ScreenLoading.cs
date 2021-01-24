@@ -69,7 +69,7 @@ namespace BasicRPGTest_Mono.Screens
             TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2));
             TileManager.add(new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1));
             TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false, 0));
-            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), false, false, 0));
+            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), true, false, 0));
             TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0));
             TileManager.add(new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0));
             TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5));
@@ -84,7 +84,8 @@ namespace BasicRPGTest_Mono.Screens
             biome = new Biome("field", TileManager.getByName("grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Decoration("bush", 10, TileManager.getByName("tree")));
+            biome.decorations.Add(new Decoration("bush", 60, TileManager.getByName("tree")));
+
             decoTiles.Add(new Vector2(0, 0), TileManager.getByName("tree"));
             decoTiles.Add(new Vector2(0, 1), TileManager.getByName("tree"));
             decoTiles.Add(new Vector2(0, 2), TileManager.getByName("tree"));
@@ -94,19 +95,40 @@ namespace BasicRPGTest_Mono.Screens
             decoTiles.Add(new Vector2(2, 0), TileManager.getByName("tree"));
             decoTiles.Add(new Vector2(2, 1), TileManager.getByName("tree"));
             decoTiles.Add(new Vector2(2, 2), TileManager.getByName("tree"));
-            biome.decorations.Add(new Decoration("bush_cluster", 1, decoTiles));
+            biome.decorations.Add(new Decoration("bush_cluster", 10, decoTiles));
+
+            decoTiles = new Dictionary<Vector2, Tile>();
+            decoTiles.Add(new Vector2(0, 0), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(0, 1), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(0, 2), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(0, 3), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(0, 4), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(1, 0), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(1, 4), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(2, 4), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(3, 0), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(3, 4), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(4, 0), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(4, 1), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(4, 2), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(4, 3), TileManager.getByName("stone"));
+            decoTiles.Add(new Vector2(4, 4), TileManager.getByName("stone"));
+            biome.decorations.Add(new Decoration("box", 1, decoTiles));
+
             biome.decoChance = 5;
             BiomeManager.add(biome);
+
 
             biome = new Biome("desert", TileManager.getByName("sand"));
             biome.undergroundTile = TileManager.getByName("hardened_sand");
             biome.coastTile = TileManager.getByName("sand");
             BiomeManager.add(biome);
 
+
             biome = new Biome("swamp", TileManager.getByName("swamp_grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Decoration("bush", 1, TileManager.getByName("tree")));
+            biome.decorations.Add(new Decoration("bush", 30, TileManager.getByName("tree")));
             BiomeManager.add(biome);
         }
 

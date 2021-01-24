@@ -23,6 +23,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
             this.groundTile = groundTile;
 
             decorations = new List<Decoration>();
+            decorations.Add(new Decoration("Blank", 100, tile: null));
             decoChance = 1;
         }
         public Biome(string name, Tile groundTile, List<Decoration> decorations)
@@ -31,6 +32,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
             this.groundTile = groundTile;
 
             this.decorations = decorations;
+            decorations.Add(new Decoration("Blank", 100, tile: null));
             decoChance = 1;
         }
 

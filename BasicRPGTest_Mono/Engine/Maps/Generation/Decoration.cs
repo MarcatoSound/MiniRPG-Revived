@@ -37,20 +37,38 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
             this.tiles = decoration.tiles;
         }
 
-        public void place(TileLayer layer, Vector2 decoPos, Biome biome)
+        public void place(List<TileLayer> layers, Vector2 decoPos, Biome biome)
         {
             Vector2 pos;
             Tile tile;
             Vector2 tilePos;
+            TileLayer decoLayer = layers[3]; // Make this more flexible!
+
             foreach (KeyValuePair<Vector2, Tile> pair in tiles)
             {
                 tile = pair.Value;
+                if (tile == null) continue;
                 pos = pair.Key;
                 tilePos = decoPos;
                 tilePos.X += pos.X;
                 tilePos.Y += pos.Y;
-                layer.setTile(tilePos, new Tile(tile, tilePos, biome));
+
+                Tile targetTile;
+                foreach (TileLayer layer in layers)
+                {
+                    targetTile = layer.getTile(tilePos);
+                    if (targetTile == null) continue;
+                    if (targetTile.isCollidable) goto TILES; 
+                }
+
+                if (decoLayer.tiles.ContainsKey(tilePos)) return;
+
+                decoLayer.setTile(tilePos, new Tile(tile, tilePos, biome));
+
+            TILES:;
+
             }
+
         }
 
     }
