@@ -87,6 +87,7 @@ namespace BasicRPGTest_Mono.Engine
             inventory.setItem(30, ItemManager.getByNamespace("cryorose"));
             inventory.setItem(52, ItemManager.getByNamespace("hollysong"));
             inventory.addItem(ItemManager.getByNamespace("hollysong"));
+            inventory.addItem(ItemManager.getByNamespace("crystalsword"));
             inventory.hotbarPrimary.setItem(0, ItemManager.getByNamespace("hollysong"));
             inventory.hotbarPrimary.setItem(1, ItemManager.getByNamespace("ironroot"));
             inventory.hotbarPrimary.setItem(2, ItemManager.getByNamespace("cryorose"));
@@ -125,7 +126,7 @@ namespace BasicRPGTest_Mono.Engine
             Item mainhand = inventory.hotbarPrimary.hand;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 200, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
+            itemSwing = new ItemSwing(direction, 200, this, mainhand, Position, mainhand.swingStyle, mainhand.swingDist);
             attackTimer = new Timer(200);
             attackTimer.Elapsed += (sender, args) =>
             {
@@ -134,6 +135,45 @@ namespace BasicRPGTest_Mono.Engine
                 attackTimer = null;
             };
             attackTimer.Start();
+
+            // Tool handling
+            if (mainhand.GetType() == typeof(Tool))
+            {
+                Tool tool = (Tool)mainhand;
+
+                Vector2 targetPos = getPlayerTilePosition();
+                Tile tile = null;
+                switch (direction)
+                {
+                    case Direction.Up:
+                        targetPos.Y = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Top);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                    case Direction.Down:
+                        targetPos.Y = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Bottom);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                    case Direction.Left:
+                        targetPos.X = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Left);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                    case Direction.Right:
+                        targetPos.X = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Right);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                }
+                if (tile == null) return;
+                if (tool.damageTypes.ContainsKey(DamageType.Mining))
+                {
+                    double damage;
+                    if (tile.destructable)
+                        damage = tool.damageTypes[DamageType.Mining];
+                    else
+                        damage = 0;
+                    tile.Damage(damage);
+                    System.Diagnostics.Debug.WriteLine($"Dealt {damage} damage to tile at {tile.tilePos}");
+                }
+            }
 
         }
         public void Dash()

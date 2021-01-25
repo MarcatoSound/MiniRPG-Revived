@@ -30,7 +30,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
         public Rectangle hitBox;
         public Rectangle itemBox;
 
-        public ItemSwing(Direction direction, int swingTime, Player player, Item item, SwingStyle style = SwingStyle.Slash, float swingDist = 1.57f)
+        public ItemSwing(Direction direction, int swingTime, Player player, Item item, Vector2 position, SwingStyle style = SwingStyle.Slash, float swingDist = 1.57f)
         {
             this.player = player;
             this.direction = direction;
@@ -45,6 +45,32 @@ namespace BasicRPGTest_Mono.Engine.Entities
             swingTimer = new Timer(swingTime / 7);
             swingTimer.Elapsed += Update;
             swingTimer.Start();
+
+            swingPos = new Vector2(position.X, position.Y);
+            int offset = itemBox.Height - itemBox.Y - 16;
+            if (offset < 0) offset = 0;
+            if (style == SwingStyle.Slash)
+            {
+                switch (direction)
+                {
+                    case Direction.Up:
+                        swingPos.Y -= 36;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y - offset, itemBox.Width, itemBox.Height);
+                        break;
+                    case Direction.Left:
+                        swingPos.X -= 28;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.Y - offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
+                        break;
+                    case Direction.Down:
+                        swingPos.Y += 36;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.X, (int)swingPos.Y - itemBox.Y + offset, itemBox.Width, itemBox.Height);
+                        break;
+                    case Direction.Right:
+                        swingPos.X += 28;
+                        hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
+                        break;
+                }
+            }
         }
 
         public void Update(Object source, ElapsedEventArgs args)

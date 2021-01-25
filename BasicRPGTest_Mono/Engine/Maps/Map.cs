@@ -108,7 +108,7 @@ namespace BasicRPGTest_Mono.Engine
 
             }
 
-            //Save.oldMapStates.Add(name, new Map(this));
+            Save.oldMapStates.Add(name, new Map(this));
 
         }
 
@@ -255,6 +255,23 @@ namespace BasicRPGTest_Mono.Engine
 
             return regions;
 
+        }
+        public TileLayer getTopLayer()
+        {
+            return layers[layers.Count - 1];
+        }
+        public Tile getTopTile(Vector2 tilePos)
+        {
+            List<TileLayer> layers = new List<TileLayer>(this.layers);
+            layers.Reverse();
+            Tile tile = null;
+            foreach (TileLayer layer in layers)
+            {
+                tile = layer.getTile(tilePos);
+                if (tile != null) break;
+            }
+
+            return tile;
         }
 
 
@@ -404,16 +421,17 @@ namespace BasicRPGTest_Mono.Engine
                     batch.DrawRectangle(rect, Color.White);
                 }*/
 
-                /*batch.Begin(transformMatrix: Camera.camera.Transform);
+                batch.Begin(transformMatrix: Camera.camera.Transform);
                 foreach (TileLayer layer in layers)
                 {
                     foreach (Tile tile in layer.tiles.Values)
                     {
+                        if (!tile.isBeingDamaged) continue;
                         tile.draw(batch);
                     }
-                }*/
+                }
 
-                batch.Begin(transformMatrix: Camera.camera.Transform);
+                //batch.Begin(transformMatrix: Camera.camera.Transform);
                 foreach (Region region in v_regionsVisible)
                 {
                     region.draw(batch, tLayer);
@@ -454,7 +472,7 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        private void buildTileCache()
+        public void buildTileCache()
         {
             // Clear Collection
             v_TileCache.Clear();

@@ -7,6 +7,7 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace RPGEngine
 {
@@ -27,6 +28,9 @@ namespace RPGEngine
         public bool isCollidable { get; set; }
         public int zIndex { get; set; }
 
+        public double maxHealth { get; set; }
+        public bool destructable { get; set; }
+
         // Instance variables
         public bool isInstance { get; set; }
         public Tile parent { get; set; }
@@ -38,7 +42,23 @@ namespace RPGEngine
         public Dictionary<TileSide, bool> sides { get; set; }
         public Biome biome { get; set; }
 
-        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1)
+        private double _health;
+        public double health
+        {
+            get { return _health; }
+            set
+            {
+                if (value <= 0)
+                {
+                    Break();
+                }
+                else
+                    _health = value;
+            }
+        }
+        public bool isBeingDamaged;
+
+        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
         {
             id = TileManager.tiles.Count;
             this.name = name;
@@ -46,6 +66,8 @@ namespace RPGEngine
             isCollidable = collidable;
             isInstance = instance;
             sideGraphics = new Dictionary<TileSide, Graphic>();
+            this.maxHealth = maxHP;
+            this.destructable = destructable;
 
             if (texture.Width > dimensions)
             {
@@ -70,6 +92,7 @@ namespace RPGEngine
         // For instantiating an existing tile
         public Tile(Tile tile, Vector2 tilePos, Biome biome)
         {
+
             this.parent = tile;
             this.name = tile.name;
             this.id = tile.id;
@@ -84,6 +107,10 @@ namespace RPGEngine
             sides = new Dictionary<TileSide, bool>();
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
+
+            maxHealth = tile.maxHealth;
+            health = maxHealth;
+            this.destructable = tile.destructable;
 
         }
 
@@ -210,8 +237,33 @@ namespace RPGEngine
             if (!isInstance) return;
             /*parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.1f);
             drawAdjacentTiles(batch);*/
-            batch.DrawRectangle(box, Color.White);
+            batch.DrawRectangle(box, Color.Red);
         }
+
+
+        public void Damage(double dmg)
+        {
+            health -= dmg;
+            // Later for handling coloration or breaking graphic?
+            isBeingDamaged = true;
+            Timer timer = new Timer(500);
+            timer.Elapsed += (sender, args) =>
+            {
+                isBeingDamaged = false;
+                timer.Stop();
+            };
+            timer.Start();
+        }
+        public void Heal(double gain)
+        {
+            health += gain;
+        }
+        public void Break()
+        {
+            layer.clearTile(tilePos);
+            MapManager.activeMap.buildTileCache();
+        }
+
 
 
         public override bool Equals(object obj)

@@ -369,6 +369,12 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return pos;
         }
+        public static int trueCoordToTileCoord(int truePos)
+        {
+            System.Diagnostics.Debug.WriteLine($"TruePos {truePos}");
+            System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
+            return truePos / TileManager.dimensions;
+        }
 
         public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int dimensions = 32)
         {

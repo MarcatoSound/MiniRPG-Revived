@@ -69,11 +69,11 @@ namespace BasicRPGTest_Mono.Screens
             TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2));
             TileManager.add(new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1));
             TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false, 0));
-            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), true, false, 0));
+            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), true, false, 0, 50));
             TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0));
             TileManager.add(new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0));
             TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5));
-            TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
+            TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false, destructable: false));
         }
 
         private void loadBiomes()
@@ -147,6 +147,10 @@ namespace BasicRPGTest_Mono.Screens
             ItemManager.add(new Item("Cryorose", sprite));
             sprite = Content.Load<Texture2D>("iron_root");
             ItemManager.add(new Item("Iron Root", sprite));
+            sprite = Content.Load<Texture2D>("crystal_sword");
+            Tool pickaxe = new Tool("Crystal Sword", sprite, new Rectangle(), 5);
+            pickaxe.damageTypes.Add(DamageType.Mining, 5);
+            ItemManager.add(pickaxe);
         }
 
         private void loadEntities()
