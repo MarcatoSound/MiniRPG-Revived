@@ -141,7 +141,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 Tool tool = (Tool)mainhand;
 
-                Vector2 targetPos = getPlayerTilePosition();
+                Vector2 targetPos = Utility.Util.getTilePosition(Position);
                 Tile tile = null;
                 switch (direction)
                 {

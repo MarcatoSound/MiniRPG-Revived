@@ -67,31 +67,6 @@ namespace BasicRPGTest_Mono.Engine
             return false;
         }
 
-        public List<Tile> getSurroundingTiles(Map map, int radius, Vector2 pos)
-        {
-            List<Tile> tiles = new List<Tile>();
-
-            Vector2 startingPos = new Vector2(TilePosition.X - radius, TilePosition.Y - radius);
-
-            Vector2 targetPos = new Vector2();
-            for (int x = (int)startingPos.X; x < startingPos.X + (radius * 2); x++)
-            {
-                for (int y = (int)startingPos.Y; y < startingPos.Y + (radius * 2); y++)
-                {
-                    foreach (TileLayer layer in map.layers)
-                    {
-                        targetPos.X = x;
-                        targetPos.Y = y;
-                        tiles.Add(layer.getTile(targetPos));
-                    }
-                    //System.Diagnostics.Debug.WriteLine($"Scanned position {targetPos}.");
-                }
-            }
-
-            //System.Diagnostics.Debug.WriteLine($"Collected {tiles.Count} tiles.");
-
-            return tiles;
-        }
 
         public virtual void update()
         {

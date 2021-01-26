@@ -98,10 +98,7 @@ namespace BasicRPGTest_Mono.Engine
 
                     tile.update();
 
-
-                    if (layer.name == "water") continue;
                     if (!tile.isCollidable) continue;
-
                     // Create a collidable box at the following true-map coordinate.
                     collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
                 }
@@ -171,10 +168,6 @@ namespace BasicRPGTest_Mono.Engine
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 1));
         }
 
-        public void Update()
-        {
-
-        }
         public void trySpawn(Object source, ElapsedEventArgs e)
         {
             if (livingEntities.Count >= livingEntityCap) return;
@@ -272,6 +265,95 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             return tile;
+        }
+
+        // Remove Decoration Tile at Position
+        public void removeTile(Vector2 mTilePosition)
+        {
+            foreach (TileLayer layer in layers)
+            {
+
+                /*
+                // For testing purposes...
+                if (layer.tiles.ContainsKey(mTilePosition))
+                {
+                    // Get Tile
+                    tile = layer.tiles[mTilePosition];
+
+                    Utility.Util.myDebug("Layer (" + layer.name + "), Tile Position(" + mTilePosition + ") = " + tile.name);
+                }
+                */
+
+
+                if (layer.name != "decorations") { continue; }
+                // Otherwise...
+
+                // Remove Tile from THIS Layer
+                this.removeTile(layer, mTilePosition);
+
+                break;
+            }
+        }
+
+        // Remove Tile from Layer and Position
+        public bool removeTile(TileLayer mLayer, Vector2 mTilePosition)
+        {
+            Tile tile;
+
+
+            if (!mLayer.tiles.ContainsKey(mTilePosition))
+            {
+                //Utility.Util.myDebug("No Tile on Decorations Layer at position: " + mTilePosition);
+                return false;
+            }
+            // Otherwise...
+
+            // Get Tile
+            tile = mLayer.tiles[mTilePosition];
+
+            // Remove Tile from Map
+            this.removeTile(tile);
+            //Utility.Util.myDebug("Tile REMOVED on Decorations Layer at position: " + mTilePosition);
+
+            return true;
+        }
+
+        // Remove specific Tile from Map (and Caches)
+        public bool removeTile(Tile mTile)
+        {
+            // Remove Tile from Layer
+            TileLayer layer = mTile.layer;
+
+            // If Tile does NOT exist on Map  (return FALSE for Removing sent Tile)
+            if (!layer.tiles.ContainsValue(mTile)) { return false; }
+            // Otherwise...
+
+            layer.clearTile(mTile.tilePos);
+
+            // Remove Tile from Region
+            Region region = regions[mTile.region];
+            region.removeTile(mTile);
+
+            if (this.v_regionsVisible.Contains(region))
+            {
+                // Rebuilds updated Visible Tile Cache
+                buildTileCache();
+            }
+
+
+            /*
+            Dictionary<Tile, List<Vector2>> tileTemplates = tilesCache[mTile.layer];
+            List<Vector2> list = tileTemplates[mTile.parent];
+            list.Remove(mTile.pos);
+
+            if (list.Count < 1)
+            {
+                // Remove TileTemplate from Cache
+                tileTemplates.Remove(mTile.parent);
+            }
+            */
+
+            return true;
         }
 
 

@@ -10,6 +10,7 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
     {
         public string name { get; private set; }
         public int weight;
+        public Rectangle box { get; private set; }
 
         // A collection of tiles and their relative positions
         public Dictionary<Vector2, Tile> tiles;
@@ -23,6 +24,7 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
             tiles = new Dictionary<Vector2, Tile>();
             tiles.Add(Vector2.Zero, tile);
+            box = new Rectangle(0, 0, TileManager.dimensions, TileManager.dimensions);
         }
         public Decoration(string name, int weight, Dictionary<Vector2, Tile> tiles)
         {
@@ -30,6 +32,7 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
             this.weight = weight;
 
             this.tiles = tiles;
+            box = new Rectangle(0, 0, TileManager.dimensions, TileManager.dimensions);
         }
         public Decoration(string name, int weight, Decoration decoration)
         {
@@ -37,6 +40,7 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
             this.weight = weight;
 
             this.tiles = decoration.tiles;
+            box = decoration.box;
         }
 
         public void place(List<TileLayer> layers, Vector2 decoPos, Biome biome)

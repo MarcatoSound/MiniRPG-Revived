@@ -34,6 +34,11 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             this.tiles.Add(tile);
         }
+        public void removeTile(Tile mTile)
+        {
+            // Remove Tile from Region
+            tiles.Remove(mTile);
+        }
 
         public void draw(SpriteBatch batch, TileLayer layer)
         {

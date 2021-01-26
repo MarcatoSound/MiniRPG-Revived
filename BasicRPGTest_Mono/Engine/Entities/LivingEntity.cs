@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BasicRPGTest_Mono.Engine.Utility;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RPGEngine;
 using System;
@@ -289,7 +290,7 @@ namespace BasicRPGTest_Mono.Engine
                 if (box.Intersects(pair.Value))
                     return true;
             }*/
-            List<Tile> tiles = getSurroundingTiles(map, 1, TilePosition);
+            List<Tile> tiles = Util.getSurroundingTiles(map, 1, TilePosition);
             foreach (Tile tile in tiles)
             {
                 if (tile == null) continue;

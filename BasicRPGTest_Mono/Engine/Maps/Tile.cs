@@ -50,7 +50,7 @@ namespace RPGEngine
             {
                 if (value <= 0)
                 {
-                    Break();
+                    Destroy();
                 }
                 else
                     _health = value;
@@ -258,10 +258,18 @@ namespace RPGEngine
         {
             health += gain;
         }
-        public void Break()
+        public void Destroy()
         {
-            layer.clearTile(tilePos);
-            MapManager.activeMap.buildTileCache();
+            map.removeTile(this);
+
+            List<Tile> surroundings = Util.getSurroundingTiles(map, 2, tilePos);
+            foreach (Tile tile in surroundings)
+            {
+                if (tile == null) continue;
+                if (tile.sideGraphics.Count == 0) continue;
+                tile.update();
+            }
+            
         }
 
 
