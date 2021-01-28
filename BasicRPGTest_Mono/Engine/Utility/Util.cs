@@ -372,8 +372,8 @@ namespace BasicRPGTest_Mono.Engine.Utility
         }
         public static int trueCoordToTileCoord(int truePos)
         {
-            System.Diagnostics.Debug.WriteLine($"TruePos {truePos}");
-            System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
+            //System.Diagnostics.Debug.WriteLine($"TruePos {truePos}");
+            //System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
             return truePos / TileManager.dimensions;
         }
 
@@ -562,9 +562,9 @@ namespace BasicRPGTest_Mono.Engine.Utility
             Vector2 startingPos = new Vector2(pos.X - radius, pos.Y - radius);
 
             Vector2 targetPos = new Vector2();
-            for (int x = (int)startingPos.X; x < startingPos.X + (radius * 2); x++)
+            for (int x = (int)startingPos.X; x < startingPos.X + 1 +(radius * 2); x++)
             {
-                for (int y = (int)startingPos.Y; y < startingPos.Y + (radius * 2); y++)
+                for (int y = (int)startingPos.Y; y < startingPos.Y + 1 + (radius * 2); y++)
                 {
                     foreach (TileLayer layer in map.layers)
                     {

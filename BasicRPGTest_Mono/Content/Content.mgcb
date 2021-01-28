@@ -38,6 +38,13 @@
 /processorParam:TextureFormat=Color
 /build:arctic_fox_tail.png
 
+#begin crit.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:crit.spritefont
+
 #begin cryorose.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -86,6 +93,13 @@
 /processorParam:TextureFormat=Color
 /build:dirt.png
 
+#begin dmg.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:dmg.spritefont
+
 #begin dragontail.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -133,13 +147,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:enemy3.png
-
-#begin File.spritefont
-/importer:FontDescriptionImporter
-/processor:FontDescriptionProcessor
-/processorParam:PremultiplyAlpha=True
-/processorParam:TextureFormat=Compressed
-/build:File.spritefont;arial.spritefont
 
 #begin grass.png
 /importer:TextureImporter

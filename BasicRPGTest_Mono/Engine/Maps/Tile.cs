@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
@@ -57,6 +58,8 @@ namespace RPGEngine
             }
         }
         public bool isBeingDamaged;
+        public PopupText dmgIndicator { get; set; }
+
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
         {
@@ -180,8 +183,10 @@ namespace RPGEngine
             Graphic graphic;
             Vector2 checkPos;
             Tile checkTile;
+            bool isCorner;
             foreach (TileSide side in Enum.GetValues(typeof(TileSide)))
             {
+                isCorner = false;
                 graphic = getSideGraphic(side);
                 if (graphic == null) continue;
                 checkPos = tilePos;
@@ -190,6 +195,7 @@ namespace RPGEngine
                     case TileSide.NorthWest:
                         checkPos.X -= 1;
                         checkPos.Y -= 1;
+                        isCorner = true;
                         break;
                     case TileSide.North:
                         checkPos.Y -= 1;
@@ -197,6 +203,7 @@ namespace RPGEngine
                     case TileSide.NorthEast:
                         checkPos.X += 1;
                         checkPos.Y -= 1;
+                        isCorner = true;
                         break;
                     case TileSide.West:
                         checkPos.X -= 1;
@@ -207,6 +214,7 @@ namespace RPGEngine
                     case TileSide.SouthWest:
                         checkPos.X -= 1;
                         checkPos.Y += 1;
+                        isCorner = true;
                         break;
                     case TileSide.South:
                         checkPos.Y += 1;
@@ -214,18 +222,42 @@ namespace RPGEngine
                     case TileSide.SouthEast:
                         checkPos.X += 1;
                         checkPos.Y += 1;
+                        isCorner = true;
                         break;
                 }
                 checkTile = layer.getTile(checkPos);
                 if (checkTile == null || checkTile.zIndex < zIndex)
                 {
-                    sides.Remove(side);
-                    sides.Add(side, true);
+                    if (isCorner)
+                    {
+                        Tile north = layer.getTile(checkPos.X, checkPos.Y - 1);
+                        Tile south = layer.getTile(checkPos.X, checkPos.Y + 1);
+                        Tile east = layer.getTile(checkPos.X - 1, checkPos.Y);
+                        Tile west = layer.getTile(checkPos.X + 1, checkPos.Y);
+                        if ((north == null || north.zIndex < zIndex) && (south == null || south.zIndex < zIndex) && (east == null || east.zIndex < zIndex) && (west == null || west.zIndex < zIndex))
+                        {
+                            sides.Remove(side);
+                            sides.Add(side, true);
+                        }
+
+                    } 
+                    else
+                    {
+                        sides.Remove(side);
+                        sides.Add(side, true);
+                    }
                 }
                 else
                 {
-                    sides.Remove(side);
-                    sides.Add(side, false);
+                    if (isCorner)
+                    {
+
+                    }
+                    else
+                    {
+                        sides.Remove(side);
+                        sides.Add(side, false);
+                    }
                 }
             }
 
@@ -253,6 +285,8 @@ namespace RPGEngine
                 timer.Stop();
             };
             timer.Start();
+
+            showDamageText(dmg);
         }
         public void Heal(double gain)
         {
@@ -262,7 +296,14 @@ namespace RPGEngine
         {
             map.removeTile(this);
 
-            List<Tile> surroundings = Util.getSurroundingTiles(map, 2, tilePos);
+            if (this.name == "grass")
+            {
+                Tile replacement = new Tile(TileManager.getByName("dirt"), tilePos, biome);
+                replacement.layer = layer;
+                map.addTile(replacement);
+            }
+
+            List<Tile> surroundings = Util.getSurroundingTiles(map, 1, tilePos);
             foreach (Tile tile in surroundings)
             {
                 if (tile == null) continue;
@@ -272,6 +313,19 @@ namespace RPGEngine
             
         }
 
+        public void showDamageText(double dmg)
+        {
+            // TODO: Implement check for critical hit.
+            Vector2 stringPos = new Vector2(drawPos.X, drawPos.Y);
+            Vector2 stringSize = Core.dmgFont.MeasureString(dmg.ToString());
+            stringPos.X -= stringSize.X / 2;
+            stringPos.Y -= 20;
+
+            Random rand = new Random();
+            stringPos.X += rand.Next(-5, 5);
+
+            new PopupText(dmg.ToString(), Core.dmgFont, stringPos, Color.Crimson, 500);
+        }
 
 
         public override bool Equals(object obj)

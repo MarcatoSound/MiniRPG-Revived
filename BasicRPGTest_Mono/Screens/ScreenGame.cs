@@ -36,8 +36,6 @@ namespace BasicRPGTest_Mono
         public Player player;
         string worldName;
 
-        private SpriteFont font;
-
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -65,7 +63,8 @@ namespace BasicRPGTest_Mono
         {
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            font = Content.Load<SpriteFont>("arial");
+            Core.dmgFont = Content.Load<SpriteFont>("dmg");
+            Core.critFont = Content.Load<SpriteFont>("crit");
 
             Game.renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
 
@@ -340,7 +339,7 @@ namespace BasicRPGTest_Mono
             //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
 
@@ -365,7 +364,14 @@ namespace BasicRPGTest_Mono
                 GuiWindowManager.activeWindow.Draw(_spriteBatch);
             }
 
-
+            // Draw active popup texts
+            _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, blendState: BlendState.NonPremultiplied);
+            List<PopupText> popups = new List<PopupText>(Core.popupTexts);
+            foreach (PopupText popup in popups)
+            {
+                popup.draw(_spriteBatch);
+            }
+            _spriteBatch.End();
 
             // End Code Timer for speed test
             //codeTimer.endTimer();

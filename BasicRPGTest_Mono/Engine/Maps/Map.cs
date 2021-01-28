@@ -26,6 +26,8 @@ namespace BasicRPGTest_Mono.Engine
         public int height { get; set; }
         public int widthInPixels { get; set; }
         public int heightInPixels { get; set; }
+        public int regionTilesWide { get; set; } = 8;
+        public int regionTilesHigh { get; set; } = 8;
 
         public ConcurrentDictionary<int, Rectangle> collidables { get; set; }
 
@@ -352,6 +354,68 @@ namespace BasicRPGTest_Mono.Engine
                 tileTemplates.Remove(mTile.parent);
             }
             */
+
+            return true;
+        }
+        // Adds a new Tile to the Map
+        public bool addTile(Tile mTile)
+        {
+
+            Vector2 pos = mTile.pos;
+            Region region;
+
+
+            // If NO Layer given
+            if (mTile.layer == null)
+            {
+                // Default to Layer 3 (decorations layer)
+                //mTile.layer = layers[3];
+
+                // OR
+
+                // Do NOT Add Tile to Map. Tile had no Layer information.
+                Utility.Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). Tile had no assigned Layer.");
+                return false;
+            }
+            // Otherwise continue...
+
+            // Check if Tile already exists at same Position and Layer
+            if (mTile.layer.tiles.ContainsKey(mTile.pos))
+            {
+                // Do NOT Add Tile to Map. A Tile already exists at that Position
+                Utility.Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
+                return false;
+            }
+            // Otherwise continue...
+
+
+            mTile.map = this;
+
+            // If didn't work... Return FALSE.
+            if (!mTile.layer.addTile(mTile)) { return false; }
+            // Otherwise...
+
+            // Add Tile to proper Region
+            // Figure out matching Region (based on Tile Position)
+
+            Vector2 regionPos;
+
+            // Calculate what Region Position the Tile would fall into
+            regionPos.X = (int)(mTile.tilePos.X / regionTilesWide);
+            regionPos.Y = (int)(mTile.tilePos.Y / regionTilesHigh);
+
+            // Get that Region
+            region = regions[regionPos];
+
+            // Add mTile to Region
+            region.tiles.Add(mTile);
+            // Assign Tile's Region value to this Region
+            mTile.region = regionPos;
+
+
+            // Update Tile rendering Cache
+            // Update Visible Tiles if Tile belongs to any Visible Region
+            if (v_regionsVisible.Contains(region)) { buildTileCache(); }
 
             return true;
         }

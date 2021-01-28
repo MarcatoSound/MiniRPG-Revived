@@ -31,9 +31,32 @@ namespace BasicRPGTest_Mono.Engine.Maps
             else
                 return null;
         }
+        public Tile getTile(float x, float y)
+        {
+            return getTile(new Vector2(x, y));
+        }
         public void clearTile(Vector2 pos)
         {
             tiles.Remove(pos);
+        }
+
+        // Add Tile to Layer
+        public bool addTile(Tile mTile)
+        {
+            // Check if Tile already exists at same Position and Layer
+            if (tiles.ContainsKey(mTile.pos))
+            {
+                // Do NOT Add Tile to Map. A Tile already exists at that Position
+                Utility.Util.myDebug(true, "TileLayer.cs addTile(Tile)", "Could NOT Add Tile. A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
+                return false;
+            }
+            // Otherwise...
+
+            tiles.Add(mTile.pos, mTile);
+
+            //this.childTiles[(int)mTile.pos.X, (int)mTile.pos.Y] = mTile;
+
+            return true;
         }
     }
 }
