@@ -7,8 +7,15 @@ namespace BasicRPGTest_Mono.Engine.Inventories
 {
     public class PlayerInventory : Inventory
     {
-        public Item mainhand;
-        public Item offhand;
+        public Item mainhand
+        {
+            get { return hotbarPrimary.getItem(hotbarPrimary.selectedSlot); }
+        }
+        public Item offhand
+        {
+            get { return hotbarSecondary.getItem(hotbarSecondary.selectedSlot); }
+        }
+
         public Hotbar hotbarPrimary;
         public Hotbar hotbarSecondary;
 

@@ -1,4 +1,5 @@
-﻿using BasicRPGTest_Mono.Engine.Utility;
+﻿using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RPGEngine;
@@ -25,7 +26,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public Timer immunityTimer;
         public bool isImmunity;
-        public int immunityTime = 150;
+        public int immunityTime = 200;
 
         public Timer knockbackTimer { get; set; }
         public bool isGettingKnockedBack { get; set; }
@@ -305,7 +306,7 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public virtual void hurt(Vector2 sourcePos)
+        public virtual void hurt(double dmg, Vector2 sourcePos)
         {
             if (isImmunity) return;
             isImmunity = true;
@@ -323,6 +324,20 @@ namespace BasicRPGTest_Mono.Engine
             immunityTimer.Start();
 
             knockback(sourcePos);
+            showDamageText(dmg);
+        }
+        public void showDamageText(double dmg)
+        {
+            // TODO: Implement check for critical hit.
+            Vector2 stringPos = new Vector2(Position.X, Position.Y);
+            Vector2 stringSize = Core.dmgFont.MeasureString(dmg.ToString());
+            stringPos.X -= stringSize.X / 2;
+            stringPos.Y -= 20;
+
+            Random rand = new Random();
+            stringPos.X += rand.Next(-5, 5);
+
+            new MovingText(dmg.ToString(), Core.dmgFont, stringPos, new TextColor(Color.Crimson), 500);
         }
 
         public virtual void knockback(Vector2 sourcePos)

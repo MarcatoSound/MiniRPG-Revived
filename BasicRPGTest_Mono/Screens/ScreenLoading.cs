@@ -136,7 +136,7 @@ namespace BasicRPGTest_Mono.Screens
         {
             Texture2D sprite;
             sprite = Content.Load<Texture2D>("hollysong");
-            ItemManager.add(new Tool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 10, swingDist: 1.57f));
+            ItemManager.add(new Tool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 20, swingDist: 1.57f));
             sprite = Content.Load<Texture2D>("arctic_fox_tail");
             ItemManager.add(new Item("Arctic Fox Tail", sprite));
             sprite = Content.Load<Texture2D>("unicorn_horn");

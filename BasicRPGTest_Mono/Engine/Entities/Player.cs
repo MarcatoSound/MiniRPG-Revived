@@ -299,10 +299,10 @@ namespace BasicRPGTest_Mono.Engine
             foreach (LivingEntity entity in entities)
             {
                 if (itemSwing != null && itemSwing.hitBox.Intersects(entity.boundingBox) && !entity.isImmunity)
-                    entity.hurt(Position);
+                    entity.hurt(inventory.mainhand.damage, Position);
 
                 if (boundingBox.Intersects(entity.boundingBox) && !entity.isImmunity)
-                    hurt(entity.CenteredPosition);
+                    hurt(inventory.mainhand.damage, entity.CenteredPosition);
             }
 
             var kstate = Keyboard.GetState();
@@ -404,7 +404,7 @@ namespace BasicRPGTest_Mono.Engine
             move();
 
         }
-        public override void hurt(Vector2 sourcePos)
+        public override void hurt(double dmg, Vector2 sourcePos)
         {
             if (isImmunity) return;
             isImmunity = true;
@@ -422,6 +422,7 @@ namespace BasicRPGTest_Mono.Engine
             immunityTimer.Start();
 
             knockback(sourcePos);
+            showDamageText(dmg);
         }
         public override void knockback(Vector2 sourcePos)
         {
