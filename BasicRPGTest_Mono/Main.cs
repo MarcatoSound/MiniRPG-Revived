@@ -1,29 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using MonoGame.Extended;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
-using MonoGame.Extended.ViewportAdapters;
-using System;
-using System.Collections.Generic;
-using RPGEngine;
-using System.IO;
-using System.Xml.Serialization;
 using BasicRPGTest_Mono.Engine;
 using MonoGame.Extended.Screens;
-using MonoGame.Extended.Screens.Transitions;
 using MonoGame.Extended.Input.InputListeners;
 using BasicRPGTest_Mono.Screens;
 using BasicRPGTest_Mono.Engine.Utility;
-using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Items;
-using SharpNoise.Modules;
-using SharpNoise.Utilities.Imaging;
-using SharpNoise.Builders;
-using System.Drawing.Imaging;
-using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 
 namespace BasicRPGTest_Mono
 {
@@ -92,72 +77,9 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        Random seedGenerator = new Random();
-                        int seed = seedGenerator.Next(0, 9999999);
+                        new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
 
-                        Cell gen1 = new Cell();
-                        gen1.Seed = seed;
-                        gen1.Frequency = 0.015;
-                        gen1.Type = Cell.CellType.Minkowsky;
-
-                        //gen.Type = Cell.CellType.Manhattan;
-
-                        /*Cell gen2 = new Cell();
-                        gen2.Seed = seed;
-                        gen2.Frequency = 0.04;
-                        gen2.Displacement = 0.2;
-                        gen2.Type = Cell.CellType.Minkowsky;
-
-                        Add mod1 = new Add();
-                        mod1.Source0 = gen1;
-                        mod1.Source1 = gen2;
-
-                        ScaleBias mod2 = new ScaleBias();
-                        mod2.Source0 = mod1;
-                        mod2.Bias = 0.2;
-                        mod2.Scale = 0.68;*/
-
-                        PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
-                        builder.SourceModule = gen1;
-                        builder.SetBounds(0, 512, 0, 512);
-                        SharpNoise.NoiseMap map = new SharpNoise.NoiseMap(512, 512);
-                        builder.DestNoiseMap = map;
-                        builder.SetDestSize(512, 512);
-                        builder.Build();
-
-                        Image img = new Image();
-                        ImageRenderer renderer = new ImageRenderer();
-                        renderer.DestinationImage = img;
-                        renderer.SourceNoiseMap = map;
-                        renderer.BuildGrayscaleGradient();
-                        renderer.Render();
-
-                        img.SaveGdiBitmap("noise.png", ImageFormat.Png);
-
-                        /*Random seedGenerator = new Random();
-                        int seed = seedGenerator.Next(0, 9999999);
-                        System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
-                        Perlin gen = new Perlin();
-                        gen.Seed = seed;
-                        gen.Frequency = 0.01;
-                        gen.Persistence = 0.5;
-                        gen.Lacunarity = 2.25;
-                        gen.OctaveCount = 4;
-
-                        ScaleBias mod = new ScaleBias();
-                        mod.Source0 = gen;
-                        mod.Bias = 0.2;
-                        mod.Scale = 0.68;
-
-                        PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
-                        builder.SourceModule = mod;
-                        builder.SetBounds(0, 512, 0, 512);
-                        SharpNoise.NoiseMap map = new SharpNoise.NoiseMap(512, 512);
-                        builder.DestNoiseMap = map;
-                        builder.SetDestSize(512, 512);
-                        builder.Build();
-
-
+                        /*
                         Image img = new Image();
                         ImageRenderer renderer = new ImageRenderer();
                         renderer.DestinationImage = img;

@@ -1,5 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
@@ -324,7 +325,7 @@ namespace RPGEngine
             Random rand = new Random();
             stringPos.X += rand.Next(-5, 5);
 
-            new PopupText(dmg.ToString(), Core.dmgFont, stringPos, Color.Crimson, 500);
+            new MovingText(dmg.ToString(), Core.dmgFont, stringPos, new TextColor(Color.Crimson), 500);
         }
 
 

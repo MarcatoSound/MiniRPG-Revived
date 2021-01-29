@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using BasicRPGTest_Mono.Engine;
-using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
@@ -11,16 +9,9 @@ using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Screens;
-using MonoGame.Extended.Screens.Transitions;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
-using MonoGame.Extended.ViewportAdapters;
 using RPGEngine;
-using SharpNoise.Builders;
-using SharpNoise.Modules;
 using SharpNoise.Utilities.Imaging;
 
 namespace BasicRPGTest_Mono
@@ -44,6 +35,8 @@ namespace BasicRPGTest_Mono
         private Rectangle cameraRectangle = new Rectangle();
 
         private bool v_NotNewDraw;
+
+        private Texture2D cloudOverlay;
 
 
         //====================================================================================
@@ -85,6 +78,7 @@ namespace BasicRPGTest_Mono
             loadHud();
 
             Texture2D texture;
+            cloudOverlay = Content.Load<Texture2D>("cloud_overlay");
 
             texture = Content.Load<Texture2D>("player_spriteset");
             player = new Player(texture, _graphics);
@@ -337,6 +331,10 @@ namespace BasicRPGTest_Mono
             MapManager.activeMap.DrawVisibleMapCache(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
             //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
+
+            _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, samplerState: SamplerState.PointClamp);
+            _spriteBatch.Draw(cloudOverlay, Vector2.Zero, null, Microsoft.Xna.Framework.Color.White, 0, Vector2.Zero, 10, SpriteEffects.None, 0);
+            _spriteBatch.End();
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);

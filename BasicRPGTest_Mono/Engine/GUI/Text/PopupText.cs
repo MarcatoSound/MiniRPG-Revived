@@ -4,28 +4,31 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 
 namespace BasicRPGTest_Mono.Engine.GUI
 {
     public class PopupText : IDisposable
     {
         public string text { get; set; }
-        public Color color;
+        public TextColor textColor;
         public SpriteFont font { get; set; }
         public Vector2 pos;
         public int duration { get; set; }
         public Timer timer { get; set; }
 
         public int alpha { get; set; }
+        public int alphaRate { get; set; }
 
-        public PopupText(string text, SpriteFont font, Vector2 startPos, Color color, int duration)
+        public PopupText(string text, SpriteFont font, Vector2 startPos, TextColor textColor, int duration)
         {
             this.text = text;
             this.font = font;
             this.pos = startPos;
-            this.color = color;
+            this.textColor = textColor;
             this.duration = duration;
             this.alpha = 512;
+            this.alphaRate = Convert.ToInt32(((double)this.alpha / (double)duration) * 20);
 
             Core.popupTexts.Add(this);
             timer = new Timer(duration);
@@ -36,24 +39,24 @@ namespace BasicRPGTest_Mono.Engine.GUI
                 Dispose();
             };
             timer.Start();
-
         }
 
-        public void draw(SpriteBatch batch)
+        public virtual void draw(SpriteBatch batch)
         {
-            batch.DrawString(font, text, pos, color);
+            textColor.update();
 
-            if (alpha < 256 && alpha >= 0)
+            if (alpha < 256)
             {
-                color.A = (byte)alpha;
+                textColor.color.A = (byte)alpha;
             }
-            alpha -= 20;
-            pos.Y -= 0.65f;
+            alpha = Math.Max(alpha - alphaRate, 0);
+
+            batch.DrawString(font, text, pos, textColor);
         }
 
         public void Dispose()
         {
-
+            textColor.Dispose();
         }
     }
 }
