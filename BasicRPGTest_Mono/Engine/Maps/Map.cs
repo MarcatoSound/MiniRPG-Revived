@@ -546,6 +546,7 @@ namespace BasicRPGTest_Mono.Engine
             //batch.Begin(transformMatrix: Camera.camera.Transform);
 
             // Go through each CachedTiles Layer
+            batch.Begin(transformMatrix: Camera.camera.Transform);
             foreach (TileLayer tLayer in layers)
             {
                 Dictionary<string, List<Vector2>> templateList = v_TileCache[tLayer.name];
@@ -567,14 +568,10 @@ namespace BasicRPGTest_Mono.Engine
                     batch.DrawRectangle(rect, Color.White);
                 }*/
 
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                foreach (TileLayer layer in layers)
+                foreach (Tile tile in tLayer.tiles.Values)
                 {
-                    foreach (Tile tile in layer.tiles.Values)
-                    {
-                        if (!tile.isBeingDamaged) continue;
-                        tile.draw(batch);
-                    }
+                    if (!tile.isBeingDamaged) continue;
+                    tile.draw(batch);
                 }
 
                 //batch.Begin(transformMatrix: Camera.camera.Transform);
@@ -582,8 +579,8 @@ namespace BasicRPGTest_Mono.Engine
                 {
                     region.draw(batch, tLayer);
                 }
-                batch.End();
             }
+            batch.End();
 
         }
 

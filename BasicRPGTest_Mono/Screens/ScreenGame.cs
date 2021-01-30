@@ -333,7 +333,7 @@ namespace BasicRPGTest_Mono
             //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
             _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, samplerState: SamplerState.PointClamp);
-            _spriteBatch.Draw(cloudOverlay, Vector2.Zero, null, Microsoft.Xna.Framework.Color.White, 0, Vector2.Zero, 11, SpriteEffects.None, 0);
+            _spriteBatch.Draw(cloudOverlay, Vector2.Zero, null, Microsoft.Xna.Framework.Color.White, 0, Vector2.Zero, 16, SpriteEffects.None, 0);
             _spriteBatch.End();
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -367,6 +367,7 @@ namespace BasicRPGTest_Mono
             List<PopupText> popups = new List<PopupText>(Core.popupTexts);
             foreach (PopupText popup in popups)
             {
+                if (popup == null) continue;
                 popup.draw(_spriteBatch);
             }
             _spriteBatch.End();

@@ -31,6 +31,7 @@ namespace BasicRPGTest_Mono.Engine
         public Timer knockbackTimer { get; set; }
         public bool isGettingKnockedBack { get; set; }
         public float kbResist = 0f;
+        public double damage { get; set; } = 5;
 
         public Map map;
 

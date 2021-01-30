@@ -302,7 +302,7 @@ namespace BasicRPGTest_Mono.Engine
                     entity.hurt(inventory.mainhand.damage, Position);
 
                 if (boundingBox.Intersects(entity.boundingBox) && !entity.isImmunity)
-                    hurt(inventory.mainhand.damage, entity.CenteredPosition);
+                    hurt(entity.damage, entity.CenteredPosition);
             }
 
             var kstate = Keyboard.GetState();

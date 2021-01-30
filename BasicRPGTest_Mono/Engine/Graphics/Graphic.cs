@@ -103,44 +103,20 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
-        public virtual void draw_Tiles(SpriteBatch spriteBatch, List<Vector2> locations, bool newBatch = true)
+        public virtual void draw_Tiles(SpriteBatch spriteBatch, List<Vector2> locations)
         {
-            draw_Tiles(spriteBatch, locations, Color.White, newBatch);
+            draw_Tiles(spriteBatch, locations, Color.White);
         }
 
 
-        public virtual void draw_Tiles(SpriteBatch spriteBatch, List<Vector2> locations, Color tintColor, bool newBatch = true)
+        public virtual void draw_Tiles(SpriteBatch spriteBatch, List<Vector2> locations, Color tintColor)
         {
-            // Slightly more efficient because one less IF check
-            if (!newBatch)
-            {
-                foreach (Vector2 location in locations)
-                {
-                    spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-                }
-            }
-            else
-            {
-                spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
 
-                foreach (Vector2 location in locations)
-                {
-                    spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-                }
-
-                spriteBatch.End();
+            foreach (Vector2 location in locations)
+            {
+                spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
             }
 
-            /*
-            if (newBatch)
-                spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
-
-            //spriteBatch.Draw(texture, location, null, tintColor, 0f, new Vector2(texture.Width / 2, texture.Height / 2), 1f, SpriteEffects.None, 0f);
-            spriteBatch.Draw(texture, location, null, tintColor, 0f, v_Origin, 1f, SpriteEffects.None, 0f);
-
-            if (newBatch)
-                spriteBatch.End();
-            */
         }
 
 
