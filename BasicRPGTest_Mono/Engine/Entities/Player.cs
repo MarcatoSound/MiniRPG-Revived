@@ -459,18 +459,15 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void draw(SpriteBatch batch)
         {
-            batch.Begin(transformMatrix: Camera.camera.Transform);
             Vector2 screenPos = Position;
-            graphic.draw(batch, screenPos, tintColor, false);
+            graphic.draw(batch, screenPos, tintColor);
 
             batch.DrawRectangle(boundingBox, Color.LightGray);
-            batch.End();
 
             if (itemSwing != null)
             {
                 itemSwing.Draw(batch, Position);
             }
-
         }
 
     }

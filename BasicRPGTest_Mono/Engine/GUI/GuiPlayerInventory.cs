@@ -300,7 +300,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                 MouseState mState = Mouse.GetState();
                 Vector2 mousePos = new Vector2(mState.X - (graphic.texture.Width / 2), mState.Y - (graphic.texture.Height / 2));
                 float scale = 32.0f / graphic.texture.Width;
-                graphic.draw(batch, mousePos, 0f, Vector2.Zero, scale, false);
+                graphic.draw(batch, mousePos, 0f, Vector2.Zero, scale);
             }
 
             batch.End();

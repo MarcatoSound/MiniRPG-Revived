@@ -42,6 +42,7 @@ namespace RPGEngine
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
+        public Texture2D edgesSum;
         public Biome biome { get; set; }
 
         private double _health;
@@ -170,7 +171,7 @@ namespace RPGEngine
                         break;
                 }
 
-                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
+                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
             }
 

@@ -144,9 +144,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                         hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                         break;
                 }
-                batch.Begin(transformMatrix: Camera.camera.Transform);
                 batch.DrawRectangle(hitBox, Color.White);
-                batch.End();
 
                 angle -= rotation;
 
@@ -186,9 +184,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                         hitBox = new Rectangle((int)swingPos.X - itemBox.Y + offset, (int)swingPos.Y - itemBox.X, itemBox.Width - (itemBox.Width - itemBox.Height), itemBox.Height + (itemBox.Width - itemBox.Height));
                         break;
                 }
-                batch.Begin(transformMatrix: Camera.camera.Transform);
                 batch.DrawRectangle(hitBox, Color.White);
-                batch.End();
 
                 graphic.draw(batch, new Vector2(swingPos.X + modx, swingPos.Y + mody), angle, origin);
             }

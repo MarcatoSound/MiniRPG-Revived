@@ -76,9 +76,6 @@ namespace BasicRPGTest_Mono.Engine
             if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
             graphic.draw(batch, Position, tintColor);
 
-            batch.Begin(transformMatrix: Camera.camera.Transform);
-            batch.DrawRectangle(new Rectangle((int)CenteredPosition.X, (int)CenteredPosition.Y, 5, 5), Color.AliceBlue);
-            batch.End();
         }
 
 

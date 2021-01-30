@@ -568,11 +568,11 @@ namespace BasicRPGTest_Mono.Engine
                     batch.DrawRectangle(rect, Color.White);
                 }*/
 
-                foreach (Tile tile in tLayer.tiles.Values)
+                /*foreach (Tile tile in tLayer.tiles.Values)
                 {
                     if (!tile.isBeingDamaged) continue;
                     tile.draw(batch);
-                }
+                }*/
 
                 //batch.Begin(transformMatrix: Camera.camera.Transform);
                 foreach (Region region in v_regionsVisible)

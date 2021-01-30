@@ -307,7 +307,7 @@ namespace BasicRPGTest_Mono
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
 
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
             //GraphicsDevice.SetRenderTarget(Game.renderTarget);
 
@@ -334,11 +334,6 @@ namespace BasicRPGTest_Mono
 
             _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, samplerState: SamplerState.PointClamp);
             _spriteBatch.Draw(cloudOverlay, Vector2.Zero, null, Microsoft.Xna.Framework.Color.White, 0, Vector2.Zero, 16, SpriteEffects.None, 0);
-            _spriteBatch.End();
-
-            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
-            _spriteBatch.End();
 
 
             //return;  // Stop Function Here (for testing)
@@ -348,12 +343,12 @@ namespace BasicRPGTest_Mono
             foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);
-                _spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
-                _spriteBatch.DrawRectangle(entity.boundingBox, Microsoft.Xna.Framework.Color.White);
-                _spriteBatch.End();
             }
 
+
             player.draw(_spriteBatch);
+
+            _spriteBatch.End();
 
             HudManager.Draw(_spriteBatch);
 
@@ -370,6 +365,11 @@ namespace BasicRPGTest_Mono
                 if (popup == null) continue;
                 popup.draw(_spriteBatch);
             }
+            _spriteBatch.End();
+
+
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             // End Code Timer for speed test

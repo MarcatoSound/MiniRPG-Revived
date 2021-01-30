@@ -24,7 +24,7 @@ namespace BasicRPGTest_Mono.Engine.Items
 
             if (item == null) return;
             float scale = (float)box.Width / item.graphic.texture.Width;
-            item.graphic.draw(batch, new Vector2(box.X, box.Y), 0f, Vector2.Zero, scale, false);
+            item.graphic.draw(batch, new Vector2(box.X, box.Y), 0f, Vector2.Zero, scale);
             batch.DrawRectangle(box, Color.White);
 
         }

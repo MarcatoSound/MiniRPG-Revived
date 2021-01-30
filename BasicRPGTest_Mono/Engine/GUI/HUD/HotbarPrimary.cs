@@ -66,7 +66,7 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
                     scale = 56.0f / item.graphic.texture.Width;
                     itemPos.X = pos.X + 4;
                     itemPos.Y = pos.Y + 4;
-                    item.graphic.draw(batch, itemPos, 0f, Vector2.Zero, scale, false);
+                    item.graphic.draw(batch, itemPos, 0f, Vector2.Zero, scale);
                 }
 
                 pos.X += slotDist;
