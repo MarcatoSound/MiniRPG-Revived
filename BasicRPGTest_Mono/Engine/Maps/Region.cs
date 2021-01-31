@@ -47,8 +47,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
                 if (tile.layer == layer)
                     tile.drawAdjacentTiles(batch);
 
-                if (tile.isBeingDamaged)
-                    tile.draw(batch);
+                tile.draw(batch);
 
             }
             //batch.DrawRectangle(box, Color.White);

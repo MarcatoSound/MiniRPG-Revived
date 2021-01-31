@@ -261,7 +261,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
         {
             //batch.Draw(texture, position, Color.White);
 
-            batch.Begin(samplerState: SamplerState.PointClamp);
+            //batch.Begin(samplerState: SamplerState.PointClamp);
 
             batch.Draw(background, position, Color.White);
 
@@ -303,7 +303,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                 graphic.draw(batch, mousePos, 0f, Vector2.Zero, scale);
             }
 
-            batch.End();
+            //batch.End();
         }
 
     }

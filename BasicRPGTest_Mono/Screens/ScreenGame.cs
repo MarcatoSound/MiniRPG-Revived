@@ -299,8 +299,8 @@ namespace BasicRPGTest_Mono
         {
 
             // Start Code Timer. Can be used for testing different sections of the code
-            //Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
-            //codeTimer.startTimer();
+            Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+            codeTimer.startTimer();
 
 
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -330,9 +330,9 @@ namespace BasicRPGTest_Mono
 
             MapManager.activeMap.DrawVisibleMapCache(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
-            //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
+            //MapManager.activeMap.DrawVisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
-            _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, samplerState: SamplerState.PointClamp);
+            _spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
             _spriteBatch.Draw(cloudOverlay, Vector2.Zero, null, Microsoft.Xna.Framework.Color.White, 0, Vector2.Zero, 16, SpriteEffects.None, 0);
 
 
@@ -350,12 +350,17 @@ namespace BasicRPGTest_Mono
 
             _spriteBatch.End();
 
+
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+
             HudManager.Draw(_spriteBatch);
 
             if (GuiWindowManager.activeWindow != null)
             {
                 GuiWindowManager.activeWindow.Draw(_spriteBatch);
             }
+
+            _spriteBatch.End();
 
             // Draw active popup texts
             _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, blendState: BlendState.NonPremultiplied);
@@ -373,9 +378,9 @@ namespace BasicRPGTest_Mono
             _spriteBatch.End();
 
             // End Code Timer for speed test
-            //codeTimer.endTimer();
+            codeTimer.endTimer();
             // Report function's speed
-            //Engine.Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+            //Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
 
 
         }

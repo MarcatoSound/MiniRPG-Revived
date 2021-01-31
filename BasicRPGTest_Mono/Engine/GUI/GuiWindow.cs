@@ -155,9 +155,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
 
         public virtual void Draw(SpriteBatch batch)
         {
-            batch.Begin();
             batch.Draw(texture, new Vector2(box.X, box.Y), Color.White);
-            batch.End();
         }
 
     }

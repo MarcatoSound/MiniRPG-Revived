@@ -42,7 +42,6 @@ namespace RPGEngine
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
-        public Texture2D edgesSum;
         public Biome biome { get; set; }
 
         private double _health;
@@ -57,10 +56,12 @@ namespace RPGEngine
                 }
                 else
                     _health = value;
+                healthPercent = _health / maxHealth;
             }
         }
         public bool isBeingDamaged;
-        public PopupText dmgIndicator { get; set; }
+        public double healthPercent;
+        private int breakTexture;
 
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
@@ -269,16 +270,37 @@ namespace RPGEngine
         public void draw(SpriteBatch batch)
         {
             if (!isInstance) return;
-            /*parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.1f);
-            drawAdjacentTiles(batch);*/
-            batch.DrawRectangle(box, Color.Red);
+
+            if (healthPercent < 1)
+                drawBreakTexture(batch);
+
+            if (isBeingDamaged)
+                batch.DrawRectangle(box, Color.Red);
+        }
+        public void drawBreakTexture(SpriteBatch batch)
+        {
+            Texture2D spriteSet = TileManager.breakTexture;
+            if (spriteSet == null) return;
+
+            Rectangle targetRect = new Rectangle(TileManager.dimensions * breakTexture, 0, TileManager.dimensions, TileManager.dimensions);
+
+            batch.Draw(spriteSet, pos, targetRect, Color.White);
         }
 
 
         public void Damage(double dmg)
         {
             health -= dmg;
-            // Later for handling coloration or breaking graphic?
+
+            if (healthPercent < 1 && healthPercent >= 0.75)
+                breakTexture = 1;
+            else if (healthPercent < 0.75 && healthPercent >= 0.5)
+                breakTexture = 2;
+            else if (healthPercent < 0.5 && healthPercent >= 0.25)
+                breakTexture = 3;
+            else if (healthPercent < 0.25)
+                breakTexture = 4;
+
             isBeingDamaged = true;
             Timer timer = new Timer(500);
             timer.Elapsed += (sender, args) =>

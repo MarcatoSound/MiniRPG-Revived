@@ -562,19 +562,7 @@ namespace BasicRPGTest_Mono.Engine
                     parentTile.graphic.draw_Tiles(batch, list);
                 }
 
-                /*batch.Begin(transformMatrix: Camera.camera.Transform);
-                foreach (Rectangle rect in collidables.Values)
-                {
-                    batch.DrawRectangle(rect, Color.White);
-                }*/
-
-                /*foreach (Tile tile in tLayer.tiles.Values)
-                {
-                    if (!tile.isBeingDamaged) continue;
-                    tile.draw(batch);
-                }*/
-
-                //batch.Begin(transformMatrix: Camera.camera.Transform);
+                // Loop through regions to draw tile edges and highlights
                 foreach (Region region in v_regionsVisible)
                 {
                     region.draw(batch, tLayer);
