@@ -44,8 +44,8 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             foreach (Tile tile in tiles)
             {
-                if (tile.layer == layer)
-                    tile.drawAdjacentTiles(batch);
+                /*if (tile.layer == layer)
+                    tile.drawAdjacentTiles(batch);*/
 
                 tile.draw(batch);
 

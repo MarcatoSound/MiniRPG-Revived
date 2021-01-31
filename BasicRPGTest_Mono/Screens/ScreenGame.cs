@@ -290,7 +290,8 @@ namespace BasicRPGTest_Mono
 
                 cameraRectangle = Camera.camera.BoundingRectangle;
                 // Update Map's Visible Regions
-                MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                //MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
             }
 
         }
@@ -316,7 +317,8 @@ namespace BasicRPGTest_Mono
             {
                 // Just in case this doesn't happen automatically. This ensures it happens right away.
                 // Update Map's Visible Regions
-                MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                //MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
                 v_NotNewDraw = true;
             }
 

@@ -35,15 +35,20 @@ namespace BasicRPGTest_Mono.Engine
         public ConcurrentDictionary<int, LivingEntity> livingEntities { get; set; }
 
         public ConcurrentDictionary<int, Spawn> spawns { get; set; }
-        //public int totalSpawnWeights { get; set; }
         public int livingEntityCap = 50;
         public Timer spawnTimer;
 
         private long v_drawnTileCount;
 
-        private List<Region> v_regionsVisible = new List<Region>();
-        private Dictionary<String, Dictionary<String, List<Vector2>>> v_TileCache = new Dictionary<String, Dictionary<String, List<Vector2>>>();
+        public List<Region> v_regionsVisible = new List<Region>();
+        private List<Tile> v_TileTemplates = new List<Tile>();
+        private Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>> v_VisibleTiles = new Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>>();
 
+        private List<Graphic> v_TileEdges = new List<Graphic>();
+        private Dictionary<TileLayer, Dictionary<Graphic, List<Vector2>>> v_VisibleEdges = new Dictionary<TileLayer, Dictionary<Graphic, List<Vector2>>>();
+
+        private Rectangle v_RegionViewBox = new Rectangle();
+        private Rectangle v_CameraViewBox = new Rectangle();
 
         //====================================================================================
         // CONSTRUCTOR
@@ -65,7 +70,7 @@ namespace BasicRPGTest_Mono.Engine
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
-            spawnTimer.Start();
+            //spawnTimer.Start();
 
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
@@ -108,6 +113,7 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             Save.oldMapStates.Add(name, new Map(this));
+            buildTileTemplateCache();
 
         }
 
@@ -133,6 +139,42 @@ namespace BasicRPGTest_Mono.Engine
         // PROPERTIES
         //====================================================================================
 
+        // Total # of Tiles on entire Map
+        public long TilesTotalCount
+        {
+            get { return layers.Count; }
+        }
+
+        // Tracks # of Tiles drawn last frame
+        public long TilesDrawnCount
+        {
+            get { return v_drawnTileCount; }
+            set { v_drawnTileCount = value; }
+        }
+
+        // Calculates the number of Cached Tiles (visible for drawing)
+        public long TilesCachedCount
+        {
+            get
+            {
+                long tCount = 0;
+
+                // Go through each CachedTiles Layer
+                foreach (TileLayer tLayer in layers)
+                {
+                    // Go through each Tile Template's Locations List in the Layer
+                    foreach (List<Vector2> locations in v_VisibleTiles[tLayer].Values)
+                    {
+                        // Get Sub-Tile Locations
+                        tCount += locations.Count;
+                    }
+                }
+
+                return tCount;
+            }
+
+        }
+
         public long getTilesTotalCount()
         {
             int tCount = 0;
@@ -157,6 +199,9 @@ namespace BasicRPGTest_Mono.Engine
 
             return null;
         }
+        public int getRegionSizeWideInPixels() { return regionTilesWide * TileManager.dimensions; }
+
+        public int getRegionSizeHighInPixels() { return regionTilesHigh * TileManager.dimensions; }
 
 
         //====================================================================================
@@ -268,6 +313,12 @@ namespace BasicRPGTest_Mono.Engine
 
             return tile;
         }
+        public Tile getTile(TileLayer mLayer, Vector2 mPosition)
+        {
+            if (mLayer.tiles.ContainsKey(mPosition)) { return mLayer.tiles[mPosition]; }
+            // Otherwise...
+            return null;
+        }
 
         // Remove Decoration Tile at Position
         public void removeTile(Vector2 mTilePosition)
@@ -336,11 +387,6 @@ namespace BasicRPGTest_Mono.Engine
             Region region = regions[mTile.region];
             region.removeTile(mTile);
 
-            if (this.v_regionsVisible.Contains(region))
-            {
-                // Rebuilds updated Visible Tile Cache
-                buildTileCache();
-            }
 
 
             /*
@@ -415,130 +461,68 @@ namespace BasicRPGTest_Mono.Engine
 
             // Update Tile rendering Cache
             // Update Visible Tiles if Tile belongs to any Visible Region
-            if (v_regionsVisible.Contains(region)) { buildTileCache(); }
+            if (v_regionsVisible.Contains(region)) { buildVisibleTileCache(); }
 
             return true;
         }
 
-
-        public void updateVisibleRegions(Camera2D camera)
+        public void update_VisibleRegions (Camera2D camera)
         {
 
+            // Clear Visible Regions collection
+            v_regionsVisible.Clear();
+
+
+            // Update stored Camera ViewBox Rectangle to match new/current Camera viewbox
+            // Useful for future planned (only update on significant changes system)
+            v_CameraViewBox.X = camera.BoundingRectangle.X;
+            v_CameraViewBox.Y = camera.BoundingRectangle.Y;
+            v_CameraViewBox.Width = camera.BoundingRectangle.Width;
+            v_CameraViewBox.Height = camera.BoundingRectangle.Height;
+
+            // Use a slightly shrunken ViewPort instead  (full Camera BoundingRectangle is good, but for some reason grabs one X and Y Region row earlier than it should)
+            v_RegionViewBox.X = v_CameraViewBox.X + getRegionSizeWideInPixels();
+            v_RegionViewBox.Y = v_CameraViewBox.Y + getRegionSizeHighInPixels();
+            v_RegionViewBox.Width = v_CameraViewBox.Width - getRegionSizeWideInPixels();
+            v_RegionViewBox.Height = v_CameraViewBox.Height - getRegionSizeHighInPixels();
+
+
+            //VisibleRegions = getRegionsInRectangle(camera.BoundingRectangle);
+            //VisibleRegions = getRegionsInRectangle(v_CameraViewBox);
+
+            //List<Region> regionsTEST = getRegionsInRectangle(v_CameraViewBox);
+
+
+            // Go through each Region on Map  (to re-populate Visible Regions collection)
             foreach (Region region in regions.Values)
             {
+
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
-                if (camera.BoundingRectangle.Intersects(region.box))
+                if (v_RegionViewBox.Intersects(region.box))
+                //if (camera.BoundingRectangle.Intersects(region.box))
                 {
                     // If List Does NOT Contain this Region
                     if (!v_regionsVisible.Contains(region))
                     {
                         // Add this Region to Collection
                         v_regionsVisible.Add(region);
-
+                        
                         //Utility.Util.myDebug("Region Added:  " + region.box);
 
                         // TODO: Add Event for on Region ADDED to regionsVisible List
                     }
 
                 }
-                // If THIS Region is OUTSIDE Camera's view (BoundingRectangle)
-                else
-                {
-                    // If List DOES Contain this Region
-                    if (v_regionsVisible.Contains(region))
-                    {
-                        // Add this Region to Collection
-                        v_regionsVisible.Remove(region);
-
-                        //Utility.Util.myDebug("Region Removed:  " + region.box);
-
-                        // TODO: Add Event for on Region REMOVED from regionsVisible List
-                    }
-                }
             }
 
-            // Build Tile Cache for Drawing
-            buildTileCache();
+            //Utility.Util.myDebug("Visible Regions of Total:  " + VisibleRegions.Count + " / " + regions.Count);
+
+
+            // Build Tile Cache (including Edges) for Drawing Map
+            buildVisibleTileCache();
 
         }
 
-
-
-        public void Draw(Camera2D camera, SpriteBatch batch)
-        {
-            // Drawing code (Draw by Map Region, one tile at a time)
-
-            // Clear Drawn Tiles Count (new fresh frame)
-            //v_drawnTileCount = 0;
-
-            foreach (TileLayer layer in layers)
-            {
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                foreach (Region region in v_regionsVisible)
-                {
-                    region.draw(batch, layer);
-                }
-                batch.End();
-            }
-
-            // Report Total # of Tiles Drawn
-            //Utility.Util.myDebug("Map.cs Draw()", "TILES DRAWN:  " + this.v_drawnTileCount + " of " + getTilesTotalCount());
-        }
-
-        public void DrawSpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
-        {
-            // Start Code Timer for speed test
-            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
-            codeTimer.startTimer();
-
-            // If No Interation count as given, use Default of 1000
-            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
-
-            for (int i = 0; i < mIterationsCount; i++)
-            {
-                // Draw code
-                Draw(camera, batch);
-            }
-
-            // End Code Timer for speed test
-            codeTimer.endTimer();
-            // Report function's speed
-            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
-        }
-
-
-        public void Draw_OLD(Camera2D camera, SpriteBatch batch)
-        {
-            // Draw code
-            foreach (Region region in regions.Values)
-            {
-                if (!camera.BoundingRectangle.Intersects(region.box)) continue;
-                batch.Begin(transformMatrix: Camera.camera.Transform);
-                //region.draw(batch);
-                batch.End();
-            }
-        }
-
-        public void DrawSpeedTest_OLD(Camera2D camera, SpriteBatch batch, int mIterationsCount)
-        {
-            // Start Code Timer for speed test
-            Utility.CodeTimer codeTimer = new Utility.CodeTimer();
-            codeTimer.startTimer();
-
-            // If No Interation count as given, use Default of 1000
-            if (mIterationsCount <= 0) { mIterationsCount = 1000; }
-
-            for (int i = 0; i < mIterationsCount; i++)
-            {
-                // Draw code
-                Draw(camera, batch);
-            }
-
-            // End Code Timer for speed test
-            codeTimer.endTimer();
-            // Report function's speed
-            Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
-        }
 
 
         public void DrawVisibleMapCache (Camera2D camera, SpriteBatch batch)
@@ -549,7 +533,7 @@ namespace BasicRPGTest_Mono.Engine
             batch.Begin(transformMatrix: Camera.camera.Transform);
             foreach (TileLayer tLayer in layers)
             {
-                Dictionary<string, List<Vector2>> templateList = v_TileCache[tLayer.name];
+                /*Dictionary<string, List<Vector2>> templateList = v_TileCache[tLayer.name];
 
                 // Go through each Tile Template in the Layer
                 foreach (string parentTileName in templateList.Keys)
@@ -560,6 +544,40 @@ namespace BasicRPGTest_Mono.Engine
                     List<Vector2> list = templateList[parentTileName];
 
                     parentTile.graphic.draw_Tiles(batch, list);
+                }*/
+
+
+                // ------------------------------------------------------------------
+                // DRAW TILES - By Cached Tile Parent (Template)
+                // ------------------------------------------------------------------
+                // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
+                Dictionary<Tile, List<Vector2>> templateList = v_VisibleTiles[tLayer];
+
+                // Go through each Tile Template in the Layer
+                foreach (KeyValuePair<Tile, List<Vector2>> pair2 in templateList)
+                {
+                    pair2.Key.graphic.draw_Tiles(batch, pair2.Value);
+
+                    v_drawnTileCount += pair2.Value.Count;  // Count drawn Tiles
+                }
+
+                // ------------------------------------------------------------------
+                // DRAW EDGES - By Cached Edge Graphics
+                // ------------------------------------------------------------------
+                // If this Layer is the Decorations Layer
+                //if (tLayer.index == 3)
+                //if (tLayer.name == "decorations")
+                //{
+                //}
+
+                Dictionary<Graphic, List<Vector2>> edgeList = v_VisibleEdges[tLayer];
+                // Go through all Visible Tile Edges to draw
+                foreach (KeyValuePair<Graphic, List<Vector2>> pair2 in edgeList)
+                {
+                    // Draw ALL matching Visible Edges at once
+                    pair2.Key.draw_Tiles(batch, pair2.Value);
+
+                    v_drawnTileCount += pair2.Value.Count;  // Count drawn Tiles
                 }
 
                 // Loop through regions to draw tile edges and highlights
@@ -597,63 +615,271 @@ namespace BasicRPGTest_Mono.Engine
 
         public void Clear()
         {
+            // Clear Tile Caches
+            this.v_VisibleTiles.Clear();
+            this.v_VisibleEdges.Clear();
+            this.v_TileEdges.Clear();
+
             entities.Clear();
             livingEntities.Clear();
             spawnTimer.Stop();
         }
 
-
-        public void buildTileCache()
+        // Stores what Tile Templates this Map uses
+        public void buildTileTemplateCache()
         {
-            // Clear Collection
-            v_TileCache.Clear();
 
-            Dictionary<String, List<Vector2>> tileTemplate;
+            // Clear the Collection
+            v_TileTemplates.Clear();
+
+            // Go through map Layers
+            foreach (TileLayer layer in layers)
+            {
+                // Go through Tiles in Layer
+                foreach (Tile tile in layer.tiles.Values)
+                {
+                    // If Collection does NOT contain this Tile Parent (template)
+                    if (!v_TileTemplates.Contains(tile.parent))
+                    {
+                        // Add this Parent Tile to Cache
+                        v_TileTemplates.Add(tile.parent);
+                    }
+                }
+            }
+
+
+            // Prepare Visible Tile Caches for use  (will still need to be filled with "buildVisibleTileCache()")
+            // Sets up Edge Tiles and Visible Tiles to work based on Time Templates
+            setupVisibleTileCaches();
+        }
+        public void setupVisibleTileCaches()
+        {
+            // Clear Visible Tile Collections (just in case)
+            v_VisibleTiles.Clear();
+            v_VisibleEdges.Clear();
+
+
+            // Generate all Edge Templates
+            // Go through each Tile Template on This Map
+            foreach (Tile tile in v_TileTemplates)
+            {
+                // Go through Edges (if any)
+                foreach (KeyValuePair<TileSide, Graphic> pair in tile.sideGraphics)
+                {
+                    TileSide side = pair.Key;
+                    Graphic graphic = pair.Value;
+
+                    if (graphic != null)
+                    {
+                        // If this Graphic does NOT already exist in Collection
+                        if (!v_TileEdges.Contains(graphic))
+                        {
+                            // Add Graphic to List
+                            v_TileEdges.Add(graphic);
+                        }
+                    }
+                }
+            }
+
 
             // Create top most level of CachedTiles collection (the Map Layer Names), in order of appearance in Map.layers
             // Layer Name is first Level of multi-dimensional v_TileCache collection
             foreach (TileLayer tileLayer in layers)
             {
-                tileTemplate = new Dictionary<String, List<Vector2>>();
+                // Add New Empty Item to Collection for this Layer with Layer as Key
+                v_VisibleTiles.Add(tileLayer, new Dictionary<Tile, List<Vector2>>());
+                v_VisibleEdges.Add(tileLayer, new Dictionary<Graphic, List<Vector2>>());
+            }
+        }
 
-                v_TileCache.Add(tileLayer.name, tileTemplate);
+        public void buildVisibleTileCache()
+        {
+
+            // For TESTING: Use buildVisibleTileCache3() instead.
+            //buildVisibleTileCache3();
+            //return;
+
+
+            Dictionary<Tile, List<Vector2>> tileTemplate;
+            Tile tile;
+            Vector2 pos = new Vector2();
+            int layerIndex = 0;
+            //TileLayer layer;
+
+
+            Clear_ChildTiles();
+
+
+            // Get Tile Bounds
+            Rectangle tileViewBounds = new Rectangle();
+
+            tileViewBounds.X = (v_CameraViewBox.X / TileManager.dimensions);
+            tileViewBounds.Y = (v_CameraViewBox.Y / TileManager.dimensions);
+            tileViewBounds.Width = (v_CameraViewBox.Width / TileManager.dimensions) + 2;
+            tileViewBounds.Height = (v_CameraViewBox.Height / TileManager.dimensions) + 2;
+
+
+            // Go through each Layer on Map
+            foreach (TileLayer layer in v_VisibleTiles.Keys)
+            {
+                // Get Tile Template Dictionary matching Layer
+                tileTemplate = v_VisibleTiles[layer];
+
+                for (int X = tileViewBounds.X; X <= tileViewBounds.Right; X++)
+                {
+                    for (int Y = tileViewBounds.Y; Y <= tileViewBounds.Bottom; Y++)
+                    {
+                        pos.X = X;
+                        pos.Y = Y;
+
+                        // Get Tile
+                        tile = getTile(layer, pos);
+                        if (tile == null) { continue; }
+                        // Otherwise...
+
+                        // If tileTemplate Dictionary does NOT have this Tile Template already
+                        if (!tileTemplate.ContainsKey(tile.parent))
+                        {
+                            // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
+                            //List<Vector2> list = new List<Vector2>();
+                            // Add Position to TileCache List
+                            //list.Add(tile.drawPos);
+
+                            // Add Tile template with this Tile's Position to Collection
+                            //tileTemplate.Add(tile.parent, list);
+                            tileTemplate.Add(tile.parent, new List<Vector2>());
+
+                        }
+
+
+                        // Check if any Tiles ABOVE This tile completely cover it
+                        bool keepTile = true;
+
+                        for (int checkLayer = layerIndex + 1; checkLayer < layers.Count; checkLayer++)
+                        {
+                            // If a Tile does NOT exist at this Position on next Layer
+                            if (!layers[checkLayer].tiles.ContainsKey(pos)) { continue; }
+                            // Otherwise...
+
+                            // If checkTile is on Decorations Layer (it's probably see through, so ignore this Layer)
+                            if (layers[checkLayer].name == "decorations") { continue; }
+                            // Otherwise...
+
+
+                            Tile checkTile = layers[checkLayer].getTile(pos);
+
+                            // If checkTile is NOT See Through  (will completely cover current tile being checked for)
+                            if (!checkTile.seeThrough)
+                            {
+                                keepTile = false;
+                                break;
+                            }
+
+                        }
+
+                        // Testing: Force keep ALL Tiles by setting to TRUE.
+                        //keepTile = true;
+
+                        // Store this Tile for drawing
+                        if (keepTile) { tileTemplate[tile.parent].Add(tile.drawPos); }
+
+                        // Add this Tile's Position to Template Cache
+                        //tileTemplate[tile.parent].Add(tile.drawPos);
+
+
+
+                        // Go through Edges (if any)
+                        foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
+                        {
+
+                            if (!pair.Value) continue;
+
+                            TileSide side = pair.Key;
+                            Graphic graphic = tile.sideGraphics[side];
+                            Vector2 drawPos = new Vector2(tile.drawPos.X, tile.drawPos.Y);
+                            int tileSize = TileManager.dimensions;
+
+                            if (graphic != null)
+                            {
+                                if (v_TileEdges.Contains(graphic))
+                                {
+                                    switch (side)
+                                    {
+                                        case TileSide.NorthWest:
+                                            drawPos.X -= tileSize;
+                                            drawPos.Y -= tileSize;
+                                            break;
+                                        case TileSide.North:
+                                            drawPos.Y -= tileSize;
+                                            break;
+                                        case TileSide.NorthEast:
+                                            drawPos.X += tileSize;
+                                            drawPos.Y -= tileSize;
+                                            break;
+                                        case TileSide.West:
+                                            drawPos.X -= tileSize;
+                                            break;
+                                        case TileSide.East:
+                                            drawPos.X += tileSize;
+                                            break;
+                                        case TileSide.SouthWest:
+                                            drawPos.X -= tileSize;
+                                            drawPos.Y += tileSize;
+                                            break;
+                                        case TileSide.South:
+                                            drawPos.Y += tileSize;
+                                            break;
+                                        case TileSide.SouthEast:
+                                            drawPos.X += tileSize;
+                                            drawPos.Y += tileSize;
+                                            break;
+                                    }
+                                    if (!v_VisibleEdges[layer].ContainsKey(graphic))
+                                        v_VisibleEdges[layer].Add(graphic, new List<Vector2>());
+
+                                    v_VisibleEdges[layer][graphic].Add(drawPos);
+                                }
+                                else
+                                {
+                                    Utility.Util.myDebug(true, "Map.cs buildVisibleTileCache()", "Missing graphic from (v_EdgeTiles). Tile: " + tile.name);
+                                }
+                            }
+                        }
+
+                    }
+                }
+
+                layerIndex++;
             }
 
 
-            // Go through Visible Regions
-            foreach (Region region in v_regionsVisible)
+
+            // Test for examining a target region
+            //Region testRegion = regions[5, 5];
+            //Utility.Util.myDebug("Test");
+
+        }
+        public void Clear_ChildTiles()
+        {
+            // Visible Tiles
+            // For each Template Tile
+            foreach (Dictionary<Tile, List<Vector2>> template in v_VisibleTiles.Values)
             {
-                // Go through each Tile in Region
-                foreach (Tile tile in region.tiles)
+                foreach (List<Vector2> list in template.Values)
                 {
-                    String tileParentName = tile.parent.name;
-                    string layerName = tile.layer.name;
-
-                    // Get Tile Template Dictionary matching layerName (Layer Key)
-                    tileTemplate = v_TileCache[layerName];
-
-                    // If tileTemplate Dictionary does NOT have this Tile Template Name (key) already
-                    if (!tileTemplate.ContainsKey(tileParentName))
-                        {
-                        // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
-                        List<Vector2> list = new List<Vector2>();
-                        // Add Position to TileCache List
-                        list.Add(tile.drawPos);
-
-                        // Add Tile template with this Tile's Position to Collection
-                        tileTemplate.Add(tileParentName, list);
-
-                    } else
-                    {
-                        // Get Parent Tile's sub-tile position List
-                        List<Vector2> list = tileTemplate[tileParentName];
-                        // Add Position to TileCache List
-                        list.Add(tile.drawPos);
-                    }
-
+                    list.Clear();
                 }
             }
 
+            // Visible Edge Tiles
+            // For each Template Tile
+            foreach (Dictionary<Graphic, List<Vector2>> template in v_VisibleEdges.Values)
+            {
+                foreach (List<Vector2> list in template.Values)
+                {
+                    list.Clear();
+                }
+            }
         }
 
 

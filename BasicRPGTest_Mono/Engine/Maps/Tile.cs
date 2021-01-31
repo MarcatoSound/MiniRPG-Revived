@@ -42,6 +42,11 @@ namespace RPGEngine
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
+
+        private Dictionary<Graphic, Vector2> edgeCache = new Dictionary<Graphic, Vector2>();
+        private bool v_Visible = true;
+        public bool seeThrough = false;
+
         public Biome biome { get; set; }
 
         private double _health;
@@ -132,6 +137,7 @@ namespace RPGEngine
         {
             if (sideGraphics.Count == 0) return;
             Vector2 drawPos;
+            int drawnEdgesCount = 0;
             foreach (KeyValuePair<TileSide, bool> pair in sides)
             {
                 bool draw = pair.Value;
@@ -143,40 +149,61 @@ namespace RPGEngine
                 switch (side)
                 {
                     case TileSide.NorthWest:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.X -= TileManager.dimensions;
+                        drawPos.Y -= TileManager.dimensions;
                         break;
                     case TileSide.North:
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.Y -= TileManager.dimensions;
                         break;
                     case TileSide.NorthEast:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.X += TileManager.dimensions;
+                        drawPos.Y -= TileManager.dimensions;
                         break;
                     case TileSide.West:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
+                        drawPos.X -= TileManager.dimensions;
                         break;
                     case TileSide.East:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
+                        drawPos.X += TileManager.dimensions;
                         break;
                     case TileSide.SouthWest:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.X -= TileManager.dimensions;
+                        drawPos.Y += TileManager.dimensions;
                         break;
                     case TileSide.South:
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.Y += TileManager.dimensions;
                         break;
                     case TileSide.SouthEast:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.X += TileManager.dimensions;
+                        drawPos.Y += TileManager.dimensions;
                         break;
                 }
 
                 sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
+
+                drawnEdgesCount++;
             }
 
             return;
+
+        }
+        public void drawAdjacentTiles2(SpriteBatch batch)
+        {
+
+            int drawnEdgesCount = 0;
+
+            foreach (KeyValuePair<Graphic, Vector2> pair in edgeCache)
+            {
+                //if (pair.Key == null) { continue; }
+                pair.Key.draw(batch, pair.Value, 0f, Vector2.Zero, 1, 0);
+
+                //batch.DrawRectangle(new Rectangle((int)pair.Value.X, (int)pair.Value.Y, 32, 32), Color.Red);
+
+                drawnEdgesCount++;
+            }
+
+            // Show count of this Tile's number of Drawn Edges
+            //batch.DrawString(Core.mainFont, drawnEdgesCount.ToString(), pos, Microsoft.Xna.Framework.Color.Black);
 
         }
 
@@ -334,7 +361,10 @@ namespace RPGEngine
                 if (tile.sideGraphics.Count == 0) continue;
                 tile.update();
             }
-            
+
+            // Rebuilds updated Visible Tile Cache
+            map.buildVisibleTileCache();
+
         }
 
         public void showDamageText(double dmg)
