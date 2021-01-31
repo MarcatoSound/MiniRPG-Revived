@@ -14,8 +14,11 @@ namespace BasicRPGTest_Mono.Engine
     public static class Generator
     {
 
-        public static List<TileLayer> generateOverworldTiles(int size)
+        public static List<TileLayer> generateOverworldTiles(Map map)
         {
+            int mapWidth = map.width;
+            int mapHeight = map.height;
+            
             List<TileLayer> layers = new List<TileLayer>();
 
             Random rand = new Random();
@@ -29,10 +32,12 @@ namespace BasicRPGTest_Mono.Engine
 
             NoiseMap noise = createLandNoise();
 
-            TileLayer waterLayer = new TileLayer("water");
-            for (int x = 0; x < size; x++)
+
+            // Add Water Layer
+            TileLayer waterLayer = new TileLayer(map, "water", 0);
+            for (int x = 0; x < mapWidth; x++)
             {
-                for (int y = 0; y < size; y++)
+                for (int y = 0; y < mapHeight; y++)
                 {
                     if (noise[x, y] < 0)
                     {
@@ -43,10 +48,12 @@ namespace BasicRPGTest_Mono.Engine
             }
             layers.Add(waterLayer);
 
-            TileLayer groundLayer = new TileLayer("ground");
-            for (int x = 0; x < size; x++)
+
+            // Add Ground Layer
+            TileLayer groundLayer = new TileLayer(map, "ground", 1);
+            for (int x = 0; x < mapWidth; x++)
             {
-                for (int y = 0; y < size; y++)
+                for (int y = 0; y < mapHeight; y++)
                 {
                     if (noise[x, y] >= 0 && noise[x, y] < 0.07)
                     {
@@ -60,10 +67,12 @@ namespace BasicRPGTest_Mono.Engine
             }
             layers.Add(groundLayer);
 
-            TileLayer stoneLayer = new TileLayer("stone");
-            for (int x = 0; x < size; x++)
+
+            // Add Stone Layer
+            TileLayer stoneLayer = new TileLayer(map, "stone", 2);
+            for (int x = 0; x < mapWidth; x++)
             {
-                for (int y = 0; y < size; y++)
+                for (int y = 0; y < mapHeight; y++)
                 {
                     if (noise[x, y] > 0.5)
                     {
@@ -74,11 +83,13 @@ namespace BasicRPGTest_Mono.Engine
             }
             layers.Add(stoneLayer);
 
-            TileLayer decoration = new TileLayer("decorations");
+
+            // Add Decorations Layer
+            TileLayer decoration = new TileLayer(map, "decorations", 3);
             Vector2 treePos = new Vector2();
-            for (int x = 0; x < size; x++)
+            for (int x = 0; x < mapWidth; x++)
             {
-                for (int y = 0; y < size; y++)
+                for (int y = 0; y < mapHeight; y++)
                 {
                     treePos.X = x;
                     treePos.Y = y;
@@ -92,6 +103,13 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
             layers.Add(decoration);
+
+
+            // Add Edge Layer
+            // TODO: ("Engine\Maps\Generator.cs") Generate Tile Edges (Layer) based on previous layers.
+
+
+
 
             return layers;
         }

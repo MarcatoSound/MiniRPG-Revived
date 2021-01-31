@@ -21,6 +21,7 @@ namespace BasicRPGTest_Mono.Engine
         {
         }
 
+        // LOAD PLAYER
         public static Dictionary<string, Object> loadPlayer(string world)
         {
             Dictionary<string, Object> playerData = new Dictionary<string, object>();
@@ -37,7 +38,10 @@ namespace BasicRPGTest_Mono.Engine
 
             return playerData;
         }
-        public static List<TileLayer> loadMap(string world, string map) 
+
+        /*
+        // LOAD MAP
+        public static List<TileLayer> loadMap(string world, string map)
         {
 
             // Track how long this function takes to run
@@ -52,23 +56,46 @@ namespace BasicRPGTest_Mono.Engine
 
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             FileInfo[] files = dirInfo.GetFiles();
-            List<Tile> tiles;
 
+            // Declare variables here instead of repeatedly in For loops below
+            TileLayer layer;
+            int layerIndex = -1;
+            JArray tileArray;
+            List<Tile> tiles;
+            Tile template;
+            int templateID;
+            Tile tile;
+
+
+            // Each File is a Map Tile Layer
             foreach (FileInfo file in files)
             {
+                layerIndex += 1;  // Count Layer Index
+
                 // TODO: Account for incorrect layer loading order.
                 reader = new StreamReader($"{path}\\{file.Name}");
                 JObject jsonLayer = JObject.Parse(reader.ReadToEnd());
 
+                layer = new TileLayer(jsonLayer.Value<string>("layer"), layerIndex);
+                tileArray = jsonLayer.Value<JArray>("tiles");
                 tiles = new List<Tile>();
-                TileLayer layer = new TileLayer(jsonLayer.Value<string>("layer"));
-                JArray tileArray = jsonLayer.Value<JArray>("tiles");
-                Tile tile;
 
+
+                // Go through each Tile in this Layer
                 foreach (JObject tileJson in tileArray)
                 {
-                    Tile template = TileManager.get(tileJson.Value<int>("id"));
-                    if (template == null) continue;
+                    templateID = tileJson.Value<int>("id");
+                    // Grab Template Tile
+                    template = TileManager.get(templateID);
+                    
+                    // If NO Template Tile given, skip  (it's bad)
+                    if (template == null)
+                    {
+                        // Report Error
+                        Utility.Util.myDebug(true, "Load.cs loadMap()", "Missing Tile Template (ID: " + templateID + ") on Map Tile (" + tileJson.Value<int>("x") + ", " + tileJson.Value<int>("y") + ")");
+                        continue;  // Skip this Tile  (it's bad)
+                    }
+                    // Otherwise...
 
                     int x = tileJson.Value<int>("x");
                     int y = tileJson.Value<int>("y");
@@ -78,6 +105,7 @@ namespace BasicRPGTest_Mono.Engine
                     layer.setTile(tile.tilePos, tile);
                     tile = null;
                 }
+
 
                 layers.Add(layer);
                 System.Diagnostics.Debug.WriteLine("Loaded layer: " + layer.name);
@@ -90,9 +118,17 @@ namespace BasicRPGTest_Mono.Engine
 
             }
 
+
+            // Report Load Speed
+            codeTimer.endTimer();
+            // Report function's speed
+            Utility.Util.myDebug("Load.cs loadMap()", "Map (" + path + ") Loaded CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+
+
             return layers;
 
         }
+        */
 
     }
 }

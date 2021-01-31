@@ -133,7 +133,43 @@ namespace BasicRPGTest_Mono.Engine
             };
             attackTimer.Start();
 
+
+            /*
+            // Michael's Test Code
+
+            Tile destroyTile;
+
+            // Get Tiles in front of Player
+
+            Vector2 tilePos = new Vector2(this.getPlayerTilePosition().X, this.getPlayerTilePosition().Y);
+
+            // Destroy Tile
+            destroyTile = MapManager.activeMap.getDecorationTile(tilePos);
+            MapManager.activeMap.removeTile(destroyTile);
+
+
+            // Add Tile
+            Tile tileParent = TileManager.getByName("stone");
+            Tile tile = new Tile (tileParent, tilePos);
+            TileLayer layer = MapManager.activeMap.getLayerByName("stone");
+            tile.layer = layer;
+
+            MapManager.activeMap.addTile(tile);
+            */
+
+            /*
+            destroyTile = MapManager.activeMap.getDecorationTile(new Vector2(this.getPlayerTilePosition().X, this.getPlayerTilePosition().Y - 1));
+            MapManager.activeMap.removeTile(destroyTile);
+
+            destroyTile = MapManager.activeMap.getDecorationTile(new Vector2(this.getPlayerTilePosition().X, this.getPlayerTilePosition().Y));
+            MapManager.activeMap.removeTile(destroyTile); 
+
+            destroyTile = MapManager.activeMap.getDecorationTile(new Vector2(this.getPlayerTilePosition().X, this.getPlayerTilePosition().Y + 1));
+            MapManager.activeMap.removeTile(destroyTile);
+            */
+
         }
+
         public void Dash()
         {
             if (!isDashing)

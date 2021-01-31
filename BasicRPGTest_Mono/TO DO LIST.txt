@@ -1,0 +1,40 @@
+﻿#################################################
+# TASK LIST
+#################################################
+
+
+=================================================
+ MICHAEL
+=================================================
+
+...Engine\Maps\Generator.cs:  
+	- Generate Tile Edges (Layer) based on layers below Decorations layer.
+
+...Engine\Save.cs:  
+	- Save Map with Edges Layer. Will be faster than generating them new every time Map Loads.
+	- 
+
+...Engine\Load.cs:  
+	- Load Map with Edges Layer. Will be faster than generating them new every time Map Loads.
+
+...Engine\Maps\Map.cs
+	X- Create Map first, then add Layers. Instead of layers first, then Map with Layers added.
+		X- Will allow for Layers knowing the Map they belong to.
+	- Map and Layer helper functions and properties (tiles wide/high, etc.)
+	X Draw only tiles in view, not whole Regions in view.
+	- Only draw upper most layers of a Tile. Don't draw lowest layers if layers on top overwrite.
+	- Fix Tile Edges drawn over or under Decoration tiles.
+
+	- Mixed Rendering? Draw all matching batches when NO edges exist. Draw by Tile for Tiles where edges do.
+
+...Engine\Maps\Tile.cs
+	- Tile transparency. If True, stuff needs to be drawn beneath it. If False, nothing beneath it. Just draw this tile.
+	- Sub-Layer levels for better understand of what's beneath what.
+	- Terrain Type identifiers for terrain and objects so it isn't just dependent on tile graphic.
+
+	- Re-write DrawAdjacentTiles system?
+
+	- Cache adjacent tile positional data (for drawing edges faster, instead of re-calculating position every Draw).
+	- Tiles update neighbour tile edges based on their own (if needed). Would eliminate duplicate and extra corner rendering.
+
+

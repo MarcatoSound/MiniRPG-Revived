@@ -37,6 +37,17 @@ namespace RPGEngine
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
 
+        private Dictionary<Graphic, Vector2> edgeCache = new Dictionary<Graphic, Vector2>();
+        private bool v_Visible = true;
+        public bool seeThrough = false;
+
+        
+        public int tileSetGraphicIndex = 0;
+
+        public Texture2D tileSetTexture;
+        public Rectangle textureRect;
+
+
 
         //====================================================================================
         // CONSTRUCTORS
@@ -120,30 +131,59 @@ namespace RPGEngine
                 return null;
         }
 
+
+        public void drawAdjacentTiles2(SpriteBatch batch)
+        {
+
+            int drawnEdgesCount = 0;
+
+            foreach (KeyValuePair<Graphic, Vector2> pair in edgeCache)
+            {
+                //if (pair.Key == null) { continue; }
+                pair.Key.draw(batch, pair.Value, 0f, Vector2.Zero, 1, false, 0);
+
+                //batch.DrawRectangle(new Rectangle((int)pair.Value.X, (int)pair.Value.Y, 32, 32), Color.Red);
+
+                drawnEdgesCount++;
+            }
+
+            // Show count of this Tile's number of Drawn Edges
+            //batch.DrawString(Core.mainFont, drawnEdgesCount.ToString(), pos, Microsoft.Xna.Framework.Color.Black);
+
+        }
+
+
         public void drawAdjacentTiles(SpriteBatch batch)
         {
+
+            //drawAdjacentTiles2(batch);
+            //return;
+
+            
             if (sideGraphics.Count == 0) return;
             // Otherwise...
 
             Vector2 drawPos;
+            TileSide side;
+            Graphic sideGraphic;
+            int tileSize = TileManager.dimensions;
+            int drawnEdgesCount = 0;
+
+
             foreach (KeyValuePair<TileSide, bool> pair in sides)
             {
 
                 // If NO Value (skip to next)
-                if (!pair.Value) continue;
+                if (!pair.Value) { continue; }
                 // Otherwise...
 
-                TileSide side = pair.Key;
-                // Get SideGraphic object  (slightly faster grabbing it once than grabbing it repeatedly)
-                Graphic sideGraphic = getSideGraphic(side);
-
-                // If NO SideGraphic (skip to next)
-                if (sideGraphic == null) continue;
-                // Otherwise...
+                side = pair.Key;
+                // If Side Graphic does NOT Exist
+                if (!sideGraphics.ContainsKey(side)) { continue; }
+                // Otherwise... Get it
+                sideGraphic = sideGraphics[side];
 
                 drawPos = pos;
-                // Get Tile Dimension  (slightly faster grabbing it once than grabbing it repeatedly)
-                int tileSize = TileManager.dimensions;
 
                 switch (side)
                 {
@@ -180,11 +220,27 @@ namespace RPGEngine
                 sideGraphic.draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
                 //sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
+
+                drawnEdgesCount++;
             }
+
+            // Show count of this Tile's number of Drawn Edges
+            //batch.DrawString(Core.mainFont, drawnEdgesCount.ToString(), pos, Microsoft.Xna.Framework.Color.Black);
 
             return;
 
         }
+
+
+        public void Break()
+        {
+            layer.clearTile(tilePos);
+            //Map map = MapManager.activeMap;
+            Region region = map.regions[this.region];
+            region.removeTile(this);
+            map.buildVisibleTileCache();
+        }
+
 
         public void update()
         {
@@ -192,6 +248,9 @@ namespace RPGEngine
             Graphic graphic;
             Vector2 checkPos;
             Tile checkTile;
+
+            edgeCache.Clear();
+
             foreach (TileSide side in Enum.GetValues(typeof(TileSide)))
             {
                 graphic = getSideGraphic(side);
@@ -233,6 +292,17 @@ namespace RPGEngine
                 {
                     sides.Remove(side);
                     sides.Add(side, true);
+
+                    /*
+                    if (graphic != null)
+                    {
+                        Vector2 cacheVector = pos;
+                        cacheVector.X += (checkPos.X * TileManager.dimensions);
+                        cacheVector.Y += (checkPos.Y * TileManager.dimensions);
+
+                        edgeCache.Add(graphic, cacheVector);
+                    }
+                    */
                 }
                 else
                 {
@@ -241,8 +311,15 @@ namespace RPGEngine
                 }
             }
 
+
+
+
+
+
+
             return;
         }
+
 
         public void draw(SpriteBatch batch)
         {

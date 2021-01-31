@@ -14,16 +14,55 @@ namespace BasicRPGTest_Mono.Engine
         public string name { get; set; }
         public int id { get; set; }
         public int instanceId { get; set; }
-        public Graphic graphic { get; set; }
+        private Graphic v_Graphic { get; set; }
         public Rectangle boundingBox { get; set; }
         public Vector2 Position { get; set; }
+
+        private Vector2 v_CenteredPosition = new Vector2();
+
+        private Rectangle v_HitBox;
+        public int HitBoxSize { get; set; } = 24;
+        public bool DrawBoundingBox { get; set; } = true;
+        public bool DrawCenterBox { get; set; } = true;
+        public bool DrawHitBox { get; set; } = false;
+
+
+        //====================================================================================
+        // PROPERTIES
+        //====================================================================================
+
         public Vector2 CenteredPosition
+        {
+            get 
+            {
+                v_CenteredPosition.X = Position.X + (graphic.texture.Width / 2);
+                v_CenteredPosition.Y = Position.Y + (graphic.texture.Height / 2);
+                
+                return v_CenteredPosition;
+            }
+        }
+
+
+        public Rectangle HitBox
         {
             get
             {
-                return new Vector2(Position.X + (graphic.texture.Width / 2), Position.Y + (graphic.texture.Height / 2));
+                v_HitBox.X = (int)CenteredPosition.X - HitBoxSize;
+                v_HitBox.Y = (int)CenteredPosition.Y - HitBoxSize;
+                v_HitBox.Width = HitBoxSize;
+                v_HitBox.Height = HitBoxSize;
+
+                return v_HitBox;
             }
         }
+
+
+        public Graphic graphic
+        {
+            get { return v_Graphic; }
+            set { v_Graphic = value; }
+        }
+
 
         private Color _tintColor = Color.White;
         public Color tintColor
@@ -36,6 +75,11 @@ namespace BasicRPGTest_Mono.Engine
         }
 
         public GraphicsDeviceManager graphicsManager { get; set; }
+
+
+        //====================================================================================
+        // CONSTRUCTORS
+        //====================================================================================
 
         public Entity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsDevice)
         {
@@ -63,31 +107,70 @@ namespace BasicRPGTest_Mono.Engine
             return false;
         }
 
-        public virtual void update()
-        {
-        }
-        public virtual void draw(SpriteBatch batch)
-        {
-            if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
-            graphic.draw(batch, Position, tintColor);
 
-            batch.Begin(transformMatrix: Camera.camera.Transform);
-            batch.DrawRectangle(new Rectangle((int)CenteredPosition.X, (int)CenteredPosition.Y, 5, 5), Color.AliceBlue);
-            batch.End();
-        }
 
+        //====================================================================================
+        // FUNCTIONS
+        //====================================================================================
 
         public virtual Rectangle getBox(Vector2 pos)
         {
             int x = (int)(pos.X - (boundingBox.Width - (boundingBox.Width / 2)));
-            int y = (int)(pos.Y - (boundingBox.Height - (graphic.texture.Height / 2)));
+            int y = (int)(pos.Y - (boundingBox.Height - (v_Graphic.texture.Height / 2)));
 
             Rectangle box = new Rectangle(x, y, boundingBox.Width, boundingBox.Height);
 
             return box;
         }
 
+
+        public bool MoveTo(Vector2 mPosition)
+        {
+
+            // If CANNOT move to sent Position
+            
+            // Otherwise...
+            // Move Entity position
+
+
+
+            return true;
+        }
+
+
+        //====================================================================================
+        // FUNCTIONS - Update & Draw
+        //====================================================================================
+
+        public virtual void update()
+        {
+        }
+
+        public virtual void draw(SpriteBatch batch)
+        {
+            if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
+            // Otherwise...
+
+            // Draw THIS Entity's texture
+            graphic.draw(batch, Position, tintColor);
+
+            // Draw helper Boxes
+            batch.Begin(transformMatrix: Camera.camera.Transform);
+
+            // Draw Entity Center point
+            if (DrawCenterBox) { batch.DrawRectangle(new Rectangle((int)CenteredPosition.X, (int)CenteredPosition.Y, 5, 5), Color.AliceBlue); }
+
+            // If Draw Bounding Box = TRUE. Draw it.
+            if (DrawBoundingBox) { batch.DrawRectangle(boundingBox, Microsoft.Xna.Framework.Color.White); }
+
+            // If Draw Hit Box = TRUE. Draw it.
+            if (DrawHitBox) { batch.DrawRectangle(HitBox, Microsoft.Xna.Framework.Color.PaleVioletRed); }
+
+            batch.End();
+        }
+
     }
+
 
     public enum Direction
     {
