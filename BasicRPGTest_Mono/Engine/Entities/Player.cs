@@ -460,7 +460,7 @@ namespace BasicRPGTest_Mono.Engine
         public override void draw(SpriteBatch batch)
         {
             Vector2 screenPos = Position;
-            graphic.draw(batch, screenPos, tintColor);
+            ((GraphicSet)graphic).active.draw(batch, screenPos, tintColor);
 
             batch.DrawRectangle(boundingBox, Color.LightGray);
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,17 @@ namespace BasicRPGTest_Mono.Engine.Graphics
 {
     public class GraphicSet : Graphic
     {
+
+        private GraphicAnimated _active;
+        public GraphicAnimated active
+        {
+            get { return _active; }
+            set
+            {
+                _active = value;
+                texture = value.texture;
+            }
+        }
 
         public GraphicAnimated idleUp;
         public GraphicAnimated idleDown;
@@ -26,22 +38,22 @@ namespace BasicRPGTest_Mono.Engine.Graphics
 
         public GraphicSet(Texture2D spriteSet)
         {
-            idleUp = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 0, 0, 64), 1, 1);
-            idleDown = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 1, 0, 64), 1, 1);
-            idleLeft = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 2, 0, 64), 1, 1);
-            idleRight = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 3, 0, 64), 1, 1);
+            idleUp = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 0, 256, 64)), 1, 4, 3);
+            idleDown = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 64, 256, 64)), 1, 4, 3);
+            idleLeft = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 128, 256, 64)), 1, 4, 3);
+            idleRight = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 192, 256, 64)), 1, 4, 3);
 
-            moveUp = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 0, 0, 64), 1, 1);
-            moveDown = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 1, 0, 64), 1, 1);
-            moveLeft = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 2, 0, 64), 1, 1);
-            moveRight = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 3, 0, 64), 1, 1);
+            moveUp = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 256, 256, 64)), 1, 4, 5);
+            moveDown = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 320, 256, 64)), 1, 4, 5);
+            moveLeft = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 384, 256, 64)), 1, 4, 5);
+            moveRight = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 448, 256, 64)), 1, 4, 5);
 
-            attackUp = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 0, 0, 64), 1, 1);
-            attackDown = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 1, 0, 64), 1, 1);
-            attackLeft = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 2, 0, 64), 1, 1);
-            attackRight = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, 3, 0, 64), 1, 1);
+            attackUp = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 512, 256, 64)), 1, 4, 9);
+            attackDown = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 576, 256, 64)), 1, 4, 9);
+            attackLeft = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 640, 256, 64)), 1, 4, 9);
+            attackRight = new GraphicAnimated(Utility.Util.getSpriteFromSet(spriteSet, new Rectangle(0, 704, 256, 64)), 1, 4, 9);
 
-            texture = idleDown.texture;
+            active = idleDown;
 
         }
 
@@ -53,16 +65,16 @@ namespace BasicRPGTest_Mono.Engine.Graphics
                     switch (direction)
                     {
                         case Direction.Up:
-                            texture = idleUp.texture;
+                            active = idleUp;
                             break;
                         case Direction.Down:
-                            texture = idleDown.texture;
+                            active = idleDown;
                             break;
                         case Direction.Left:
-                            texture = idleLeft.texture;
+                            active = idleLeft;
                             break;
                         case Direction.Right:
-                            texture = idleRight.texture;
+                            active = idleRight;
                             break;
                     }
                     break;
@@ -70,16 +82,16 @@ namespace BasicRPGTest_Mono.Engine.Graphics
                     switch (direction)
                     {
                         case Direction.Up:
-                            texture = moveUp.texture;
+                            active = moveUp;
                             break;
                         case Direction.Down:
-                            texture = moveDown.texture;
+                            active = moveDown;
                             break;
                         case Direction.Left:
-                            texture = moveLeft.texture;
+                            active = moveLeft;
                             break;
                         case Direction.Right:
-                            texture = moveRight.texture;
+                            active = moveRight;
                             break;
                     }
                     break;
@@ -87,16 +99,16 @@ namespace BasicRPGTest_Mono.Engine.Graphics
                     switch (direction)
                     {
                         case Direction.Up:
-                            texture = attackUp.texture;
+                            active = attackUp;
                             break;
                         case Direction.Down:
-                            texture = attackDown.texture;
+                            active = attackDown;
                             break;
                         case Direction.Left:
-                            texture = attackLeft.texture;
+                            active = attackLeft;
                             break;
                         case Direction.Right:
-                            texture = attackRight.texture;
+                            active = attackRight;
                             break;
                     }
                     break;
