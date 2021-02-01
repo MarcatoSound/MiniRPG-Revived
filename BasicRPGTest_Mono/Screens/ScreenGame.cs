@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using BasicRPGTest_Mono.Engine;
-using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
@@ -11,16 +9,9 @@ using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using MonoGame.Extended.Screens;
-using MonoGame.Extended.Screens.Transitions;
-using MonoGame.Extended.Tiled;
-using MonoGame.Extended.Tiled.Renderers;
-using MonoGame.Extended.ViewportAdapters;
 using RPGEngine;
-using SharpNoise.Builders;
-using SharpNoise.Modules;
 using SharpNoise.Utilities.Imaging;
 
 namespace BasicRPGTest_Mono
@@ -36,8 +27,6 @@ namespace BasicRPGTest_Mono
         public Player player;
         string worldName;
 
-        private SpriteFont font;
-
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
@@ -46,6 +35,8 @@ namespace BasicRPGTest_Mono
         private Rectangle cameraRectangle = new Rectangle();
 
         private bool v_NotNewDraw;
+
+        private Texture2D cloudOverlay;
 
 
         //====================================================================================
@@ -65,7 +56,8 @@ namespace BasicRPGTest_Mono
         {
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            font = Content.Load<SpriteFont>("arial");
+            Core.dmgFont = Content.Load<SpriteFont>("dmg");
+            Core.critFont = Content.Load<SpriteFont>("crit");
 
             Game.renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
 
@@ -86,6 +78,7 @@ namespace BasicRPGTest_Mono
             loadHud();
 
             Texture2D texture;
+            cloudOverlay = Content.Load<Texture2D>("cloud_overlay");
 
             texture = Content.Load<Texture2D>("player_spriteset");
             player = new Player(texture, _graphics);
@@ -297,7 +290,8 @@ namespace BasicRPGTest_Mono
 
                 cameraRectangle = Camera.camera.BoundingRectangle;
                 // Update Map's Visible Regions
-                MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                //MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
             }
 
         }
@@ -306,15 +300,15 @@ namespace BasicRPGTest_Mono
         {
 
             // Start Code Timer. Can be used for testing different sections of the code
-            //Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
-            //codeTimer.startTimer();
+            Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+            codeTimer.startTimer();
 
 
             var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
 
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.CornflowerBlue);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
 
             //GraphicsDevice.SetRenderTarget(Game.renderTarget);
 
@@ -323,7 +317,8 @@ namespace BasicRPGTest_Mono
             {
                 // Just in case this doesn't happen automatically. This ensures it happens right away.
                 // Update Map's Visible Regions
-                MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                //MapManager.activeMap.updateVisibleRegions(Camera.camera);
+                MapManager.activeMap.update_VisibleRegions(Camera.camera);
                 v_NotNewDraw = true;
             }
 
@@ -337,11 +332,10 @@ namespace BasicRPGTest_Mono
 
             MapManager.activeMap.DrawVisibleMapCache(Camera.camera, _spriteBatch);
             // Below function is for hard speed testing function
-            //MapManager.activeMap.Draw_VisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
+            //MapManager.activeMap.DrawVisibleMapTileCache_SpeedTest(Camera.camera, _spriteBatch, 1000);
 
-            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
-            _spriteBatch.End();
+            _spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
+            _spriteBatch.Draw(cloudOverlay, Vector2.Zero, null, Microsoft.Xna.Framework.Color.White, 0, Vector2.Zero, 16, SpriteEffects.None, 0);
 
 
             //return;  // Stop Function Here (for testing)
@@ -351,12 +345,15 @@ namespace BasicRPGTest_Mono
             foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);
-                _spriteBatch.Begin(transformMatrix: Camera.camera.Transform);
-                _spriteBatch.DrawRectangle(entity.boundingBox, Microsoft.Xna.Framework.Color.White);
-                _spriteBatch.End();
             }
 
+
             player.draw(_spriteBatch);
+
+            _spriteBatch.End();
+
+
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             HudManager.Draw(_spriteBatch);
 
@@ -365,12 +362,27 @@ namespace BasicRPGTest_Mono
                 GuiWindowManager.activeWindow.Draw(_spriteBatch);
             }
 
+            _spriteBatch.End();
 
+            // Draw active popup texts
+            _spriteBatch.Begin(transformMatrix: Camera.camera.Transform, blendState: BlendState.NonPremultiplied);
+            List<PopupText> popups = new List<PopupText>(Core.popupTexts);
+            foreach (PopupText popup in popups)
+            {
+                if (popup == null) continue;
+                popup.draw(_spriteBatch);
+            }
+            _spriteBatch.End();
+
+
+            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+            _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.End();
 
             // End Code Timer for speed test
-            //codeTimer.endTimer();
+            codeTimer.endTimer();
             // Report function's speed
-            //Engine.Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
+            //Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
 
 
         }

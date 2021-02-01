@@ -1,4 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
@@ -7,6 +9,7 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace RPGEngine
 {
@@ -27,6 +30,9 @@ namespace RPGEngine
         public bool isCollidable { get; set; }
         public int zIndex { get; set; }
 
+        public double maxHealth { get; set; }
+        public bool destructable { get; set; }
+
         // Instance variables
         public bool isInstance { get; set; }
         public Tile parent { get; set; }
@@ -36,9 +42,39 @@ namespace RPGEngine
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
         public Dictionary<TileSide, bool> sides { get; set; }
+
+        private Dictionary<Graphic, Vector2> edgeCache = new Dictionary<Graphic, Vector2>();
+        private bool v_Visible = true;
+        public bool seeThrough = false;
+
         public Biome biome { get; set; }
 
-        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1)
+        private double _health;
+        public double health
+        {
+            get { return _health; }
+            set
+            {
+                if (value <= 0)
+                {
+                    Destroy();
+                }
+                else if (value > maxHealth)
+                {
+                    _health = maxHealth;
+                }
+                else
+                    _health = value;
+                healthPercent = _health / maxHealth;
+            }
+        }
+        public bool isBeingDamaged;
+        public double healthPercent;
+        private int breakTexture;
+        private Timer restoreTimer;
+
+
+        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
         {
             id = TileManager.tiles.Count;
             this.name = name;
@@ -46,6 +82,8 @@ namespace RPGEngine
             isCollidable = collidable;
             isInstance = instance;
             sideGraphics = new Dictionary<TileSide, Graphic>();
+            this.maxHealth = maxHP;
+            this.destructable = destructable;
 
             if (texture.Width > dimensions)
             {
@@ -70,6 +108,7 @@ namespace RPGEngine
         // For instantiating an existing tile
         public Tile(Tile tile, Vector2 tilePos, Biome biome)
         {
+
             this.parent = tile;
             this.name = tile.name;
             this.id = tile.id;
@@ -85,6 +124,16 @@ namespace RPGEngine
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
 
+            maxHealth = tile.maxHealth;
+            health = maxHealth;
+            this.destructable = tile.destructable;
+            restoreTimer = new Timer(10000);
+            restoreTimer.Elapsed += (sender, args) =>
+            {
+                Heal(maxHealth);
+                restoreTimer.Stop();
+            };
+
         }
 
         private Graphic getSideGraphic(TileSide side)
@@ -99,6 +148,7 @@ namespace RPGEngine
         {
             if (sideGraphics.Count == 0) return;
             Vector2 drawPos;
+            int drawnEdgesCount = 0;
             foreach (KeyValuePair<TileSide, bool> pair in sides)
             {
                 bool draw = pair.Value;
@@ -110,40 +160,61 @@ namespace RPGEngine
                 switch (side)
                 {
                     case TileSide.NorthWest:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.X -= TileManager.dimensions;
+                        drawPos.Y -= TileManager.dimensions;
                         break;
                     case TileSide.North:
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.Y -= TileManager.dimensions;
                         break;
                     case TileSide.NorthEast:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
-                        drawPos.Y = drawPos.Y - TileManager.dimensions;
+                        drawPos.X += TileManager.dimensions;
+                        drawPos.Y -= TileManager.dimensions;
                         break;
                     case TileSide.West:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
+                        drawPos.X -= TileManager.dimensions;
                         break;
                     case TileSide.East:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
+                        drawPos.X += TileManager.dimensions;
                         break;
                     case TileSide.SouthWest:
-                        drawPos.X = drawPos.X - TileManager.dimensions;
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.X -= TileManager.dimensions;
+                        drawPos.Y += TileManager.dimensions;
                         break;
                     case TileSide.South:
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.Y += TileManager.dimensions;
                         break;
                     case TileSide.SouthEast:
-                        drawPos.X = drawPos.X + TileManager.dimensions;
-                        drawPos.Y = drawPos.Y + TileManager.dimensions;
+                        drawPos.X += TileManager.dimensions;
+                        drawPos.Y += TileManager.dimensions;
                         break;
                 }
 
-                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, false, 0);
+                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
+
+                drawnEdgesCount++;
             }
 
             return;
+
+        }
+        public void drawAdjacentTiles2(SpriteBatch batch)
+        {
+
+            int drawnEdgesCount = 0;
+
+            foreach (KeyValuePair<Graphic, Vector2> pair in edgeCache)
+            {
+                //if (pair.Key == null) { continue; }
+                pair.Key.draw(batch, pair.Value, 0f, Vector2.Zero, 1, 0);
+
+                //batch.DrawRectangle(new Rectangle((int)pair.Value.X, (int)pair.Value.Y, 32, 32), Color.Red);
+
+                drawnEdgesCount++;
+            }
+
+            // Show count of this Tile's number of Drawn Edges
+            //batch.DrawString(Core.mainFont, drawnEdgesCount.ToString(), pos, Microsoft.Xna.Framework.Color.Black);
 
         }
 
@@ -153,8 +224,10 @@ namespace RPGEngine
             Graphic graphic;
             Vector2 checkPos;
             Tile checkTile;
+            bool isCorner;
             foreach (TileSide side in Enum.GetValues(typeof(TileSide)))
             {
+                isCorner = false;
                 graphic = getSideGraphic(side);
                 if (graphic == null) continue;
                 checkPos = tilePos;
@@ -163,6 +236,7 @@ namespace RPGEngine
                     case TileSide.NorthWest:
                         checkPos.X -= 1;
                         checkPos.Y -= 1;
+                        isCorner = true;
                         break;
                     case TileSide.North:
                         checkPos.Y -= 1;
@@ -170,6 +244,7 @@ namespace RPGEngine
                     case TileSide.NorthEast:
                         checkPos.X += 1;
                         checkPos.Y -= 1;
+                        isCorner = true;
                         break;
                     case TileSide.West:
                         checkPos.X -= 1;
@@ -180,6 +255,7 @@ namespace RPGEngine
                     case TileSide.SouthWest:
                         checkPos.X -= 1;
                         checkPos.Y += 1;
+                        isCorner = true;
                         break;
                     case TileSide.South:
                         checkPos.Y += 1;
@@ -187,18 +263,42 @@ namespace RPGEngine
                     case TileSide.SouthEast:
                         checkPos.X += 1;
                         checkPos.Y += 1;
+                        isCorner = true;
                         break;
                 }
                 checkTile = layer.getTile(checkPos);
                 if (checkTile == null || checkTile.zIndex < zIndex)
                 {
-                    sides.Remove(side);
-                    sides.Add(side, true);
+                    if (isCorner)
+                    {
+                        Tile north = layer.getTile(checkPos.X, checkPos.Y - 1);
+                        Tile south = layer.getTile(checkPos.X, checkPos.Y + 1);
+                        Tile east = layer.getTile(checkPos.X - 1, checkPos.Y);
+                        Tile west = layer.getTile(checkPos.X + 1, checkPos.Y);
+                        if ((north == null || north.zIndex < zIndex) && (south == null || south.zIndex < zIndex) && (east == null || east.zIndex < zIndex) && (west == null || west.zIndex < zIndex))
+                        {
+                            sides.Remove(side);
+                            sides.Add(side, true);
+                        }
+
+                    } 
+                    else
+                    {
+                        sides.Remove(side);
+                        sides.Add(side, true);
+                    }
                 }
                 else
                 {
-                    sides.Remove(side);
-                    sides.Add(side, false);
+                    if (isCorner)
+                    {
+
+                    }
+                    else
+                    {
+                        sides.Remove(side);
+                        sides.Add(side, false);
+                    }
                 }
             }
 
@@ -208,9 +308,90 @@ namespace RPGEngine
         public void draw(SpriteBatch batch)
         {
             if (!isInstance) return;
-            /*parent.graphic.draw(batch, pos, 0f, Vector2.Zero, 1, false, 0.1f);
-            drawAdjacentTiles(batch);*/
-            batch.DrawRectangle(box, Color.White);
+
+            if (healthPercent < 1)
+                drawBreakTexture(batch);
+
+            if (isBeingDamaged)
+                batch.DrawRectangle(box, Color.Red);
+        }
+        public void drawBreakTexture(SpriteBatch batch)
+        {
+            Texture2D spriteSet = TileManager.breakTexture;
+            if (spriteSet == null) return;
+
+            Rectangle targetRect = new Rectangle(TileManager.dimensions * breakTexture, 0, TileManager.dimensions, TileManager.dimensions);
+
+            batch.Draw(spriteSet, pos, targetRect, Color.White);
+        }
+
+
+        public void Damage(double dmg)
+        {
+            restoreTimer.Stop();
+            restoreTimer.Start();
+            health -= dmg;
+
+            if (healthPercent < 1 && healthPercent >= 0.75)
+                breakTexture = 1;
+            else if (healthPercent < 0.75 && healthPercent >= 0.5)
+                breakTexture = 2;
+            else if (healthPercent < 0.5 && healthPercent >= 0.25)
+                breakTexture = 3;
+            else if (healthPercent < 0.25)
+                breakTexture = 4;
+
+            isBeingDamaged = true;
+            Timer timer = new Timer(500);
+            timer.Elapsed += (sender, args) =>
+            {
+                isBeingDamaged = false;
+                timer.Stop();
+            };
+            timer.Start();
+
+            showDamageText(dmg);
+        }
+        public void Heal(double gain)
+        {
+            health += gain;
+        }
+        public void Destroy()
+        {
+            map.removeTile(this);
+
+            if (this.name == "grass")
+            {
+                Tile replacement = new Tile(TileManager.getByName("dirt"), tilePos, biome);
+                replacement.layer = layer;
+                map.addTile(replacement);
+            }
+
+            List<Tile> surroundings = Util.getSurroundingTiles(map, 1, tilePos);
+            foreach (Tile tile in surroundings)
+            {
+                if (tile == null) continue;
+                if (tile.sideGraphics.Count == 0) continue;
+                tile.update();
+            }
+
+            // Rebuilds updated Visible Tile Cache
+            map.buildVisibleTileCache();
+
+        }
+
+        public void showDamageText(double dmg)
+        {
+            // TODO: Implement check for critical hit.
+            Vector2 stringPos = new Vector2(drawPos.X, drawPos.Y);
+            Vector2 stringSize = Core.dmgFont.MeasureString(dmg.ToString());
+            stringPos.X -= stringSize.X / 2;
+            stringPos.Y -= 20;
+
+            Random rand = new Random();
+            stringPos.X += rand.Next(-5, 5);
+
+            new MovingText(dmg.ToString(), Core.dmgFont, stringPos, new TextColor(Color.Crimson), 500);
         }
 
 

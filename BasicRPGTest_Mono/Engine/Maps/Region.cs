@@ -34,16 +34,23 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             this.tiles.Add(tile);
         }
+        public void removeTile(Tile mTile)
+        {
+            // Remove Tile from Region
+            tiles.Remove(mTile);
+        }
 
         public void draw(SpriteBatch batch, TileLayer layer)
         {
             foreach (Tile tile in tiles)
             {
-                if (tile.layer == layer)
-                    tile.drawAdjacentTiles(batch);
+                /*if (tile.layer == layer)
+                    tile.drawAdjacentTiles(batch);*/
+
+                tile.draw(batch);
 
             }
-            //batch.DrawRectangle(box, Color.White);
+            batch.DrawRectangle(box, Color.White);
         }
 
     }

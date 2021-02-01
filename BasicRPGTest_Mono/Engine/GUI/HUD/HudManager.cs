@@ -50,12 +50,10 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         }
         public static void Draw(SpriteBatch batch)
         {
-            batch.Begin(samplerState: SamplerState.PointClamp);
             foreach (HudElement element in elements)
             {
                 element.Draw(batch);
             }
-            batch.End();
         }
 
         public static void Clear()

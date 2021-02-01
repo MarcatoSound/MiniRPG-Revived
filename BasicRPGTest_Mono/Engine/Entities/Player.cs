@@ -87,6 +87,7 @@ namespace BasicRPGTest_Mono.Engine
             inventory.setItem(30, ItemManager.getByNamespace("cryorose"));
             inventory.setItem(52, ItemManager.getByNamespace("hollysong"));
             inventory.addItem(ItemManager.getByNamespace("hollysong"));
+            inventory.addItem(ItemManager.getByNamespace("crystalsword"));
             inventory.hotbarPrimary.setItem(0, ItemManager.getByNamespace("hollysong"));
             inventory.hotbarPrimary.setItem(1, ItemManager.getByNamespace("ironroot"));
             inventory.hotbarPrimary.setItem(2, ItemManager.getByNamespace("cryorose"));
@@ -125,7 +126,7 @@ namespace BasicRPGTest_Mono.Engine
             Item mainhand = inventory.hotbarPrimary.hand;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 200, this, mainhand, mainhand.swingStyle, mainhand.swingDist);
+            itemSwing = new ItemSwing(direction, 200, this, mainhand, Position, mainhand.swingStyle, mainhand.swingDist);
             attackTimer = new Timer(200);
             attackTimer.Elapsed += (sender, args) =>
             {
@@ -134,6 +135,45 @@ namespace BasicRPGTest_Mono.Engine
                 attackTimer = null;
             };
             attackTimer.Start();
+
+            // Tool handling
+            if (mainhand.GetType() == typeof(Tool))
+            {
+                Tool tool = (Tool)mainhand;
+
+                Vector2 targetPos = Utility.Util.getTilePosition(Position);
+                Tile tile = null;
+                switch (direction)
+                {
+                    case Direction.Up:
+                        targetPos.Y = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Top);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                    case Direction.Down:
+                        targetPos.Y = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Bottom);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                    case Direction.Left:
+                        targetPos.X = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Left);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                    case Direction.Right:
+                        targetPos.X = Utility.Util.trueCoordToTileCoord(itemSwing.hitBox.Right);
+                        tile = map.getTopTile(targetPos);
+                        break;
+                }
+                if (tile == null) return;
+                if (tool.damageTypes.ContainsKey(DamageType.Mining))
+                {
+                    double damage;
+                    if (tile.destructable)
+                        damage = tool.damageTypes[DamageType.Mining];
+                    else
+                        damage = 0;
+                    tile.Damage(damage);
+                    System.Diagnostics.Debug.WriteLine($"Dealt {damage} damage to tile at {tile.tilePos}");
+                }
+            }
 
         }
         public void Dash()
@@ -259,10 +299,10 @@ namespace BasicRPGTest_Mono.Engine
             foreach (LivingEntity entity in entities)
             {
                 if (itemSwing != null && itemSwing.hitBox.Intersects(entity.boundingBox) && !entity.isImmunity)
-                    entity.hurt(Position);
+                    entity.hurt(inventory.mainhand.damage, Position);
 
                 if (boundingBox.Intersects(entity.boundingBox) && !entity.isImmunity)
-                    hurt(entity.CenteredPosition);
+                    hurt(entity.damage, entity.CenteredPosition);
             }
 
             var kstate = Keyboard.GetState();
@@ -364,7 +404,7 @@ namespace BasicRPGTest_Mono.Engine
             move();
 
         }
-        public override void hurt(Vector2 sourcePos)
+        public override void hurt(double dmg, Vector2 sourcePos)
         {
             if (isImmunity) return;
             isImmunity = true;
@@ -382,6 +422,7 @@ namespace BasicRPGTest_Mono.Engine
             immunityTimer.Start();
 
             knockback(sourcePos);
+            showDamageText(dmg);
         }
         public override void knockback(Vector2 sourcePos)
         {
@@ -418,18 +459,15 @@ namespace BasicRPGTest_Mono.Engine
 
         public override void draw(SpriteBatch batch)
         {
-            batch.Begin(transformMatrix: Camera.camera.Transform);
             Vector2 screenPos = Position;
-            graphic.draw(batch, screenPos, tintColor, false);
+            ((GraphicSet)graphic).active.draw(batch, screenPos, tintColor);
 
             batch.DrawRectangle(boundingBox, Color.LightGray);
-            batch.End();
 
             if (itemSwing != null)
             {
                 itemSwing.Draw(batch, Position);
             }
-
         }
 
     }

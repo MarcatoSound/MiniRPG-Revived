@@ -1,4 +1,5 @@
-﻿using RPGEngine;
+﻿using Microsoft.Xna.Framework.Graphics;
+using RPGEngine;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +14,8 @@ namespace BasicRPGTest_Mono.Engine.Maps
     {
         public static List<Tile> tiles { get; set; }
         public static int dimensions { get; set; }
+
+        public static Texture2D breakTexture { get; set; }
 
         static TileManager()
         {
@@ -57,6 +60,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             return tiles;
         }
+
 
         public static void Clear()
         {

@@ -5,6 +5,7 @@ using BasicRPGTest_Mono.Engine.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RPGEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -369,6 +370,12 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return pos;
         }
+        public static int trueCoordToTileCoord(int truePos)
+        {
+            //System.Diagnostics.Debug.WriteLine($"TruePos {truePos}");
+            //System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
+            return truePos / TileManager.dimensions;
+        }
 
         public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int dimensions = 32)
         {
@@ -545,6 +552,33 @@ namespace BasicRPGTest_Mono.Engine.Utility
             str = Regex.Replace(str, "[!@#$%^&*();:'\",.<>/?[\\]{}\\-+_=|\\s]", "");
 
             return str;
+        }
+
+
+        public static List<Tile> getSurroundingTiles(Map map, int radius, Vector2 pos)
+        {
+            List<Tile> tiles = new List<Tile>();
+
+            Vector2 startingPos = new Vector2(pos.X - radius, pos.Y - radius);
+
+            Vector2 targetPos = new Vector2();
+            for (int x = (int)startingPos.X; x < startingPos.X + 1 +(radius * 2); x++)
+            {
+                for (int y = (int)startingPos.Y; y < startingPos.Y + 1 + (radius * 2); y++)
+                {
+                    foreach (TileLayer layer in map.layers)
+                    {
+                        targetPos.X = x;
+                        targetPos.Y = y;
+                        tiles.Add(layer.getTile(targetPos));
+                    }
+                    //System.Diagnostics.Debug.WriteLine($"Scanned position {targetPos}.");
+                }
+            }
+
+            //System.Diagnostics.Debug.WriteLine($"Collected {tiles.Count} tiles.");
+
+            return tiles;
         }
 
 
