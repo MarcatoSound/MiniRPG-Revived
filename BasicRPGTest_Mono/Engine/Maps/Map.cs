@@ -310,6 +310,10 @@ namespace BasicRPGTest_Mono.Engine
             Utility.Util.myDebug("Load.cs loadMap()", "Map (" + path + ") Loaded CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
 
 
+            // Test spawn a bunch of Entities
+            spawnNewRandomEntities(50);
+
+
             //return layers;
 
         }
@@ -423,6 +427,11 @@ namespace BasicRPGTest_Mono.Engine
         }
         public void trySpawn(Object source, ElapsedEventArgs e)
         {
+
+            // Turn off (for testing) by Returning automatically
+            //return;
+
+            
             if (livingEntities.Count >= livingEntityCap) return;
             Random rand = new Random();
 
@@ -459,6 +468,27 @@ namespace BasicRPGTest_Mono.Engine
 
             return pos;
         }
+
+
+        public bool spawnNewRandomEntities (int mCount)
+        {
+
+            for (int i = 0; i < mCount; i++)
+            {
+                Spawn spawn = Utility.Util.randomizeSpawn(spawns);
+
+                //System.Diagnostics.Debug.WriteLine("Successfully spawned entity " + spawn.entity.name);
+
+                Vector2 target = findSpawnLocation(spawn.entity);
+
+                LivingEntity ent = new LivingEntity(spawn.entity, target, livingEntities.Count);
+                livingEntities.TryAdd(livingEntities.Keys.Count, ent);
+
+            }
+
+            return true;
+        }
+
 
         public bool isLocationSafe(Rectangle location)
         {

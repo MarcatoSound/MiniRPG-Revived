@@ -440,6 +440,7 @@ namespace BasicRPGTest_Mono
             _spriteBatch.DrawString(font, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             // Show count of Tiles Drawn
             _spriteBatch.DrawString(font, "Tiles Drawn: " + MapManager.activeMap.TilesDrawnCount.ToString(), new Vector2(25, 50), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.DrawString(font, "Entities: " + MapManager.activeMap.livingEntities.Count.ToString(), new Vector2(25, 70), Microsoft.Xna.Framework.Color.Black);
 
             _spriteBatch.End();
 
