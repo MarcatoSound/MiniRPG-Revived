@@ -59,6 +59,10 @@ namespace RPGEngine
                 {
                     Destroy();
                 }
+                else if (value > maxHealth)
+                {
+                    _health = maxHealth;
+                }
                 else
                     _health = value;
                 healthPercent = _health / maxHealth;
@@ -67,6 +71,7 @@ namespace RPGEngine
         public bool isBeingDamaged;
         public double healthPercent;
         private int breakTexture;
+        private Timer restoreTimer;
 
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
@@ -122,6 +127,12 @@ namespace RPGEngine
             maxHealth = tile.maxHealth;
             health = maxHealth;
             this.destructable = tile.destructable;
+            restoreTimer = new Timer(10000);
+            restoreTimer.Elapsed += (sender, args) =>
+            {
+                Heal(maxHealth);
+                restoreTimer.Stop();
+            };
 
         }
 
@@ -317,6 +328,8 @@ namespace RPGEngine
 
         public void Damage(double dmg)
         {
+            restoreTimer.Stop();
+            restoreTimer.Start();
             health -= dmg;
 
             if (healthPercent < 1 && healthPercent >= 0.75)

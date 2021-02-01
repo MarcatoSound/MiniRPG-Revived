@@ -16,6 +16,7 @@ namespace BasicRPGTest_Mono.Engine.Graphics
             get { return _active; }
             set
             {
+                if (_active == value) return;
                 _active = value;
                 texture = value.texture;
             }

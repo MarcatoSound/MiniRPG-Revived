@@ -51,6 +51,12 @@ namespace RPGEngine
             columns = graphic.columns;
             currentFrame = 0;
             totalFrames = rows * columns;
+
+            frameTimer = new Timer(graphic.framerate);
+            framerate = graphic.framerate;
+
+            frameTimer.Elapsed += update;
+            frameTimer.Start();
         }
 
 

@@ -481,10 +481,10 @@ namespace BasicRPGTest_Mono.Engine
             v_CameraViewBox.Height = camera.BoundingRectangle.Height;
 
             // Use a slightly shrunken ViewPort instead  (full Camera BoundingRectangle is good, but for some reason grabs one X and Y Region row earlier than it should)
-            v_RegionViewBox.X = v_CameraViewBox.X + getRegionSizeWideInPixels();
-            v_RegionViewBox.Y = v_CameraViewBox.Y + getRegionSizeHighInPixels();
-            v_RegionViewBox.Width = v_CameraViewBox.Width - getRegionSizeWideInPixels();
-            v_RegionViewBox.Height = v_CameraViewBox.Height - getRegionSizeHighInPixels();
+            //v_RegionViewBox.X = v_CameraViewBox.X;
+            //v_RegionViewBox.Y = v_CameraViewBox.Y;
+            //v_RegionViewBox.Width = v_CameraViewBox.Width;
+            //v_RegionViewBox.Height = v_CameraViewBox.Height;
 
 
             //VisibleRegions = getRegionsInRectangle(camera.BoundingRectangle);
@@ -498,7 +498,7 @@ namespace BasicRPGTest_Mono.Engine
             {
 
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
-                if (v_RegionViewBox.Intersects(region.box))
+                if (v_CameraViewBox.Intersects(region.box))
                 //if (camera.BoundingRectangle.Intersects(region.box))
                 {
                     // If List Does NOT Contain this Region
