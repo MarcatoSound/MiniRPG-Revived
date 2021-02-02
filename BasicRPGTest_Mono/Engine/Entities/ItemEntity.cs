@@ -4,11 +4,15 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine.Entities
 {
     public class ItemEntity : Entity, IDisposable
     {
+        const int timeToLive = 600000;
+        private Timer despawnTimer;
+
         public Map map;
 
         private Rectangle box = new Rectangle(0, 0, 24, 24);
@@ -27,6 +31,12 @@ namespace BasicRPGTest_Mono.Engine.Entities
             }
 
             Core.items.Add(Position, this);
+            despawnTimer = new Timer(timeToLive);
+            despawnTimer.Elapsed += (senders, args) => {
+                despawnTimer.Stop();
+                remove();
+            };
+            despawnTimer.Start();
         }
 
         public List<ItemEntity> getNearbyItems(int pixelRadius)

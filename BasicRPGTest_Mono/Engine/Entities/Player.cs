@@ -62,7 +62,7 @@ namespace BasicRPGTest_Mono.Engine
             kbResist = 0.75f;
 
             inventory = new PlayerInventory();
-            inventory.addItem(new Item(ItemManager.getByNamespace("hollysong")));
+            inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
             inventory.addItem(new Item(ItemManager.getByNamespace("arcticfoxtail")));
             inventory.addItem(new Item(ItemManager.getByNamespace("ironroot")));
             inventory.addItem(new Item(ItemManager.getByNamespace("sunfeather")));
@@ -83,10 +83,10 @@ namespace BasicRPGTest_Mono.Engine
             inventory.setItem(23, new Item(ItemManager.getByNamespace("ironroot")));
             inventory.setItem(35, new Item(ItemManager.getByNamespace("unicornhorn")));
             inventory.setItem(30, new Item(ItemManager.getByNamespace("cryorose")));
-            inventory.setItem(52, new Item(ItemManager.getByNamespace("hollysong")));
-            inventory.addItem(new Item(ItemManager.getByNamespace("hollysong")));
-            inventory.addItem(new Item(ItemManager.getByNamespace("crystalsword")));
-            inventory.hotbarPrimary.setItem(0, new Item(ItemManager.getByNamespace("hollysong")));
+            inventory.setItem(52, new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
+            inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
+            inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("crystalsword")));
+            inventory.hotbarPrimary.setItem(0, new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
             inventory.hotbarPrimary.setItem(1, new Item(ItemManager.getByNamespace("ironroot")));
             inventory.hotbarPrimary.setItem(2, new Item(ItemManager.getByNamespace("cryorose")));
             inventory.hotbarSecondary.setItem(0, new Item(ItemManager.getByNamespace("arcticfoxtail")));
