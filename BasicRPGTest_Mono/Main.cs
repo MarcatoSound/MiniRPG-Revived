@@ -9,6 +9,7 @@ using BasicRPGTest_Mono.Engine.Utility;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Entities;
 
 namespace BasicRPGTest_Mono
 {
@@ -77,7 +78,9 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
+                        new ItemEntity(MapManager.activeMap, ItemManager.getByNamespace("unicornhorn"), Core.player.Position);
+
+                        //new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
 
                         /*
                         Image img = new Image();
@@ -228,6 +231,13 @@ namespace BasicRPGTest_Mono
                                     playerInv.updateGui();
                                 }
                             }
+                        }
+                    }
+                    else
+                    {
+                        if (args.Button == MonoGame.Extended.Input.MouseButton.Left)
+                        {
+
                         }
                     }
                 }

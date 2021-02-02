@@ -30,13 +30,11 @@ namespace BasicRPGTest_Mono.Engine
         public Timer attackTimer;
 
         public PlayerInventory inventory;
-        public Player(Texture2D texture, GraphicsDeviceManager graphics) : 
-            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), graphics, 125f)
+        public Player(Texture2D texture) : 
+            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), 125f)
         {
             Core.player = this;
             Camera.camera.Focus = this;
-
-            graphicsManager = graphics;
 
             Random rand = new Random();
             Vector2 spawnPoint = new Vector2(rand.Next(32, MapManager.activeMap.widthInPixels / 2 - 32), rand.Next(32, MapManager.activeMap.heightInPixels / 2 - 32));

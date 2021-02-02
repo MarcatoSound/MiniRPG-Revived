@@ -157,11 +157,11 @@ namespace BasicRPGTest_Mono.Screens
         private void loadEntities()
         {
             Texture2D texture = Content.Load<Texture2D>("enemy1");
-            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26)));
             texture = Content.Load<Texture2D>("enemy2");
-            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26)));
             texture = Content.Load<Texture2D>("enemy3");
-            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26)));
 
             foreach (LivingEntity entity in EntityManager.livingEntities.Values)
             {

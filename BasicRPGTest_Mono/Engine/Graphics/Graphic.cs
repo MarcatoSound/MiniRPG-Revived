@@ -60,6 +60,10 @@ namespace BasicRPGTest_Mono.Engine
         {
             spriteBatch.Draw(texture, location, null, Color.White, rotation, origin, scale, SpriteEffects.None, 0f);
         }
+        public virtual void draw(SpriteBatch spriteBatch, Vector2 location, Color tintColor, float rotation, Vector2 origin, float scale = 1, float z = 1)
+        {
+            spriteBatch.Draw(texture, location, null, tintColor, rotation, origin, scale, SpriteEffects.None, 0f);
+        }
 
 
         public virtual void draw_Tiles(SpriteBatch spriteBatch, List<Vector2> locations)

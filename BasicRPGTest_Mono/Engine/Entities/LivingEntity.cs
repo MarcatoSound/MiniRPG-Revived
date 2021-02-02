@@ -35,7 +35,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public Map map;
 
-        public LivingEntity(string name, Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
+        public LivingEntity(string name, Texture2D texture, Rectangle box, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
@@ -45,7 +45,7 @@ namespace BasicRPGTest_Mono.Engine
 
             //EntityManager.add(this);
         }
-        public LivingEntity(string name, Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
+        public LivingEntity(string name, Graphic graphic, Rectangle box, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
@@ -54,7 +54,7 @@ namespace BasicRPGTest_Mono.Engine
 
             //EntityManager.add(this);
         }
-        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
+        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height))
         {
             this.speed = entity.speed;
             this.Position = pos;

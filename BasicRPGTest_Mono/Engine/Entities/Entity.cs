@@ -48,14 +48,13 @@ namespace BasicRPGTest_Mono.Engine
             }
         }
 
-        public GraphicsDeviceManager graphicsManager { get; set; }
 
-        public Entity(Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsDevice)
+        public Entity(Graphic graphic) : this(graphic, new Rectangle(0, 0, graphic.width, graphic.height)) { }
+        public Entity(Graphic graphic, Rectangle box)
         {
             this.graphic = graphic;
             boundingBox = box;
             if (GetType() == typeof(Entity)) id = EntityManager.entities.Count;
-            graphicsManager = graphicsDevice;
 
 
             //EntityManager.add(this);

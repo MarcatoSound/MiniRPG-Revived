@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
@@ -81,7 +82,7 @@ namespace BasicRPGTest_Mono
             cloudOverlay = Content.Load<Texture2D>("cloud_overlay");
 
             texture = Content.Load<Texture2D>("player_spriteset");
-            player = new Player(texture, _graphics);
+            player = new Player(texture);
 
             if (loadPlayer())
                 Save.save(player, worldName);
@@ -176,11 +177,11 @@ namespace BasicRPGTest_Mono
         private void loadEntities()
         {
             Texture2D texture = Content.Load<Texture2D>("enemy1");
-            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26)));
             texture = Content.Load<Texture2D>("enemy2");
-            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26)));
             texture = Content.Load<Texture2D>("enemy3");
-            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26), _graphics));
+            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26)));
 
             foreach (LivingEntity entity in EntityManager.livingEntities.Values)
             {
@@ -340,14 +341,22 @@ namespace BasicRPGTest_Mono
 
             //return;  // Stop Function Here (for testing)
 
+            // Draw the items on the map.
+            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(Core.items);
+            foreach (ItemEntity item in items.Values)
+            {
+                if (item == null) continue;
+                item.draw(_spriteBatch);
+            }
 
+            // Draw non-player entities;
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);
             }
 
-
+            // Draw the player.
             player.draw(_spriteBatch);
 
             _spriteBatch.End();
