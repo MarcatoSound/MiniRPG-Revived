@@ -19,6 +19,7 @@ namespace BasicRPGTest_Mono.Engine
         public static SpriteFont mainFont;
         public static SpriteFont dmgFont;
         public static SpriteFont critFont;
+        public static SpriteFont itemFont;
 
         public static Player player;
 

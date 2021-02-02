@@ -244,6 +244,13 @@
 /processorParam:TextureFormat=Color
 /build:iron_root.png
 
+#begin item.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:item.spritefont
+
 #begin main_font.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor

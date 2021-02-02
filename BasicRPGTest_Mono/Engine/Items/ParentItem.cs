@@ -1,15 +1,14 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace BasicRPGTest_Mono.Engine.Items
 {
-    public class Item
+    public class ParentItem
     {
-        public ParentItem parent;
-
         public int id { get; set; }
         public string name { get; set; }
         public string displayName { get; set; }
@@ -22,11 +21,28 @@ namespace BasicRPGTest_Mono.Engine.Items
         public Rectangle hitbox;
         public double damage;
 
+        // Instance variables
+        public bool isInstance = false;
+        public ParentItem parent;
         public int quantity { get; set; }
 
-        public Item(ParentItem parentItem, int quantity = 1)
+        public ParentItem(string displayName, Texture2D texture) : this(displayName, new Graphic(texture)) { }
+        public ParentItem(string displayName, Graphic graphic)
         {
-            parent = parentItem;
+            id = ItemManager.items.Count;
+            name = Utility.Util.cleanString(displayName).ToLower();
+            this.displayName = displayName;
+            this.graphic = graphic;
+
+
+            if (GetType() == typeof(ParentItem)) swingDist = 0.785f;
+            if (GetType() == typeof(ParentItem)) swingStyle = SwingStyle.Slash;
+            if (GetType() == typeof(ParentItem)) hitbox = new Rectangle(0, 0, 24, 24);
+            if (GetType() == typeof(ParentItem)) damage = 1;
+        }
+        public ParentItem(ParentItem parent, int quantity = 1)
+        {
+            this.parent = parent;
 
             id = parent.id;
             name = parent.name;
@@ -38,6 +54,7 @@ namespace BasicRPGTest_Mono.Engine.Items
             hitbox = parent.hitbox;
             damage = parent.damage;
 
+            isInstance = true;
             this.quantity = quantity;
 
         }

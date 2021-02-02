@@ -18,9 +18,10 @@ namespace BasicRPGTest_Mono.Engine.Entities
             this.item = item;
             Position = new Vector2((int)pos.X, (int)pos.Y);
 
-            List<ItemEntity> nearbyItems = getNearbyItems(80);
+            List<ItemEntity> nearbyItems = getNearbyItems(50);
             foreach (ItemEntity nearbyItem in nearbyItems)
             {
+                item.quantity += nearbyItem.item.quantity;
                 nearbyItem.remove();
                 // Add code for increasing the quantity of this new item here.
             }
@@ -76,6 +77,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
             if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
             float scale = (float)box.Width / item.graphic.texture.Width;
             graphic.draw(batch, Position, Color.White, 0f, Vector2.Zero, scale);
+            batch.DrawString(Core.itemFont, $"{item.quantity}", new Vector2(Position.X + 12, Position.Y + 12), Color.Black);
         }
 
         public void Dispose()

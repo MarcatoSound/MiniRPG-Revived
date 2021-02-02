@@ -78,7 +78,7 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        new ItemEntity(MapManager.activeMap, ItemManager.getByNamespace("unicornhorn"), Core.player.Position);
+                        new ItemEntity(MapManager.activeMap, new Item(ItemManager.getByNamespace("unicornhorn")), Core.player.Position);
 
                         //new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
 

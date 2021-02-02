@@ -6,26 +6,26 @@ namespace BasicRPGTest_Mono.Engine.Items
 {
     public static class ItemManager
     {
-        public static List<Item> items;
+        public static List<ParentItem> items;
 
         static ItemManager()
         {
-            items = new List<Item>();
+            items = new List<ParentItem>();
         }
 
-        public static void add(Item item)
+        public static void add(ParentItem item)
         {
             items.Add(item);
         }
 
-        public static Item get(int i)
+        public static ParentItem get(int i)
         {
             if (i > items.Count - 1) return null;
             return items[i];
         }
-        public static Item getByNamespace(string name)
+        public static ParentItem getByNamespace(string name)
         {
-            foreach (Item item in items)
+            foreach (ParentItem item in items)
             {
                 if (item.name == name) return item;
             }
@@ -33,7 +33,7 @@ namespace BasicRPGTest_Mono.Engine.Items
             return null;
         }
 
-        public static List<Item> getTiles()
+        public static List<ParentItem> getTiles()
         {
             return items;
         }
