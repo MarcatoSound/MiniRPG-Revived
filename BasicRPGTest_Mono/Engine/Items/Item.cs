@@ -15,6 +15,7 @@ namespace BasicRPGTest_Mono.Engine.Items
         public string displayName { get; set; }
         public Graphic graphic { get; set; }
         public string description { get; set; }
+        public int maxStackSize { get; set; } = 99;
 
         // Attack data
         public float swingDist;
@@ -32,6 +33,8 @@ namespace BasicRPGTest_Mono.Engine.Items
             name = parent.name;
             displayName = parent.displayName;
             graphic = parent.graphic;
+            description = parent.description;
+            maxStackSize = parent.maxStackSize;
 
             swingDist = parent.swingDist;
             swingStyle = parent.swingStyle;

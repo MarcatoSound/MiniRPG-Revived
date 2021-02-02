@@ -141,7 +141,7 @@ namespace BasicRPGTest_Mono.Screens
             sprite = Content.Load<Texture2D>("arctic_fox_tail");
             ItemManager.add(new ParentItem("Arctic Fox Tail", sprite));
             sprite = Content.Load<Texture2D>("unicorn_horn");
-            ItemManager.add(new ParentItem("Unicorn Horn", sprite));
+            ItemManager.add(new ParentItem("Unicorn Horn", sprite, 5));
             sprite = Content.Load<Texture2D>("sun_feather");
             ItemManager.add(new ParentItem("Sun Feather", sprite));
             sprite = Content.Load<Texture2D>("cryorose");
