@@ -31,6 +31,16 @@ namespace BasicRPGTest_Mono.Engine
 
         public void addItem(Item item)
         {
+            foreach (Item i in items.Values)
+            {
+                if (i == null) continue;
+                if (i.id == item.id)
+                {
+                    i.quantity += item.quantity;
+                    return;
+                }
+            }
+
             int slot = getFirstEmpty();
             //System.Diagnostics.Debug.WriteLine("First empty: " + slot);
             if (maxItems != 0 && slot + 1 > maxItems)

@@ -376,6 +376,15 @@ namespace BasicRPGTest_Mono.Engine.Utility
             //System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
             return truePos / TileManager.dimensions;
         }
+        public static Vector2 screenPosToTruePos(Vector2 truePos)
+        {
+            Vector2 pos = new Vector2(truePos.X, truePos.Y);
+
+            pos.X += Camera.camera.BoundingRectangle.X;
+            pos.Y += Camera.camera.BoundingRectangle.Y;
+
+            return pos;
+        }
 
         public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int dimensions = 32)
         {

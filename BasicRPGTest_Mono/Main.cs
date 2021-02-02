@@ -78,7 +78,6 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        new ItemEntity(MapManager.activeMap, new Item(ItemManager.getByNamespace("unicornhorn")), Core.player.Position);
 
                         //new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
 
@@ -237,7 +236,9 @@ namespace BasicRPGTest_Mono
                     {
                         if (args.Button == MonoGame.Extended.Input.MouseButton.Left)
                         {
-
+                            Vector2 clickPos = new Vector2(args.Position.X, args.Position.Y);
+                            clickPos = Util.screenPosToTruePos(clickPos);
+                            new ItemEntity(MapManager.activeMap, new Item(ItemManager.getByNamespace("unicornhorn")), clickPos);
                         }
                     }
                 }
