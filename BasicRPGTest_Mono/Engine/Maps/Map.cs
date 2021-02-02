@@ -21,6 +21,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public string name { get; set; }
         public List<TileLayer> layers { get; set; }
+        public Dictionary<string, TileLayer> layersByName = new Dictionary<string, TileLayer>();
         public Dictionary<Vector2, Region> regions { get; set; }
         public int width { get; set; }
         public int height { get; set; }
@@ -72,7 +73,7 @@ namespace BasicRPGTest_Mono.Engine
             initSpawns();
             spawnTimer = new Timer(1000);
             spawnTimer.Elapsed += trySpawn;
-            //spawnTimer.Start();
+            spawnTimer.Start();
 
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
@@ -92,6 +93,9 @@ namespace BasicRPGTest_Mono.Engine
 
             foreach (TileLayer layer in layers)
             {
+                // Ensure this layer is in the "ByName" dictionary
+                layersByName.Add(layer.name, layer);
+
                 Dictionary<Vector2, Tile> tiles = layer.tiles;
                 foreach (KeyValuePair<Vector2, Tile> pair in tiles)
                 {
@@ -107,9 +111,9 @@ namespace BasicRPGTest_Mono.Engine
 
                     tile.update();
 
-                    if (!tile.isCollidable) continue;
+                    //if (!tile.isCollidable) continue;
                     // Create a collidable box at the following true-map coordinate.
-                    collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
+                    //collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
                 }
 
             }
@@ -119,6 +123,7 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
+        // COnstruct a map based on an existing map.
         public Map(Map oldMap)
         {
             this.name = oldMap.name;
@@ -192,12 +197,15 @@ namespace BasicRPGTest_Mono.Engine
         public long getTilesTotalCountDrawn () { return this.v_drawnTileCount; }
         public void setTilesTotalCountDrawn (long mValue) { this.v_drawnTileCount += mValue;  }
 
+        /// <summary>
+        /// Get a layer from the map by its name.
+        /// </summary>
+        /// <param name="name">The name of the layer.</param>
+        /// <returns>The layer matching "name"; null if not found.</returns>
         public TileLayer getLayer(string name)
         {
-            foreach (TileLayer layer in layers)
-            {
-                if (layer.name.Equals(name)) return layer;
-            }
+            if (name != null && layersByName.ContainsKey(name))
+                return layersByName[name];
 
             return null;
         }
@@ -207,16 +215,23 @@ namespace BasicRPGTest_Mono.Engine
 
 
         //====================================================================================
-        // FUNCTIONS
+        // ENTITY FUNCTIONS
         //====================================================================================
 
+        /// <summary>
+        /// Set up the spawn chances for varying entities on this map.
+        /// </summary>
         public void initSpawns()
         {
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(0), 2));
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 3));
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 1));
         }
-
+        /// <summary>
+        /// Try to spawn an entity on the map.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e"></param>
         public void trySpawn(Object source, ElapsedEventArgs e)
         {
             if (livingEntities.Count >= livingEntityCap) return;
@@ -234,7 +249,11 @@ namespace BasicRPGTest_Mono.Engine
             livingEntities.TryAdd(livingEntities.Keys.Count, ent);
 
         }
-
+        /// <summary>
+        /// Attempts to find a place to spawn an entity.
+        /// </summary>
+        /// <param name="ent">The entity we are trying to spawn.</param>
+        /// <returns>The safe position found.</returns>
         public Vector2 findSpawnLocation(LivingEntity ent)
         {
             Vector2 pos = new Vector2();
@@ -247,6 +266,7 @@ namespace BasicRPGTest_Mono.Engine
             pos.X = x;
             pos.Y = y;
 
+            // TODO: Implement a "max tries" to prevent endless recursion.
             Rectangle target = new Rectangle(x, y, ent.boundingBox.Width, ent.boundingBox.Height);
             if (!isLocationSafe(target))
             {
@@ -255,26 +275,58 @@ namespace BasicRPGTest_Mono.Engine
 
             return pos;
         }
-
+        /// <summary>
+        /// Checks if a position is safe to place an object in.
+        /// </summary>
+        /// <param name="location">The bounding box </param>
+        /// <returns></returns>
         public bool isLocationSafe(Rectangle location)
         {
-            foreach (Rectangle collidable in collidables.Values)
+            Vector2 tilePos = Utility.Util.getTilePosition(new Vector2(location.X, location.Y));
+            List<Tile> nearbyTiles = Utility.Util.getSurroundingTiles(this, 2, tilePos);
+
+            Rectangle collidable;
+            foreach (Tile tile in nearbyTiles)
             {
+                if (tile == null) continue;
+                if (!tile.isCollidable) continue;
+
+                collidable = tile.box;
                 collidable.Inflate(5, 5);
                 if (location.Intersects(collidable)) return false;
             }
             return true;
         }
+
+        //====================================================================================
+        // TILE MAP FUNCTIONS
+        //====================================================================================
+        /// <summary>
+        /// Retrieve a region using a tile.
+        /// </summary>
+        /// <param name="tile">The tile we are retrieving the region of.</param>
+        /// <returns>The region this tile resides in.</returns>
         public Region getRegionByTile(Tile tile)
         {
             return regions[tile.region];
         }
+        /// <summary>
+        /// Retrieve a region base on a tile position.
+        /// </summary>
+        /// <param name="tilePos">The position of the tile.</param>
+        /// <returns>The region the provided tile position resides in.</returns>
         public Region getRegionByTilePosition(Vector2 tilePos)
         {
             Vector2 regionPos = new Vector2((int)(tilePos.X / 8), (int)(tilePos.Y / 8));
 
             return regions[regionPos];
         }
+        /// <summary>
+        /// Get regions surrounding the region a tile belongs to.
+        /// </summary>
+        /// <param name="tilePos">The position of the tile we are using as our starting point.</param>
+        /// <param name="radius">How many regions around we want to retrieve.</param>
+        /// <returns>A list of regions found nearby.</returns>
         public List<Region> getRegionsInRange(Vector2 tilePos, int radius)
         {
             List<Region> regions = new List<Region>();
@@ -298,18 +350,24 @@ namespace BasicRPGTest_Mono.Engine
             return regions;
 
         }
+        // Gets the top-most layer.
         public TileLayer getTopLayer()
         {
             return layers[layers.Count - 1];
         }
+        // Gets the tile at a position from the top-most layer.
         public Tile getTopTile(Vector2 tilePos)
         {
             List<TileLayer> layers = new List<TileLayer>(this.layers);
             layers.Reverse();
             Tile tile = null;
+
+            // Loop through the layers in reverse order.
             foreach (TileLayer layer in layers)
             {
                 tile = layer.getTile(tilePos);
+
+                // If the tile isn't null, we've found the top-most tile.
                 if (tile != null) break;
             }
 
@@ -320,34 +378,6 @@ namespace BasicRPGTest_Mono.Engine
             if (mLayer.tiles.ContainsKey(mPosition)) { return mLayer.tiles[mPosition]; }
             // Otherwise...
             return null;
-        }
-
-        // Remove Decoration Tile at Position
-        public void removeTile(Vector2 mTilePosition)
-        {
-            foreach (TileLayer layer in layers)
-            {
-
-                /*
-                // For testing purposes...
-                if (layer.tiles.ContainsKey(mTilePosition))
-                {
-                    // Get Tile
-                    tile = layer.tiles[mTilePosition];
-
-                    Utility.Util.myDebug("Layer (" + layer.name + "), Tile Position(" + mTilePosition + ") = " + tile.name);
-                }
-                */
-
-
-                if (layer.name != "decorations") { continue; }
-                // Otherwise...
-
-                // Remove Tile from THIS Layer
-                this.removeTile(layer, mTilePosition);
-
-                break;
-            }
         }
 
         // Remove Tile from Layer and Position
@@ -372,7 +402,6 @@ namespace BasicRPGTest_Mono.Engine
 
             return true;
         }
-
         // Remove specific Tile from Map (and Caches)
         public bool removeTile(Tile mTile)
         {
@@ -389,20 +418,6 @@ namespace BasicRPGTest_Mono.Engine
             Region region = regions[mTile.region];
             region.removeTile(mTile);
 
-
-
-            /*
-            Dictionary<Tile, List<Vector2>> tileTemplates = tilesCache[mTile.layer];
-            List<Vector2> list = tileTemplates[mTile.parent];
-            list.Remove(mTile.pos);
-
-            if (list.Count < 1)
-            {
-                // Remove TileTemplate from Cache
-                tileTemplates.Remove(mTile.parent);
-            }
-            */
-
             return true;
         }
         // Adds a new Tile to the Map
@@ -416,11 +431,6 @@ namespace BasicRPGTest_Mono.Engine
             // If NO Layer given
             if (mTile.layer == null)
             {
-                // Default to Layer 3 (decorations layer)
-                //mTile.layer = layers[3];
-
-                // OR
-
                 // Do NOT Add Tile to Map. Tile had no Layer information.
                 Utility.Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). Tile had no assigned Layer.");
                 return false;
@@ -468,6 +478,10 @@ namespace BasicRPGTest_Mono.Engine
             return true;
         }
 
+
+        //====================================================================================
+        // RENDER AND CACHE FUNCTIONS
+        //====================================================================================
         public void update_VisibleRegions (Camera2D camera)
         {
 
@@ -481,18 +495,6 @@ namespace BasicRPGTest_Mono.Engine
             v_CameraViewBox.Y = camera.BoundingRectangle.Y;
             v_CameraViewBox.Width = camera.BoundingRectangle.Width;
             v_CameraViewBox.Height = camera.BoundingRectangle.Height;
-
-            // Use a slightly shrunken ViewPort instead  (full Camera BoundingRectangle is good, but for some reason grabs one X and Y Region row earlier than it should)
-            //v_RegionViewBox.X = v_CameraViewBox.X;
-            //v_RegionViewBox.Y = v_CameraViewBox.Y;
-            //v_RegionViewBox.Width = v_CameraViewBox.Width;
-            //v_RegionViewBox.Height = v_CameraViewBox.Height;
-
-
-            //VisibleRegions = getRegionsInRectangle(camera.BoundingRectangle);
-            //VisibleRegions = getRegionsInRectangle(v_CameraViewBox);
-
-            //List<Region> regionsTEST = getRegionsInRectangle(v_CameraViewBox);
 
 
             // Go through each Region on Map  (to re-populate Visible Regions collection)
@@ -525,29 +527,13 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
-
-
         public void DrawVisibleMapCache (Camera2D camera, SpriteBatch batch)
         {
-            //batch.Begin(transformMatrix: Camera.camera.Transform);
 
             // Go through each CachedTiles Layer
             batch.Begin(transformMatrix: Camera.camera.Transform);
             foreach (TileLayer tLayer in layers)
             {
-                /*Dictionary<string, List<Vector2>> templateList = v_TileCache[tLayer.name];
-
-                // Go through each Tile Template in the Layer
-                foreach (string parentTileName in templateList.Keys)
-                {
-                    // Get Parent Tile Template
-                    Tile parentTile = TileManager.getByName(parentTileName);
-                    // Get Sub-Tile Locations
-                    List<Vector2> list = templateList[parentTileName];
-
-                    parentTile.graphic.draw_Tiles(batch, list);
-                }*/
-
 
                 // ------------------------------------------------------------------
                 // DRAW TILES - By Cached Tile Parent (Template)
@@ -566,11 +552,6 @@ namespace BasicRPGTest_Mono.Engine
                 // ------------------------------------------------------------------
                 // DRAW EDGES - By Cached Edge Graphics
                 // ------------------------------------------------------------------
-                // If this Layer is the Decorations Layer
-                //if (tLayer.index == 3)
-                //if (tLayer.name == "decorations")
-                //{
-                //}
 
                 Dictionary<Graphic, List<Vector2>> edgeList = v_VisibleEdges[tLayer];
                 // Go through all Visible Tile Edges to draw
@@ -592,7 +573,6 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
-
         public void DrawVisibleMapTileCache_SpeedTest(Camera2D camera, SpriteBatch batch, int mIterationsCount)
         {
             // Start Code Timer for speed test
@@ -612,19 +592,6 @@ namespace BasicRPGTest_Mono.Engine
             codeTimer.endTimer();
             // Report function's speed
             Utility.Util.myDebug("Map.cs Draw()", "CODE TIMER:  " + codeTimer.getTotalTimeInMilliseconds());
-        }
-
-
-        public void Clear()
-        {
-            // Clear Tile Caches
-            this.v_VisibleTiles.Clear();
-            this.v_VisibleEdges.Clear();
-            this.v_TileEdges.Clear();
-
-            entities.Clear();
-            livingEntities.Clear();
-            spawnTimer.Stop();
         }
 
         // Stores what Tile Templates this Map uses
@@ -697,20 +664,13 @@ namespace BasicRPGTest_Mono.Engine
         public void buildVisibleTileCache()
         {
 
-            // For TESTING: Use buildVisibleTileCache3() instead.
-            //buildVisibleTileCache3();
-            //return;
-
-
             Dictionary<Tile, List<Vector2>> tileTemplate;
             Tile tile;
             Vector2 pos = new Vector2();
             int layerIndex = 0;
             //TileLayer layer;
 
-
             Clear_ChildTiles();
-
 
             // Get Tile Bounds
             Rectangle tileViewBounds = new Rectangle();
@@ -719,7 +679,6 @@ namespace BasicRPGTest_Mono.Engine
             tileViewBounds.Y = (v_CameraViewBox.Y / TileManager.dimensions);
             tileViewBounds.Width = (v_CameraViewBox.Width / TileManager.dimensions) + 2;
             tileViewBounds.Height = (v_CameraViewBox.Height / TileManager.dimensions) + 2;
-
 
             // Go through each Layer on Map
             foreach (TileLayer layer in v_VisibleTiles.Keys)
@@ -742,13 +701,8 @@ namespace BasicRPGTest_Mono.Engine
                         // If tileTemplate Dictionary does NOT have this Tile Template already
                         if (!tileTemplate.ContainsKey(tile.parent))
                         {
-                            // Create List of Vector positions. List will contain Positions of ALL matching Tiles.
-                            //List<Vector2> list = new List<Vector2>();
-                            // Add Position to TileCache List
-                            //list.Add(tile.drawPos);
 
                             // Add Tile template with this Tile's Position to Collection
-                            //tileTemplate.Add(tile.parent, list);
                             tileTemplate.Add(tile.parent, new List<Vector2>());
 
                         }
@@ -779,15 +733,8 @@ namespace BasicRPGTest_Mono.Engine
 
                         }
 
-                        // Testing: Force keep ALL Tiles by setting to TRUE.
-                        //keepTile = true;
-
                         // Store this Tile for drawing
                         if (keepTile) { tileTemplate[tile.parent].Add(tile.drawPos); }
-
-                        // Add this Tile's Position to Template Cache
-                        //tileTemplate[tile.parent].Add(tile.drawPos);
-
 
 
                         // Go through Edges (if any)
@@ -854,12 +801,6 @@ namespace BasicRPGTest_Mono.Engine
                 layerIndex++;
             }
 
-
-
-            // Test for examining a target region
-            //Region testRegion = regions[5, 5];
-            //Utility.Util.myDebug("Test");
-
         }
         public void Clear_ChildTiles()
         {
@@ -882,6 +823,23 @@ namespace BasicRPGTest_Mono.Engine
                     list.Clear();
                 }
             }
+        }
+
+
+        //====================================================================================
+        // DISPOSAL AND GC
+        //====================================================================================
+
+        public void Clear()
+        {
+            // Clear Tile Caches
+            this.v_VisibleTiles.Clear();
+            this.v_VisibleEdges.Clear();
+            this.v_TileEdges.Clear();
+
+            entities.Clear();
+            livingEntities.Clear();
+            spawnTimer.Stop();
         }
 
 
