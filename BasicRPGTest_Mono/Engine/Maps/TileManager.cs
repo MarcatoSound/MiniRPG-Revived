@@ -32,6 +32,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         public static void add(Tile tile)
         {
             tiles.Add(tile);
+            tilesByName.Add(tile.name, tile);
         }
 
         /// <summary>
