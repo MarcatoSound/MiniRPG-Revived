@@ -77,13 +77,13 @@ namespace BasicRPGTest_Mono.Engine
         {
             if (typeof(T) == typeof(Entity))
             {
-                if (!entitiesByName.ContainsKey(name)) return null;
+                if (name == null || !entitiesByName.ContainsKey(name)) return null;
                 return entitiesByName[name] as T;
             }
 
             if (typeof(T) == typeof(LivingEntity))
             {
-                if (!livingEntitiesByName.ContainsKey(name)) return null;
+                if (name == null || !livingEntitiesByName.ContainsKey(name)) return null;
                 return livingEntitiesByName[name] as T;
             }
 

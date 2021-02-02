@@ -29,7 +29,7 @@ namespace BasicRPGTest_Mono.Engine.Items
         public ParentItem(string displayName, Texture2D texture) : this(displayName, new Graphic(texture)) { }
         public ParentItem(string displayName, Graphic graphic)
         {
-            id = ItemManager.items.Count;
+            id = ItemManager.getItems().Count;
             name = Utility.Util.cleanString(displayName).ToLower();
             this.displayName = displayName;
             this.graphic = graphic;

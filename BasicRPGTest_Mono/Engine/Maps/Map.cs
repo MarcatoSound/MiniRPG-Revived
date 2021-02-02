@@ -47,7 +47,6 @@ namespace BasicRPGTest_Mono.Engine
         private List<Graphic> v_TileEdges = new List<Graphic>();
         private Dictionary<TileLayer, Dictionary<Graphic, List<Vector2>>> v_VisibleEdges = new Dictionary<TileLayer, Dictionary<Graphic, List<Vector2>>>();
 
-        private Rectangle v_RegionViewBox = new Rectangle();
         private Rectangle v_CameraViewBox = new Rectangle();
 
         //====================================================================================

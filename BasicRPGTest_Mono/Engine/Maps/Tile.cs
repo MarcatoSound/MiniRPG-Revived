@@ -76,7 +76,7 @@ namespace RPGEngine
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
         {
-            id = TileManager.tiles.Count;
+            id = TileManager.getTiles().Count;
             this.name = name;
             this.zIndex = z;
             isCollidable = collidable;
