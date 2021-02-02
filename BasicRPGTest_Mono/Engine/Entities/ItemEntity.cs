@@ -89,7 +89,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
             if (!Camera.camera.BoundingRectangle.Intersects(boundingBox)) return;
             float scale = (float)box.Width / item.graphic.texture.Width;
             graphic.draw(batch, Position, Color.White, 0f, Vector2.Zero, scale);
-            batch.DrawString(Core.itemFont, $"{item.quantity}", new Vector2(Position.X + 12, Position.Y + 12), Color.Black);
+            batch.DrawString(FontLibrary.getFont("itemcount"), $"{item.quantity}", new Vector2(Position.X + 12, Position.Y + 12), Color.Black);
         }
 
         public void Dispose()

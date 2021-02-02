@@ -292,7 +292,7 @@ namespace BasicRPGTest_Mono
             Mouse.SetCursor(MouseCursor.FromTexture2D(cursorTexture, 0, 0));
 
             SpriteFont font = Content.Load<SpriteFont>("font_main");
-            Core.mainFont = font;
+            FontLibrary.addFont("main", font);
 
             base.LoadContent();
         }

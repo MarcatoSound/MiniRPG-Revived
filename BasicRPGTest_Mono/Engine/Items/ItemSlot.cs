@@ -25,7 +25,7 @@ namespace BasicRPGTest_Mono.Engine.Items
             if (item == null) return;
             float scale = (float)box.Width / item.graphic.texture.Width;
             item.graphic.draw(batch, new Vector2(box.X, box.Y), 0f, Vector2.Zero, scale);
-            Utility.Util.drawAlignedText($"{item.quantity}", Color.Black, batch, Core.itemFont, box, Menus.Alignment.Right, Menus.Alignment.Bottom, 2);
+            Utility.Util.drawAlignedText($"{item.quantity}", Color.Black, batch, FontLibrary.getFont("itemcount"), box, Menus.Alignment.Right, Menus.Alignment.Bottom, 2);
             //batch.DrawString(Core.itemFont, $"{item.quantity}", new Vector2((float)(box.X + (box.Width * 0.75)), (float)(box.Y + (box.Height * 0.5))), Color.Black);
             batch.DrawRectangle(box, Color.White);
 

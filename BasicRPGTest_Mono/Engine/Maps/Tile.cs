@@ -383,15 +383,16 @@ namespace RPGEngine
         public void showDamageText(double dmg)
         {
             // TODO: Implement check for critical hit.
+            SpriteFont font = FontLibrary.getFont("dmg");
             Vector2 stringPos = new Vector2(drawPos.X, drawPos.Y);
-            Vector2 stringSize = Core.dmgFont.MeasureString(dmg.ToString());
+            Vector2 stringSize = font.MeasureString(dmg.ToString());
             stringPos.X -= stringSize.X / 2;
             stringPos.Y -= 20;
 
             Random rand = new Random();
             stringPos.X += rand.Next(-5, 5);
 
-            new MovingText(dmg.ToString(), Core.dmgFont, stringPos, new TextColor(Color.Crimson), 500);
+            new MovingText(dmg.ToString(), font, stringPos, new TextColor(Color.Crimson), 500);
         }
 
 

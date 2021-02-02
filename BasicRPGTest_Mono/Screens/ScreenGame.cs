@@ -57,9 +57,9 @@ namespace BasicRPGTest_Mono
         {
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Core.dmgFont = Content.Load<SpriteFont>("dmg");
-            Core.critFont = Content.Load<SpriteFont>("crit");
-            Core.itemFont = Content.Load<SpriteFont>("item");
+            FontLibrary.addFont("dmg", Content.Load<SpriteFont>("dmg"));
+            FontLibrary.addFont("crit", Content.Load<SpriteFont>("crit"));
+            FontLibrary.addFont("itemcount", Content.Load<SpriteFont>("item"));
 
             Game.renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
 
@@ -311,7 +311,7 @@ namespace BasicRPGTest_Mono
 
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.DrawString(FontLibrary.getFont("dmg"), fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             // End Code Timer for speed test

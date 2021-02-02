@@ -12,10 +12,10 @@ namespace BasicRPGTest_Mono.Engine.GUI.Text
         private float rate;
         // No color, no font.
         public MovingText(string text, Vector2 startPos, int duration, Direction direction = Direction.Up, float rate = 0.65f) : 
-            this(text, Core.dmgFont, startPos, Color.White, duration, direction, rate) { }
+            this(text, FontLibrary.getFont("dmg"), startPos, Color.White, duration, direction, rate) { }
         // No font
         public MovingText(string text, Vector2 startPos, TextColor textColor, int duration, Direction direction = Direction.Up, float rate = 0.65f) : 
-            this(text, Core.dmgFont, startPos, textColor, duration, direction, rate) { }
+            this(text, FontLibrary.getFont("dmg"), startPos, textColor, duration, direction, rate) { }
         // No color
         public MovingText(string text, SpriteFont font, Vector2 startPos, int duration, Direction direction = Direction.Up, float rate = 0.65f) : 
             this(text, font, startPos, Color.White, duration, direction, rate) { }

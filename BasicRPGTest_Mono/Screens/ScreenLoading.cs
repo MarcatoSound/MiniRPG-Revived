@@ -238,7 +238,7 @@ namespace BasicRPGTest_Mono.Screens
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(Core.mainFont, $"Loading... {progress}%", new Vector2(500, 25), Color.White);
+            _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Loading... {progress}%", new Vector2(500, 25), Color.White);
             _spriteBatch.End();
         }
     }
