@@ -49,6 +49,9 @@ namespace BasicRPGTest_Mono.Engine
 
         private Rectangle v_CameraViewBox = new Rectangle();
 
+
+        public Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>();
+
         //====================================================================================
         // CONSTRUCTOR
         //====================================================================================

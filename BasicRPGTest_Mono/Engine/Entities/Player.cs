@@ -302,7 +302,7 @@ namespace BasicRPGTest_Mono.Engine
                 if (boundingBox.Intersects(entity.boundingBox) && !entity.isImmunity)
                     hurt(entity.damage, entity.CenteredPosition);
             }
-            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(Core.items);
+            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(map.items);
             foreach (ItemEntity item in items.Values)
             {
                 if (boundingBox.Intersects(item.boundingBox))

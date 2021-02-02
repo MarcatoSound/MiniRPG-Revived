@@ -21,6 +21,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
         {
             this.item = item;
             Position = new Vector2((int)pos.X, (int)pos.Y);
+            this.map = map;
 
             List<ItemEntity> nearbyItems = getNearbyItems(50);
             foreach (ItemEntity nearbyItem in nearbyItems)
@@ -30,7 +31,8 @@ namespace BasicRPGTest_Mono.Engine.Entities
                 // Add code for increasing the quantity of this new item here.
             }
 
-            Core.items.Add(Position, this);
+
+            map.items.Add(Position, this);
             despawnTimer = new Timer(timeToLive);
             despawnTimer.Elapsed += (senders, args) => {
                 despawnTimer.Stop();
@@ -53,9 +55,9 @@ namespace BasicRPGTest_Mono.Engine.Entities
                 {
                     targetPos.X = x;
                     targetPos.Y = y;
-                    if (Core.items.ContainsKey(targetPos))
+                    if (map.items.ContainsKey(targetPos))
                     {
-                        items.Add(Core.items[targetPos]);
+                        items.Add(map.items[targetPos]);
                         System.Diagnostics.Debug.WriteLine($"Found item in merge radius!");
                     }
                 }
@@ -78,7 +80,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
 
         public void remove()
         {
-            Core.items.Remove(Position);
+            map.items.Remove(Position);
             Dispose();
         }
 

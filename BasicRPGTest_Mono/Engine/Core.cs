@@ -26,12 +26,10 @@ namespace BasicRPGTest_Mono.Engine
         public static bool paused;
 
         public static List<PopupText> popupTexts;
-        public static Dictionary<Vector2, ItemEntity> items;
 
         static Core()
         {
             popupTexts = new List<PopupText>();
-            items = new Dictionary<Vector2, ItemEntity>();
         }
     }
 }

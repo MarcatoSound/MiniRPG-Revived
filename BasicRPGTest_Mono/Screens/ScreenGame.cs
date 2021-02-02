@@ -268,7 +268,7 @@ namespace BasicRPGTest_Mono
             //return;  // Stop Function Here (for testing)
 
             // Draw the items on the map.
-            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(Core.items);
+            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(MapManager.activeMap.items);
             foreach (ItemEntity item in items.Values)
             {
                 if (item == null) continue;
