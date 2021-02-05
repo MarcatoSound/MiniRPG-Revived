@@ -37,7 +37,6 @@ namespace BasicRPGTest_Mono.Engine
             set
             {
                 _health = value;
-                System.Diagnostics.Debug.WriteLine($"New health: {_health}");
                 if (_health < 0)
                 {
                     _health = 0;
@@ -400,12 +399,12 @@ namespace BasicRPGTest_Mono.Engine
 
         public void kill()
         {
+            Vector2 dropPos;
             foreach (ItemDrop drop in drops)
             {
-                if (drop.tryDrop(map, Position))
-                {
-                    System.Diagnostics.Debug.WriteLine($"Successfully dropped {drop.item.displayName}");
-                }
+                dropPos = Util.randomizePosition(Position, 6);
+
+                drop.tryDrop(map, dropPos);
             }
 
             MapManager.activeMap.livingEntities.TryRemove(instanceId, out _);

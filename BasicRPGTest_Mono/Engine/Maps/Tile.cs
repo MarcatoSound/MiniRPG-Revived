@@ -363,12 +363,13 @@ namespace RPGEngine
         {
             map.removeTile(this);
 
+            // Attempt to spawn the items that drop from this tile.
+            Vector2 dropPos = new Vector2(pos.X + (TileManager.dimensions / 3), pos.Y + (TileManager.dimensions / 3));
             foreach (ItemDrop drop in drops)
             {
-                if (drop.tryDrop(map, pos))
-                {
-                    System.Diagnostics.Debug.WriteLine($"Successfully dropped {drop.item.displayName}");
-                }
+                dropPos = Util.randomizePosition(dropPos, 8);
+
+                drop.tryDrop(map, dropPos);
             }
 
             if (this.name == "grass")

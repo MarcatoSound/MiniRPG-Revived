@@ -169,7 +169,6 @@ namespace BasicRPGTest_Mono.Engine
                     else
                         damage = 0;
                     tile.Damage(damage);
-                    System.Diagnostics.Debug.WriteLine($"Dealt {damage} damage to tile at {tile.tilePos}");
                 }
             }
 

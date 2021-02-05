@@ -345,6 +345,16 @@ namespace BasicRPGTest_Mono.Engine.Utility
             return iteration;
 
         }
+        public static Vector2 randomizePosition(Vector2 origin, int radius)
+        {
+            Random rand = new Random();
+            Vector2 pos = new Vector2();
+
+            pos.X = origin.X + rand.Next(-radius, radius);
+            pos.Y = origin.Y + rand.Next(-radius, radius);
+
+            return pos;
+        }
         public static Spawn randomizeSpawn(ConcurrentDictionary<int, Spawn> spawns)
         {
             // O(n) performance
