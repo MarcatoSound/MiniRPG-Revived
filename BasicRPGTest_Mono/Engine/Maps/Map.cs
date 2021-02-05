@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -296,6 +297,20 @@ namespace BasicRPGTest_Mono.Engine
                 if (location.Intersects(collidable)) return false;
             }
             return true;
+        }
+        /// <summary>
+        /// Generates an item entity using an item object and location.
+        /// </summary>
+        /// <param name="item">The item instance.</param>
+        /// <param name="pos">The true map position.</param>
+        public void spawnItem(Item item, Vector2 pos)
+        {
+            pos.X = (int)pos.X;
+            pos.Y = (int)pos.Y;
+            if (!items.ContainsKey(pos))
+                new ItemEntity(this, item, pos);
+            else
+                spawnItem(item, new Vector2(pos.X + 1, pos.Y)); // Kind of dirty fix... 
         }
 
         //====================================================================================

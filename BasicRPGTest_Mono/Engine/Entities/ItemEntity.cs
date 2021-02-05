@@ -26,6 +26,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
             List<ItemEntity> nearbyItems = getNearbyItems(50);
             foreach (ItemEntity nearbyItem in nearbyItems)
             {
+                if (nearbyItem.item.id != item.id) continue;
                 item.quantity += nearbyItem.item.quantity;
                 nearbyItem.remove();
                 // Add code for increasing the quantity of this new item here.

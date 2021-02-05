@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +11,7 @@ using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine
 {
-    public class LivingEntity : Entity
+    public class LivingEntity : Entity, IDisposable
     {
         public bool isMoving;
 
@@ -28,6 +29,24 @@ namespace BasicRPGTest_Mono.Engine
         public bool isImmunity;
         public int immunityTime = 200;
 
+        public double maxHealth = 50;
+        public double _health;
+        public double health
+        {
+            get { return _health; }
+            set
+            {
+                _health = value;
+                System.Diagnostics.Debug.WriteLine($"New health: {_health}");
+                if (_health < 0)
+                {
+                    _health = 0;
+                    kill();
+                }
+                else if (_health > maxHealth)
+                    _health = maxHealth;
+            }
+        }
         public Timer knockbackTimer { get; set; }
         public bool isGettingKnockedBack { get; set; }
         public float kbResist = 0f;
@@ -35,22 +54,25 @@ namespace BasicRPGTest_Mono.Engine
 
         public Map map;
 
-        public LivingEntity(string name, Texture2D texture, Rectangle box, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box)
+        // Drop data
+        public List<ItemDrop> drops = new List<ItemDrop>();
+
+        public LivingEntity(string name, Texture2D texture, Rectangle box, float speed = 90f) : base(new Graphic(texture), box)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
             this.speed = speed;
-            this.Position = position;
-            boundingBox = getBox(position);
+            this.Position = Vector2.Zero;
+            boundingBox = getBox(Position);
 
             //EntityManager.add(this);
         }
-        public LivingEntity(string name, Graphic graphic, Rectangle box, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box)
+        public LivingEntity(string name, Graphic graphic, Rectangle box, float speed = 90f) : base(graphic, box)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
             this.speed = speed;
-            this.Position = position;
+            this.Position = Vector2.Zero;
 
             //EntityManager.add(this);
         }
@@ -68,6 +90,10 @@ namespace BasicRPGTest_Mono.Engine
             moveCount = 0;
 
             maxVelocity = new Vector2(speed, speed);
+            maxHealth = entity.maxHealth;
+            health = maxHealth;
+
+            this.drops = entity.drops;
 
             this.map = map;
         }
@@ -285,13 +311,6 @@ namespace BasicRPGTest_Mono.Engine
         public bool isColliding(Rectangle box)
         {
             if (MapManager.activeMap == null) return true;
-            // TODO: MUST OPTIMIZE COLLIDABLE CHECKS
-            /*ConcurrentDictionary<int, Rectangle> pairs = MapManager.activeMap.collidables;
-            foreach (KeyValuePair<int, Rectangle> pair in pairs)
-            {
-                if (box.Intersects(pair.Value))
-                    return true;
-            }*/
             List<Tile> tiles = Util.getSurroundingTiles(map, 1, TilePosition);
             foreach (Tile tile in tiles)
             {
@@ -326,6 +345,8 @@ namespace BasicRPGTest_Mono.Engine
 
             knockback(sourcePos);
             showDamageText(dmg);
+
+            health -= dmg;
         }
         public void showDamageText(double dmg)
         {
@@ -379,7 +400,21 @@ namespace BasicRPGTest_Mono.Engine
 
         public void kill()
         {
-            MapManager.activeMap.entities.TryRemove(instanceId, out _);
+            foreach (ItemDrop drop in drops)
+            {
+                if (drop.tryDrop(map, Position))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Successfully dropped {drop.item.displayName}");
+                }
+            }
+
+            MapManager.activeMap.livingEntities.TryRemove(instanceId, out _);
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+
         }
 
     }

@@ -44,5 +44,28 @@ namespace BasicRPGTest_Mono.Engine.Items
             this.quantity = quantity;
 
         }
+        public Item(Item item)
+        {
+            parent = item.parent;
+
+            id = parent.id;
+            name = parent.name;
+            displayName = item.displayName;
+            graphic = parent.graphic;
+            description = item.description;
+            maxStackSize = parent.maxStackSize;
+
+            swingDist = item.swingDist;
+            swingStyle = item.swingStyle;
+            hitbox = item.hitbox;
+            damage = item.damage;
+
+            quantity = item.quantity;
+        }
+
+        public Item Clone()
+        {
+            return new Item(this);
+        }
     }
 }

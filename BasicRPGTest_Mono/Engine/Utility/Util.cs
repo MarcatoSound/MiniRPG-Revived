@@ -315,7 +315,14 @@ namespace BasicRPGTest_Mono.Engine.Utility
             drawAlignedText(strings, color, batch, font, box, horAlign, vertAlign, padding);
         }
 
+        public static bool randomBool(double chance)
+        {
+            Random rand = new Random();
+            if (rand.NextDouble() < chance)
+                return true;
 
+            return false;
+        }
         public static int weightedRandom(List<int> chances)
         {
             // O(n) performance

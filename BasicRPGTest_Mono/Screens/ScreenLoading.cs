@@ -43,9 +43,9 @@ namespace BasicRPGTest_Mono.Screens
             Core.graphics = _graphics.GraphicsDevice;
 
             // Load the general game objects
+            loadItems();
             loadTiles();
             loadBiomes();
-            loadItems();
             loadEntities();
             loadGuis();
 
@@ -63,18 +63,54 @@ namespace BasicRPGTest_Mono.Screens
         }
 
 
+        private void loadItems()
+        {
+            Texture2D sprite;
+            sprite = Content.Load<Texture2D>("hollysong");
+            ItemManager.add(new ParentTool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 20, swingDist: 1.57f));
+            sprite = Content.Load<Texture2D>("arctic_fox_tail");
+            ItemManager.add(new ParentItem("Arctic Fox Tail", sprite));
+            sprite = Content.Load<Texture2D>("unicorn_horn");
+            ItemManager.add(new ParentItem("Unicorn Horn", sprite, 5));
+            sprite = Content.Load<Texture2D>("sun_feather");
+            ItemManager.add(new ParentItem("Sun Feather", sprite));
+            sprite = Content.Load<Texture2D>("cryorose");
+            ItemManager.add(new ParentItem("Cryorose", sprite));
+            sprite = Content.Load<Texture2D>("iron_root");
+            ItemManager.add(new ParentItem("Iron Root", sprite));
+            sprite = Content.Load<Texture2D>("crystal_sword");
+            ParentTool pickaxe = new ParentTool("Crystal Sword", sprite, new Rectangle(), 5);
+            pickaxe.damageTypes.Add(DamageType.Mining, 5);
+            ItemManager.add(pickaxe);
+        }
         private void loadTiles()
         {
             TileManager.breakTexture = Content.Load<Texture2D>("breaking");
             Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
-            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2));
-            TileManager.add(new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1));
-            TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, new Rectangle(256, 0, 96, 96)), false, false, 0));
-            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), true, false, 0, 50));
-            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0));
-            TileManager.add(new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0));
-            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5));
-            TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false, destructable: false));
+
+            Tile tile = new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2);
+            TileManager.add(tile);
+
+            tile = new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1);
+            TileManager.add(tile);
+
+            tile = new Tile("dirt", Util.getSpriteFromSet(tileset, new Rectangle(256, 0, 96, 96)), false, false, 0);
+            TileManager.add(tile);
+
+            tile = new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), true, false, 0, 50);
+            TileManager.add(tile);
+
+            tile = new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0);
+            TileManager.add(tile);
+
+            tile = new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0);
+            TileManager.add(tile);
+
+            tile = new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5);
+            TileManager.add(tile);
+
+            tile = new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false, destructable: false);
+            TileManager.add(tile);
         }
 
         private void loadBiomes()
@@ -133,35 +169,23 @@ namespace BasicRPGTest_Mono.Screens
             BiomeManager.add(biome);
         }
 
-        private void loadItems()
-        {
-            Texture2D sprite;
-            sprite = Content.Load<Texture2D>("hollysong");
-            ItemManager.add(new ParentTool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 20, swingDist: 1.57f));
-            sprite = Content.Load<Texture2D>("arctic_fox_tail");
-            ItemManager.add(new ParentItem("Arctic Fox Tail", sprite));
-            sprite = Content.Load<Texture2D>("unicorn_horn");
-            ItemManager.add(new ParentItem("Unicorn Horn", sprite, 5));
-            sprite = Content.Load<Texture2D>("sun_feather");
-            ItemManager.add(new ParentItem("Sun Feather", sprite));
-            sprite = Content.Load<Texture2D>("cryorose");
-            ItemManager.add(new ParentItem("Cryorose", sprite));
-            sprite = Content.Load<Texture2D>("iron_root");
-            ItemManager.add(new ParentItem("Iron Root", sprite));
-            sprite = Content.Load<Texture2D>("crystal_sword");
-            ParentTool pickaxe = new ParentTool("Crystal Sword", sprite, new Rectangle(), 5);
-            pickaxe.damageTypes.Add(DamageType.Mining, 5);
-            ItemManager.add(pickaxe);
-        }
-
         private void loadEntities()
         {
             Texture2D texture = Content.Load<Texture2D>("enemy1");
-            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26)));
+            LivingEntity ent = new LivingEntity("purple", texture, new Rectangle(0, 0, 28, 26));
+            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
+            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
+            EntityManager.add(ent);
             texture = Content.Load<Texture2D>("enemy2");
-            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26)));
+            ent = new LivingEntity("blue", texture, new Rectangle(0, 0, 28, 26));
+            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
+            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
+            EntityManager.add(ent);
             texture = Content.Load<Texture2D>("enemy3");
-            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26)));
+            ent = new LivingEntity("red", texture, new Rectangle(0, 0, 28, 26));
+            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
+            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
+            EntityManager.add(ent);
 
             foreach (LivingEntity entity in EntityManager.livingEntities.Values)
             {
