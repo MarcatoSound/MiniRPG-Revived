@@ -1,6 +1,7 @@
 ﻿using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
@@ -32,6 +33,7 @@ namespace RPGEngine
 
         public double maxHealth { get; set; }
         public bool destructable { get; set; }
+        public List<ItemDrop> drops = new List<ItemDrop>();
 
         // Instance variables
         public bool isInstance { get; set; }
@@ -121,6 +123,7 @@ namespace RPGEngine
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
             sideGraphics = tile.sideGraphics;
             sides = new Dictionary<TileSide, bool>();
+            drops = tile.drops;
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
 
@@ -359,6 +362,14 @@ namespace RPGEngine
         public void Destroy()
         {
             map.removeTile(this);
+
+            foreach (ItemDrop drop in drops)
+            {
+                if (drop.tryDrop(map, pos))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Successfully dropped {drop.item.displayName}");
+                }
+            }
 
             if (this.name == "grass")
             {
