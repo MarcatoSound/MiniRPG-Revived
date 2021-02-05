@@ -1,6 +1,7 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.Graphics;
 using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Inventories;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
@@ -457,6 +458,12 @@ namespace BasicRPGTest_Mono.Engine
                 knockbackTimer = null;
             };
             knockbackTimer.Start();
+        }
+        public void sendCornerMessage(string msg, TextColor color)
+        {
+            Vector2 stringSize = FontLibrary.getFont("dmg").MeasureString(msg);
+            Vector2 pos = new Vector2(Camera.camera.BoundingRectangle.Width - stringSize.X - 16, Camera.camera.BoundingRectangle.Height - stringSize.Y - 16);
+            new MovingText(msg, pos, color, 1500, Direction.Up, 0.65f, 500, true);
         }
 
 

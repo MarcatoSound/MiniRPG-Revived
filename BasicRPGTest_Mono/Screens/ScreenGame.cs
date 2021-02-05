@@ -309,6 +309,16 @@ namespace BasicRPGTest_Mono
             }
             _spriteBatch.End();
 
+            // Draw active anchored popup texts
+            _spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
+            popups = new List<PopupText>(Core.anchoredPopupTexts);
+            foreach (PopupText popup in popups)
+            {
+                if (popup == null) continue;
+                popup.draw(_spriteBatch);
+            }
+            _spriteBatch.End();
+
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(FontLibrary.getFont("dmg"), fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);

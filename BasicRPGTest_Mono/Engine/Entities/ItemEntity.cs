@@ -1,4 +1,5 @@
-﻿using BasicRPGTest_Mono.Engine.Items;
+﻿using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -74,6 +75,9 @@ namespace BasicRPGTest_Mono.Engine.Entities
             if (slot == -1) return;
 
             player.inventory.addItem(item);
+
+            Vector2 pos = new Vector2(player.Position.X + 32, player.Position.Y);
+            new MovingText($"+{item.quantity} {item.displayName}", pos, Color.Cyan, 1500, Direction.Up, 0.65f, 500);
 
             remove();
 

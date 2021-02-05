@@ -22,10 +22,12 @@ namespace BasicRPGTest_Mono.Engine
         public static bool paused;
 
         public static List<PopupText> popupTexts;
+        public static List<PopupText> anchoredPopupTexts;
 
         static Core()
         {
             popupTexts = new List<PopupText>();
+            anchoredPopupTexts = new List<PopupText>();
         }
     }
 }

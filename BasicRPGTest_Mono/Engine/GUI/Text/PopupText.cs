@@ -10,6 +10,8 @@ namespace BasicRPGTest_Mono.Engine.GUI
 {
     public class PopupText : IDisposable
     {
+        private bool anchor { get; set; }
+
         public string text { get; set; }
         public TextColor textColor;
         public SpriteFont font { get; set; }
@@ -20,7 +22,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
         public int alpha { get; set; }
         public int alphaRate { get; set; }
 
-        public PopupText(string text, SpriteFont font, Vector2 startPos, TextColor textColor, int duration)
+        public PopupText(string text, SpriteFont font, Vector2 startPos, TextColor textColor, int duration, bool anchor = false)
         {
             this.text = text;
             this.font = font;
@@ -29,13 +31,21 @@ namespace BasicRPGTest_Mono.Engine.GUI
             this.duration = duration;
             this.alpha = 512;
             this.alphaRate = Convert.ToInt32(((double)this.alpha / (double)duration) * 20);
+            this.anchor = anchor;
 
-            Core.popupTexts.Add(this);
+            if (anchor)
+                Core.anchoredPopupTexts.Add(this);
+            else
+                Core.popupTexts.Add(this);
+
             timer = new Timer(duration);
             timer.Elapsed += (sender, args) =>
             {
                 timer.Stop();
-                Core.popupTexts.Remove(this);
+                if (anchor)
+                    Core.popupTexts.Remove(this);
+                else
+                    Core.anchoredPopupTexts.Remove(this);
                 Dispose();
             };
             timer.Start();
