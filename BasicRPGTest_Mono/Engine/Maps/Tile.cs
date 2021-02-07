@@ -1,6 +1,7 @@
 ﻿using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
@@ -32,6 +33,7 @@ namespace RPGEngine
 
         public double maxHealth { get; set; }
         public bool destructable { get; set; }
+        public DropTable dropTable = new DropTable();
 
         // Instance variables
         public bool isInstance { get; set; }
@@ -76,7 +78,7 @@ namespace RPGEngine
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
         {
-            id = TileManager.tiles.Count;
+            id = TileManager.getTiles().Count;
             this.name = name;
             this.zIndex = z;
             isCollidable = collidable;
@@ -121,6 +123,7 @@ namespace RPGEngine
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
             sideGraphics = tile.sideGraphics;
             sides = new Dictionary<TileSide, bool>();
+            dropTable = tile.dropTable;
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
 
@@ -360,6 +363,16 @@ namespace RPGEngine
         {
             map.removeTile(this);
 
+            // Attempt to spawn the items that drop from this tile.
+            Vector2 dropPos = new Vector2(pos.X + (TileManager.dimensions / 3), pos.Y + (TileManager.dimensions / 3));
+            dropTable.dropItems(map, dropPos);
+            /*foreach (ItemDrop drop in drops)
+            {
+                dropPos = Util.randomizePosition(dropPos, 8);
+
+                drop.tryDrop(map, dropPos);
+            }*/
+
             if (this.name == "grass")
             {
                 Tile replacement = new Tile(TileManager.getByName("dirt"), tilePos, biome);
@@ -383,15 +396,16 @@ namespace RPGEngine
         public void showDamageText(double dmg)
         {
             // TODO: Implement check for critical hit.
+            SpriteFont font = FontLibrary.getFont("dmg");
             Vector2 stringPos = new Vector2(drawPos.X, drawPos.Y);
-            Vector2 stringSize = Core.dmgFont.MeasureString(dmg.ToString());
+            Vector2 stringSize = font.MeasureString(dmg.ToString());
             stringPos.X -= stringSize.X / 2;
             stringPos.Y -= 20;
 
             Random rand = new Random();
             stringPos.X += rand.Next(-5, 5);
 
-            new MovingText(dmg.ToString(), Core.dmgFont, stringPos, new TextColor(Color.Crimson), 500);
+            new MovingText(dmg.ToString(), font, stringPos, new TextColor(Color.Crimson), 500);
         }
 
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
@@ -56,8 +57,9 @@ namespace BasicRPGTest_Mono
         {
             _graphics = Game._graphics;
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            Core.dmgFont = Content.Load<SpriteFont>("dmg");
-            Core.critFont = Content.Load<SpriteFont>("crit");
+            FontLibrary.addFont("dmg", Content.Load<SpriteFont>("dmg"));
+            FontLibrary.addFont("crit", Content.Load<SpriteFont>("crit"));
+            FontLibrary.addFont("itemcount", Content.Load<SpriteFont>("item"));
 
             Game.renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
 
@@ -81,7 +83,7 @@ namespace BasicRPGTest_Mono
             cloudOverlay = Content.Load<Texture2D>("cloud_overlay");
 
             texture = Content.Load<Texture2D>("player_spriteset");
-            player = new Player(texture, _graphics);
+            player = new Player(texture);
 
             if (loadPlayer())
                 Save.save(player, worldName);
@@ -118,81 +120,6 @@ namespace BasicRPGTest_Mono
             base.UnloadContent();
 
             GC.Collect();
-        }
-
-
-        private void loadTiles()
-        {
-            Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
-            TileManager.add(new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2));
-            TileManager.add(new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1));
-            TileManager.add(new Tile("dirt", Util.getSpriteFromSet(tileset, 0, 1), false, false, 0));
-            TileManager.add(new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), false, false, 0));
-            TileManager.add(new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0));
-            TileManager.add(new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0));
-            TileManager.add(new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5));
-            TileManager.add(new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false));
-        }
-
-        private void loadBiomes()
-        {
-            Biome biome;
-            biome = new Biome("field", TileManager.getByName("grass"));
-            biome.undergroundTile = TileManager.getByName("dirt");
-            biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Engine.Maps.Generation.Decoration("bush", 5, TileManager.getByName("tree")));
-            biome.decoChance = 5;
-            BiomeManager.add(biome);
-
-            biome = new Biome("desert", TileManager.getByName("sand"));
-            biome.undergroundTile = TileManager.getByName("hardened_sand");
-            biome.coastTile = TileManager.getByName("sand");
-            BiomeManager.add(biome);
-
-            biome = new Biome("swamp", TileManager.getByName("swamp_grass"));
-            biome.undergroundTile = TileManager.getByName("dirt");
-            biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Engine.Maps.Generation.Decoration("bush", 1, TileManager.getByName("tree")));
-            BiomeManager.add(biome);
-        }
-
-        private void loadItems()
-        {
-            Texture2D sprite;
-            sprite = Content.Load<Texture2D>("hollysong");
-            ItemManager.add(new Tool("Hollysong", sprite, new Rectangle(0, 0, 48, 32), 10, swingDist: 1.57f));
-            sprite = Content.Load<Texture2D>("arctic_fox_tail");
-            ItemManager.add(new Item("Arctic Fox Tail", sprite));
-            sprite = Content.Load<Texture2D>("unicorn_horn");
-            ItemManager.add(new Item("Unicorn Horn", sprite));
-            sprite = Content.Load<Texture2D>("sun_feather");
-            ItemManager.add(new Item("Sun Feather", sprite));
-            sprite = Content.Load<Texture2D>("cryorose");
-            ItemManager.add(new Item("Cryorose", sprite));
-            sprite = Content.Load<Texture2D>("iron_root");
-            ItemManager.add(new Item("Iron Root", sprite));
-        }
-
-        private void loadEntities()
-        {
-            Texture2D texture = Content.Load<Texture2D>("enemy1");
-            EntityManager.add(new LivingEntity("enemy1", texture, new Rectangle(0, 0, 28, 26), _graphics));
-            texture = Content.Load<Texture2D>("enemy2");
-            EntityManager.add(new LivingEntity("enemy2", texture, new Rectangle(0, 0, 28, 26), _graphics));
-            texture = Content.Load<Texture2D>("enemy3");
-            EntityManager.add(new LivingEntity("enemy3", texture, new Rectangle(0, 0, 28, 26), _graphics));
-
-            foreach (LivingEntity entity in EntityManager.livingEntities.Values)
-            {
-                System.Diagnostics.Debug.WriteLine("Entity: " + entity.name);
-            }
-        }
-
-        private void loadGuis()
-        {
-            Texture2D texture = Content.Load<Texture2D>("gui_tileset");
-            GuiWindowManager.tileset = texture;
-            GuiWindowManager.add(new GuiPlayerInventory());
         }
 
         private void loadHud()
@@ -340,14 +267,22 @@ namespace BasicRPGTest_Mono
 
             //return;  // Stop Function Here (for testing)
 
+            // Draw the items on the map.
+            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(MapManager.activeMap.items);
+            foreach (ItemEntity item in items.Values)
+            {
+                if (item == null) continue;
+                item.draw(_spriteBatch);
+            }
 
+            // Draw non-player entities;
             List<LivingEntity> entities = new List<LivingEntity>(MapManager.activeMap.livingEntities.Values);
             foreach (LivingEntity entity in entities)
             {
                 entity.draw(_spriteBatch);
             }
 
-
+            // Draw the player.
             player.draw(_spriteBatch);
 
             _spriteBatch.End();
@@ -374,9 +309,19 @@ namespace BasicRPGTest_Mono
             }
             _spriteBatch.End();
 
+            // Draw active anchored popup texts
+            _spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
+            popups = new List<PopupText>(Core.anchoredPopupTexts);
+            foreach (PopupText popup in popups)
+            {
+                if (popup == null) continue;
+                popup.draw(_spriteBatch);
+            }
+            _spriteBatch.End();
+
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(Core.dmgFont, fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.DrawString(FontLibrary.getFont("dmg"), fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             // End Code Timer for speed test

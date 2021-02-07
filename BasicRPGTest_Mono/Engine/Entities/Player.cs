@@ -1,6 +1,7 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.Graphics;
 using BasicRPGTest_Mono.Engine.GUI;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Inventories;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
@@ -30,13 +31,11 @@ namespace BasicRPGTest_Mono.Engine
         public Timer attackTimer;
 
         public PlayerInventory inventory;
-        public Player(Texture2D texture, GraphicsDeviceManager graphics) : 
-            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), graphics, 125f)
+        public Player(Texture2D texture) : 
+            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), 125f)
         {
             Core.player = this;
             Camera.camera.Focus = this;
-
-            graphicsManager = graphics;
 
             Random rand = new Random();
             Vector2 spawnPoint = new Vector2(rand.Next(32, MapManager.activeMap.widthInPixels / 2 - 32), rand.Next(32, MapManager.activeMap.heightInPixels / 2 - 32));
@@ -64,35 +63,35 @@ namespace BasicRPGTest_Mono.Engine
             kbResist = 0.75f;
 
             inventory = new PlayerInventory();
-            inventory.addItem(ItemManager.getByNamespace("hollysong"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.addItem(ItemManager.getByNamespace("ironroot"));
-            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
-            inventory.addItem(ItemManager.getByNamespace("cryorose"));
-            inventory.addItem(ItemManager.getByNamespace("unicornhorn"));
-            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.addItem(ItemManager.getByNamespace("ironroot"));
-            inventory.addItem(ItemManager.getByNamespace("unicornhorn"));
-            inventory.addItem(ItemManager.getByNamespace("cryorose"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.addItem(ItemManager.getByNamespace("ironroot"));
-            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
-            inventory.addItem(ItemManager.getByNamespace("cryorose"));
-            inventory.addItem(ItemManager.getByNamespace("unicornhorn"));
-            inventory.addItem(ItemManager.getByNamespace("sunfeather"));
-            inventory.addItem(ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.setItem(23, ItemManager.getByNamespace("ironroot"));
-            inventory.setItem(35, ItemManager.getByNamespace("unicornhorn"));
-            inventory.setItem(30, ItemManager.getByNamespace("cryorose"));
-            inventory.setItem(52, ItemManager.getByNamespace("hollysong"));
-            inventory.addItem(ItemManager.getByNamespace("hollysong"));
-            inventory.addItem(ItemManager.getByNamespace("crystalsword"));
-            inventory.hotbarPrimary.setItem(0, ItemManager.getByNamespace("hollysong"));
-            inventory.hotbarPrimary.setItem(1, ItemManager.getByNamespace("ironroot"));
-            inventory.hotbarPrimary.setItem(2, ItemManager.getByNamespace("cryorose"));
-            inventory.hotbarSecondary.setItem(0, ItemManager.getByNamespace("arcticfoxtail"));
-            inventory.hotbarSecondary.setItem(1, ItemManager.getByNamespace("sunfeather"));
+            inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("arcticfoxtail")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("ironroot")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("sunfeather")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("cryorose")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("unicornhorn")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("sunfeather")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("arcticfoxtail")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("ironroot")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("unicornhorn")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("cryorose")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("arcticfoxtail")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("ironroot")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("sunfeather")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("cryorose")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("unicornhorn")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("sunfeather")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("arcticfoxtail")));
+            inventory.setItem(23, new Item(ItemManager.getByNamespace("ironroot")));
+            inventory.setItem(35, new Item(ItemManager.getByNamespace("unicornhorn")));
+            inventory.setItem(30, new Item(ItemManager.getByNamespace("cryorose")));
+            inventory.setItem(52, new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
+            inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
+            inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("crystalsword")));
+            inventory.hotbarPrimary.setItem(0, new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
+            inventory.hotbarPrimary.setItem(1, new Item(ItemManager.getByNamespace("ironroot")));
+            inventory.hotbarPrimary.setItem(2, new Item(ItemManager.getByNamespace("cryorose")));
+            inventory.hotbarSecondary.setItem(0, new Item(ItemManager.getByNamespace("arcticfoxtail")));
+            inventory.hotbarSecondary.setItem(1, new Item(ItemManager.getByNamespace("sunfeather")));
 
             GuiWindowManager.playerInv.updateGui();
         }
@@ -171,7 +170,6 @@ namespace BasicRPGTest_Mono.Engine
                     else
                         damage = 0;
                     tile.Damage(damage);
-                    System.Diagnostics.Debug.WriteLine($"Dealt {damage} damage to tile at {tile.tilePos}");
                 }
             }
 
@@ -303,6 +301,12 @@ namespace BasicRPGTest_Mono.Engine
 
                 if (boundingBox.Intersects(entity.boundingBox) && !entity.isImmunity)
                     hurt(entity.damage, entity.CenteredPosition);
+            }
+            Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>(map.items);
+            foreach (ItemEntity item in items.Values)
+            {
+                if (boundingBox.Intersects(item.boundingBox))
+                    item.pickUp(this);
             }
 
             var kstate = Keyboard.GetState();
@@ -454,6 +458,12 @@ namespace BasicRPGTest_Mono.Engine
                 knockbackTimer = null;
             };
             knockbackTimer.Start();
+        }
+        public void sendCornerMessage(string msg, TextColor color)
+        {
+            Vector2 stringSize = FontLibrary.getFont("dmg").MeasureString(msg);
+            Vector2 pos = new Vector2(Camera.camera.BoundingRectangle.Width - stringSize.X - 16, Camera.camera.BoundingRectangle.Height - stringSize.Y - 16);
+            new MovingText(msg, pos, color, 1500, Direction.Up, 0.65f, 500, true);
         }
 
 

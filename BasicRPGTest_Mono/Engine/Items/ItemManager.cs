@@ -6,34 +6,35 @@ namespace BasicRPGTest_Mono.Engine.Items
 {
     public static class ItemManager
     {
-        public static List<Item> items;
+        private static List<ParentItem> items;
+        private static Dictionary<string, ParentItem> itemsByName;
 
         static ItemManager()
         {
-            items = new List<Item>();
+            items = new List<ParentItem>();
+            itemsByName = new Dictionary<string, ParentItem>();
         }
-
-        public static void add(Item item)
+        
+        public static void add(ParentItem item)
         {
             items.Add(item);
+            itemsByName.Add(item.name, item);
         }
 
-        public static Item get(int i)
+        public static ParentItem get(int i)
         {
             if (i > items.Count - 1) return null;
             return items[i];
         }
-        public static Item getByNamespace(string name)
+        public static ParentItem getByNamespace(string name)
         {
-            foreach (Item item in items)
-            {
-                if (item.name == name) return item;
-            }
+            if (name != null && itemsByName.ContainsKey(name))
+                return itemsByName[name];
 
             return null;
         }
 
-        public static List<Item> getTiles()
+        public static List<ParentItem> getItems()
         {
             return items;
         }

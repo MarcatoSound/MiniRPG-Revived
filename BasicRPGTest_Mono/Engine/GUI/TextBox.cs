@@ -22,7 +22,8 @@ namespace BasicRPGTest_Mono.Engine.GUI
 
         public TextBox(string text, Rectangle box)
         {
-            Vector2 lineSize = Core.mainFont.MeasureString("W");
+            SpriteFont font = FontLibrary.getFont("main");
+            Vector2 lineSize = font.MeasureString("W");
             lineHeight = lineSize.Y;
             characterWidth = lineSize.X;
             maxDisplayLines = (int)(box.Height / lineHeight);
@@ -85,7 +86,7 @@ namespace BasicRPGTest_Mono.Engine.GUI
                     string lineStr = lines[lineNumber];
 
                     stringPos.Y = lineHeight * z;
-                    batch.DrawString(Core.mainFont, lineStr, stringPos, Color.SaddleBrown);
+                    batch.DrawString(font, lineStr, stringPos, Color.SaddleBrown);
 
                     lineNumber++;
                 }

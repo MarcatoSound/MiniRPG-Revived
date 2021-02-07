@@ -1,4 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Items;
+using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +12,7 @@ using System.Timers;
 
 namespace BasicRPGTest_Mono.Engine
 {
-    public class LivingEntity : Entity
+    public class LivingEntity : Entity, IDisposable
     {
         public bool isMoving;
 
@@ -28,6 +30,23 @@ namespace BasicRPGTest_Mono.Engine
         public bool isImmunity;
         public int immunityTime = 200;
 
+        public double maxHealth = 50;
+        public double _health;
+        public double health
+        {
+            get { return _health; }
+            set
+            {
+                _health = value;
+                if (_health < 0)
+                {
+                    _health = 0;
+                    kill();
+                }
+                else if (_health > maxHealth)
+                    _health = maxHealth;
+            }
+        }
         public Timer knockbackTimer { get; set; }
         public bool isGettingKnockedBack { get; set; }
         public float kbResist = 0f;
@@ -35,26 +54,29 @@ namespace BasicRPGTest_Mono.Engine
 
         public Map map;
 
-        public LivingEntity(string name, Texture2D texture, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(new Graphic(texture), box, graphicsManager)
+        // Drop data
+        public DropTable dropTable = new DropTable();
+
+        public LivingEntity(string name, Texture2D texture, Rectangle box, float speed = 90f) : base(new Graphic(texture), box)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
             this.speed = speed;
-            this.Position = position;
-            boundingBox = getBox(position);
+            this.Position = Vector2.Zero;
+            boundingBox = getBox(Position);
 
             //EntityManager.add(this);
         }
-        public LivingEntity(string name, Graphic graphic, Rectangle box, GraphicsDeviceManager graphicsManager, float speed = 90f, Vector2 position = new Vector2()) : base(graphic, box, graphicsManager)
+        public LivingEntity(string name, Graphic graphic, Rectangle box, float speed = 90f) : base(graphic, box)
         {
             if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
             this.name = name;
             this.speed = speed;
-            this.Position = position;
+            this.Position = Vector2.Zero;
 
             //EntityManager.add(this);
         }
-        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height), entity.graphicsManager)
+        public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height))
         {
             this.speed = entity.speed;
             this.Position = pos;
@@ -68,6 +90,10 @@ namespace BasicRPGTest_Mono.Engine
             moveCount = 0;
 
             maxVelocity = new Vector2(speed, speed);
+            maxHealth = entity.maxHealth;
+            health = maxHealth;
+
+            this.dropTable = entity.dropTable;
 
             this.map = map;
         }
@@ -285,13 +311,6 @@ namespace BasicRPGTest_Mono.Engine
         public bool isColliding(Rectangle box)
         {
             if (MapManager.activeMap == null) return true;
-            // TODO: MUST OPTIMIZE COLLIDABLE CHECKS
-            /*ConcurrentDictionary<int, Rectangle> pairs = MapManager.activeMap.collidables;
-            foreach (KeyValuePair<int, Rectangle> pair in pairs)
-            {
-                if (box.Intersects(pair.Value))
-                    return true;
-            }*/
             List<Tile> tiles = Util.getSurroundingTiles(map, 1, TilePosition);
             foreach (Tile tile in tiles)
             {
@@ -326,19 +345,22 @@ namespace BasicRPGTest_Mono.Engine
 
             knockback(sourcePos);
             showDamageText(dmg);
+
+            health -= dmg;
         }
         public void showDamageText(double dmg)
         {
             // TODO: Implement check for critical hit.
+            SpriteFont font = FontLibrary.getFont("dmg");
             Vector2 stringPos = new Vector2(Position.X, Position.Y);
-            Vector2 stringSize = Core.dmgFont.MeasureString(dmg.ToString());
+            Vector2 stringSize = font.MeasureString(dmg.ToString());
             stringPos.X -= stringSize.X / 2;
             stringPos.Y -= 20;
 
             Random rand = new Random();
             stringPos.X += rand.Next(-5, 5);
 
-            new MovingText(dmg.ToString(), Core.dmgFont, stringPos, new TextColor(Color.Crimson), 500);
+            new MovingText(dmg.ToString(), font, stringPos, new TextColor(Color.Crimson), 500);
         }
 
         public virtual void knockback(Vector2 sourcePos)
@@ -378,7 +400,24 @@ namespace BasicRPGTest_Mono.Engine
 
         public void kill()
         {
-            MapManager.activeMap.entities.TryRemove(instanceId, out _);
+            Vector2 dropPos = new Vector2(Position.X + (TileManager.dimensions / 3), Position.Y + (TileManager.dimensions / 3));
+            dropTable.dropItems(map, dropPos);
+            /*
+            Vector2 dropPos;
+            foreach (ItemDrop drop in drops)
+            {
+                dropPos = Util.randomizePosition(Position, 6);
+
+                drop.tryDrop(map, dropPos);
+            }*/
+
+            MapManager.activeMap.livingEntities.TryRemove(instanceId, out _);
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+
         }
 
     }

@@ -66,14 +66,14 @@ namespace BasicRPGTest_Mono.Engine.GUI
             slotDist = 51;
 
             itemPos = new Vector2(position.X + 20, position.Y + 308); // This is the starting position for drawing the primary hotbar's items.
-            foreach (Item item in inventory.hotbarPrimary.items.Values)
+            foreach (Item item in inventory.hotbarPrimary.getAllItems())
             {
                 itemSlots.Add(new ItemSlot(item, new Rectangle(Convert.ToInt32(itemPos.X), Convert.ToInt32(itemPos.Y), 38, 38)));
                 itemPos.X += slotDist;
             }
 
             itemPos = new Vector2(position.X + 20, position.Y + 388); // This is the starting position for drawing the secondary hotbar's items.
-            foreach (Item item in inventory.hotbarSecondary.items.Values)
+            foreach (Item item in inventory.hotbarSecondary.getAllItems())
             {
                 itemSlots.Add(new ItemSlot(item, new Rectangle(Convert.ToInt32(itemPos.X), Convert.ToInt32(itemPos.Y), 38, 38)));
                 itemPos.X += slotDist;
@@ -97,66 +97,6 @@ namespace BasicRPGTest_Mono.Engine.GUI
             }
 
             itemSlots.AddRange(pages[currentPage].slots);
-
-
-            /*inventory = Core.player.inventory;
-            pages.Clear();
-
-            // Generate the GUI window
-            if (texture != null) texture.Dispose();
-            texture = new RenderTarget2D(Core.graphics, box.Width, box.Height);
-
-            Core.graphics.SetRenderTarget(texture);
-            Core.graphics.Clear(Color.Transparent);
-            SpriteBatch batch = new SpriteBatch(Core.graphics);
-
-            batch.Begin(samplerState: SamplerState.PointClamp);
-
-            batch.Draw(background, Vector2.Zero, Color.White);
-
-            // Draw the hotbars
-            int slotDist = 51;
-            float scale;
-
-            Vector2 itemPos = new Vector2(20, 308); // This is the starting position for drawing the primary hotbar's items.
-            foreach (Item item in inventory.hotbarPrimary.items.Values)
-            {
-                scale = 38.0f / item.graphic.texture.Width; // 38.0f refers to the dimensions of the box to fit the texture into.
-
-                item.graphic.draw(batch, itemPos, 0f, Vector2.Zero, scale, false);
-                itemPos.X += slotDist;
-            }
-
-            itemPos = new Vector2(20, 388); // This is the starting position for drawing the secondary hotbar's items.
-            foreach (Item item in inventory.hotbarSecondary.items.Values)
-            {
-                scale = 38.0f / item.graphic.texture.Width; // 38.0f refers to the dimensions of the box to fit the texture into.
-
-                item.graphic.draw(batch, itemPos, 0f, Vector2.Zero, scale, false);
-                itemPos.X += slotDist;
-            }
-
-            // Set up and draw the item page(s)
-            int pageCount = 2;
-            int itemNumber = 0;
-            int maxPageItems = 40;
-            GuiPlayerInventoryPage page;
-            for (int i = 1; i <= pageCount; i++)
-            {
-                page = new GuiPlayerInventoryPage();
-                for (int z = 0; z < maxPageItems; z++)
-                {
-                    page.addItem(inventory.getItem(itemNumber));
-                    itemNumber++;
-                }
-                pages.Add(page);
-            }
-
-            pages[currentPage].Draw(batch);
-
-
-            batch.End();
-            Core.graphics.Reset();*/
 
         }
 

@@ -6,11 +6,13 @@ namespace BasicRPGTest_Mono.Engine
 {
     public static class MapManager
     {
-        public static List<Map> maps;
+        private static List<Map> maps;
+        private static Dictionary<string, Map> mapsByName;
         public static Map activeMap { get; set; }
         static MapManager()
         {
             maps = new List<Map>();
+            mapsByName = new Dictionary<string, Map>();
         }
 
         /// <summary>
@@ -25,6 +27,7 @@ namespace BasicRPGTest_Mono.Engine
              */
             if (maps.Count == 0) activeMap = map;
             maps.Add(map);
+            mapsByName.Add(map.name, map);
         }
         /// <summary>
         /// Retrieves a map object from the list of loaded maps.
@@ -43,10 +46,8 @@ namespace BasicRPGTest_Mono.Engine
         /// <returns>The map matching the "name" parameter provided. NULL if it wasn't found.</returns>
         public static Map getByName(string name)
         {
-            foreach (Map map in maps)
-            {
-                if (map.name == name) return map;
-            }
+            if (name != null && mapsByName.ContainsKey(name))
+                return mapsByName[name];
 
             return null;
         }

@@ -315,7 +315,14 @@ namespace BasicRPGTest_Mono.Engine.Utility
             drawAlignedText(strings, color, batch, font, box, horAlign, vertAlign, padding);
         }
 
+        public static bool randomBool(double chance)
+        {
+            Random rand = new Random();
+            if (rand.NextDouble() < chance)
+                return true;
 
+            return false;
+        }
         public static int weightedRandom(List<int> chances)
         {
             // O(n) performance
@@ -337,6 +344,16 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             return iteration;
 
+        }
+        public static Vector2 randomizePosition(Vector2 origin, int radius)
+        {
+            Random rand = new Random();
+            Vector2 pos = new Vector2();
+
+            pos.X = origin.X + rand.Next(-radius, radius);
+            pos.Y = origin.Y + rand.Next(-radius, radius);
+
+            return pos;
         }
         public static Spawn randomizeSpawn(ConcurrentDictionary<int, Spawn> spawns)
         {
@@ -375,6 +392,15 @@ namespace BasicRPGTest_Mono.Engine.Utility
             //System.Diagnostics.Debug.WriteLine($"TruePos {truePos}");
             //System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
             return truePos / TileManager.dimensions;
+        }
+        public static Vector2 screenPosToTruePos(Vector2 truePos)
+        {
+            Vector2 pos = new Vector2(truePos.X, truePos.Y);
+
+            pos.X += Camera.camera.BoundingRectangle.X;
+            pos.Y += Camera.camera.BoundingRectangle.Y;
+
+            return pos;
         }
 
         public static Texture2D getSpriteFromSet(Texture2D spriteset, int row, int column, int dimensions = 32)

@@ -9,6 +9,7 @@ using BasicRPGTest_Mono.Engine.Utility;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.GUI.Text;
+using BasicRPGTest_Mono.Engine.Entities;
 
 namespace BasicRPGTest_Mono
 {
@@ -77,7 +78,8 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
+
+                        //new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
 
                         /*
                         Image img = new Image();
@@ -230,6 +232,15 @@ namespace BasicRPGTest_Mono
                             }
                         }
                     }
+                    else
+                    {
+                        if (args.Button == MonoGame.Extended.Input.MouseButton.Left)
+                        {
+                            Vector2 clickPos = new Vector2(args.Position.X, args.Position.Y);
+                            clickPos = Util.screenPosToTruePos(clickPos);
+                            new ItemEntity(MapManager.activeMap, new Item(ItemManager.getByNamespace("unicornhorn")), clickPos);
+                        }
+                    }
                 }
             };
 
@@ -281,7 +292,7 @@ namespace BasicRPGTest_Mono
             Mouse.SetCursor(MouseCursor.FromTexture2D(cursorTexture, 0, 0));
 
             SpriteFont font = Content.Load<SpriteFont>("font_main");
-            Core.mainFont = font;
+            FontLibrary.addFont("main", font);
 
             base.LoadContent();
         }

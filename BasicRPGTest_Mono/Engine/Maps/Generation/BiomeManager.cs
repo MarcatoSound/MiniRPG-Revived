@@ -10,11 +10,13 @@ namespace BasicRPGTest_Mono.Engine.Maps
     /// </summary>
     public static class BiomeManager
     {
-        public static List<Biome> biomes;
+        private static List<Biome> biomes;
+        private static Dictionary<string, Biome> biomesByName;
 
         static BiomeManager()
         {
             biomes = new List<Biome>();
+            biomesByName = new Dictionary<string, Biome>();
         }
 
         /// <summary>
@@ -24,6 +26,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         public static void add(Biome biome)
         {
             biomes.Add(biome);
+            biomesByName.Add(biome.name, biome);
         }
 
         /// <summary>
@@ -43,10 +46,8 @@ namespace BasicRPGTest_Mono.Engine.Maps
         /// <returns>The biome matching the "name" parameter provided. NULL if it wasn't found.</returns>
         public static Biome getByName(string name)
         {
-            foreach (Biome biome in biomes)
-            {
-                if (biome.name == name) return biome;
-            }
+            if (name != null && biomesByName.ContainsKey(name))
+                return biomesByName[name];
 
             return null;
         }

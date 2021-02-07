@@ -101,6 +101,7 @@ namespace BasicRPGTest_Mono.Engine
                     int y = tileJson.Value<int>("y");
                     string biome = tileJson.Value<string>("biome");
 
+                    // TODO: Tile biomes are NOT SAVED!! Fix this!
                     tile = new Tile(template, new Vector2(x, y), BiomeManager.getByName(biome));
 
                     layer.setTile(tile.tilePos, tile);

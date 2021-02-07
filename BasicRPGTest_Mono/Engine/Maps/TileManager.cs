@@ -12,7 +12,9 @@ namespace BasicRPGTest_Mono.Engine.Maps
     /// </summary>
     public static class TileManager
     {
-        public static List<Tile> tiles { get; set; }
+        private static List<Tile> tiles;
+        private static Dictionary<string, Tile> tilesByName;
+
         public static int dimensions { get; set; }
 
         public static Texture2D breakTexture { get; set; }
@@ -20,6 +22,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         static TileManager()
         {
             tiles = new List<Tile>();
+            tilesByName = new Dictionary<string, Tile>();
             dimensions = 32;
         }
         /// <summary>
@@ -29,6 +32,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         public static void add(Tile tile)
         {
             tiles.Add(tile);
+            tilesByName.Add(tile.name, tile);
         }
 
         /// <summary>
@@ -48,10 +52,8 @@ namespace BasicRPGTest_Mono.Engine.Maps
         /// <returns>The parent tile matching the "name" parameter provided. NULL if it wasn't found.</returns>
         public static Tile getByName(string name)
         {
-            foreach (Tile tile in tiles)
-            {
-                if (tile.name == name) return tile;
-            }
+            if (tilesByName.ContainsKey(name))
+                return tilesByName[name];
 
             return null;
         }

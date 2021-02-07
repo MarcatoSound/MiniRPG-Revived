@@ -7,17 +7,21 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
 {
     public static class HudManager
     {
-        public static List<HudElement> elements;
+        private static List<HudElement> elements;
+        private static Dictionary<string, HudElement> elementsByName;
+
         public static Texture2D tileset;
 
         static HudManager()
         {
             elements = new List<HudElement>();
+            elementsByName = new Dictionary<string, HudElement>();
         }
 
         public static void add(HudElement element)
         {
             elements.Add(element);
+            elementsByName.Add(element.name, element);
         }
 
         public static HudElement get(int i)
@@ -27,10 +31,8 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         }
         public static HudElement getByName(string name)
         {
-            foreach (HudElement element in elements)
-            {
-                if (element.name == name) return element;
-            }
+            if (name != null && elementsByName.ContainsKey(name))
+                return elementsByName[name];
 
             return null;
         }
