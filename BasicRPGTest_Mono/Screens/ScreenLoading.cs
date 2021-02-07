@@ -176,18 +176,18 @@ namespace BasicRPGTest_Mono.Screens
         {
             Texture2D texture = Content.Load<Texture2D>("enemy1");
             LivingEntity ent = new LivingEntity("purple", texture, new Rectangle(0, 0, 28, 26));
-            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
-            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
+            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
+            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
             EntityManager.add(ent);
             texture = Content.Load<Texture2D>("enemy2");
             ent = new LivingEntity("blue", texture, new Rectangle(0, 0, 28, 26));
-            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
-            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
+            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
+            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
             EntityManager.add(ent);
             texture = Content.Load<Texture2D>("enemy3");
             ent = new LivingEntity("red", texture, new Rectangle(0, 0, 28, 26));
-            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
-            ent.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
+            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
+            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
             EntityManager.add(ent);
 
             foreach (LivingEntity entity in EntityManager.livingEntities.Values)

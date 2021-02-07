@@ -32,7 +32,7 @@ namespace BasicRPGTest_Mono.Engine.Items
             int totalRatio = 0;
 
             foreach (ItemDrop s in drops)
-                totalRatio += Convert.ToInt32(s.chance * 100);
+                totalRatio += Convert.ToInt32(s.weight * 100);
 
             Random random = new Random();
             int x = random.Next(0, totalRatio);
@@ -40,7 +40,7 @@ namespace BasicRPGTest_Mono.Engine.Items
             int iteration = 0; // so you know what to do next
             foreach (ItemDrop s in drops)
             {
-                if ((x -= Convert.ToInt32(s.chance * 100)) < 0)
+                if ((x -= Convert.ToInt32(s.weight * 100)) < 0)
                     break;
                 iteration++;
             }

@@ -1,5 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Items;
+using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -54,7 +55,7 @@ namespace BasicRPGTest_Mono.Engine
         public Map map;
 
         // Drop data
-        public List<ItemDrop> drops = new List<ItemDrop>();
+        public DropTable dropTable = new DropTable();
 
         public LivingEntity(string name, Texture2D texture, Rectangle box, float speed = 90f) : base(new Graphic(texture), box)
         {
@@ -92,7 +93,7 @@ namespace BasicRPGTest_Mono.Engine
             maxHealth = entity.maxHealth;
             health = maxHealth;
 
-            this.drops = entity.drops;
+            this.dropTable = entity.dropTable;
 
             this.map = map;
         }
@@ -399,13 +400,16 @@ namespace BasicRPGTest_Mono.Engine
 
         public void kill()
         {
+            Vector2 dropPos = new Vector2(Position.X + (TileManager.dimensions / 3), Position.Y + (TileManager.dimensions / 3));
+            dropTable.dropItems(map, dropPos);
+            /*
             Vector2 dropPos;
             foreach (ItemDrop drop in drops)
             {
                 dropPos = Util.randomizePosition(Position, 6);
 
                 drop.tryDrop(map, dropPos);
-            }
+            }*/
 
             MapManager.activeMap.livingEntities.TryRemove(instanceId, out _);
             Dispose();

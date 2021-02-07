@@ -12,19 +12,19 @@ namespace BasicRPGTest_Mono.Engine.Items
         public int min;
         public int max;
 
-        public double chance;
+        public double weight;
 
-        public ItemDrop(ParentItem item, int min = 1, int max = 1, double chance = 1)
+        public ItemDrop(ParentItem item, int min = 1, int max = 1, double weight = 1)
         {
             this.item = item;
             this.min = min;
             this.max = max;
-            this.chance = chance;
+            this.weight = weight;
         }
 
         public bool tryDrop(Map map, Vector2 pos)
         {
-            if (!Utility.Util.randomBool(chance)) return false;
+            if (!Utility.Util.randomBool(weight)) return false;
 
             Random rand = new Random();
             int quantity = rand.Next(min, max);
