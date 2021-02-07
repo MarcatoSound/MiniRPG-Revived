@@ -107,7 +107,9 @@ namespace BasicRPGTest_Mono.Screens
             TileManager.add(tile);
 
             tile = new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5);
-            tile.drops.Add(new ItemDrop(ItemManager.getByNamespace("ironroot"), 1, 3));
+            tile.dropTable.max = 5;
+            tile.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot"), 1, 3));
+            tile.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3, 0.5));
             TileManager.add(tile);
 
             tile = new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false, destructable: false);

@@ -33,6 +33,7 @@ namespace RPGEngine
 
         public double maxHealth { get; set; }
         public bool destructable { get; set; }
+        public DropTable dropTable = new DropTable();
         public List<ItemDrop> drops = new List<ItemDrop>();
 
         // Instance variables
@@ -123,6 +124,7 @@ namespace RPGEngine
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
             sideGraphics = tile.sideGraphics;
             sides = new Dictionary<TileSide, bool>();
+            dropTable = tile.dropTable;
             drops = tile.drops;
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
@@ -365,12 +367,13 @@ namespace RPGEngine
 
             // Attempt to spawn the items that drop from this tile.
             Vector2 dropPos = new Vector2(pos.X + (TileManager.dimensions / 3), pos.Y + (TileManager.dimensions / 3));
-            foreach (ItemDrop drop in drops)
+            dropTable.dropItems(map, dropPos);
+            /*foreach (ItemDrop drop in drops)
             {
                 dropPos = Util.randomizePosition(dropPos, 8);
 
                 drop.tryDrop(map, dropPos);
-            }
+            }*/
 
             if (this.name == "grass")
             {

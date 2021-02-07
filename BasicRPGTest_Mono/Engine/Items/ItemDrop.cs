@@ -31,5 +31,11 @@ namespace BasicRPGTest_Mono.Engine.Items
             map.spawnItem(new Item(item, quantity), pos);
             return true;
         }
+        public void drop(Map map, Vector2 pos)
+        {
+            Random rand = new Random();
+            int quantity = rand.Next(min, max);
+            map.spawnItem(new Item(item, quantity), pos);
+        }
     }
 }
