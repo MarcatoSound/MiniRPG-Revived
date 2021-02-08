@@ -362,7 +362,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
             int totalRatio = 0;
 
             foreach (Spawn s in spawns.Values)
-                totalRatio += s.weight;
+                totalRatio += Convert.ToInt32(s.weight * 100);
 
             Random random = new Random();
             int x = random.Next(0, totalRatio);
@@ -370,7 +370,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
             int iteration = 0; // so you know what to do next
             foreach (Spawn s in spawns.Values)
             {
-                if ((x -= s.weight) < 0)
+                if ((x -= Convert.ToInt32(s.weight * 100)) < 0)
                     break;
                 iteration++;
             }

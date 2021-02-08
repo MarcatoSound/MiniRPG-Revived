@@ -227,7 +227,6 @@ namespace BasicRPGTest_Mono.Engine
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(0), 2));
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 3));
             spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 1));
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.getByName<LivingEntity>("testentity"), 10));
         }
         /// <summary>
         /// Try to spawn an entity on the map.

@@ -48,7 +48,6 @@ namespace BasicRPGTest_Mono.Screens
             loadTiles();
             loadBiomes();
             loadEntities();
-            loadDataPacks();
             loadGuis();
 
             loading = new Thread(() =>
@@ -59,9 +58,10 @@ namespace BasicRPGTest_Mono.Screens
 
                 if (loadMap())
                     Save.save(MapManager.activeMap, worldName);
+
+                loadDataPacks();
             });
             loading.Start();
-
         }
 
 

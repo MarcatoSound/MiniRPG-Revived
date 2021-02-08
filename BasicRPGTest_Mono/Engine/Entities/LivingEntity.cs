@@ -91,6 +91,8 @@ namespace BasicRPGTest_Mono.Engine
             this.boundingBox = new Rectangle(0, 0, config.getInt("hitbox.width", 32), config.getInt("hitbox.height", 32));
 
             // These take a little more processing to validate...
+
+            // GRAPHIC
             string imgPath = config.getString("texture");
             Texture2D texture;
             if (!imgPath.Equals(""))
@@ -99,6 +101,7 @@ namespace BasicRPGTest_Mono.Engine
                 texture = Util.loadTexture($"{pack.packPath}\\textures\\missing.png");
             graphic = new Graphic(texture);
 
+            // DROPTABLE
             YamlNode tableInfo = config.get("droptable");
             if (tableInfo != null)
             {
@@ -112,6 +115,34 @@ namespace BasicRPGTest_Mono.Engine
 
                 }
             }
+
+            // SPAWNING
+            YamlNode spawnYaml = config.get("spawning");
+            if (spawnYaml != null && spawnYaml.NodeType == YamlNodeType.Sequence)
+            {
+                YamlSequenceNode sequence = (YamlSequenceNode)spawnYaml;
+
+                foreach (var entry in sequence)
+                {
+                    if (entry.NodeType != YamlNodeType.Mapping) continue;
+                    YamlMappingNode mapNode = (YamlMappingNode)entry;
+
+                    YamlSection spawnConfig = new YamlSection(mapNode);
+
+                    string worldName = spawnConfig.getString("map");
+                    System.Diagnostics.Debug.WriteLine($"// ││├┬ Processing spawn entry on map '{worldName}'...");
+                    Map map = MapManager.getByName(worldName);
+                    if (map == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"// │││└╾ ERR: Unable to find map '{worldName}' when configuring spawns! Skipping...");
+                        continue;
+                    }
+                    map.spawns.TryAdd(map.spawns.Count, new Entities.Spawn(this, spawnConfig.getDouble("weight", 1)));
+                    System.Diagnostics.Debug.WriteLine($"// │││└╾ SUCCESS!");
+
+                }
+            }
+            //Map map = MapManager.getByName(mapName);
         }
         public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height))
         {

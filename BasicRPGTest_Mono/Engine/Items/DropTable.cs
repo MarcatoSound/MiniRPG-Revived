@@ -27,20 +27,19 @@ namespace BasicRPGTest_Mono.Engine.Items
             this.max = config.getInt("max_drops", 1);
 
             YamlNode dropsYaml = config.get("drops");
-            if (dropsYaml.NodeType == YamlNodeType.Sequence)
+            if (dropsYaml != null && dropsYaml.NodeType == YamlNodeType.Sequence)
             {
                 YamlSequenceNode sequence = (YamlSequenceNode)dropsYaml;
 
-                System.Diagnostics.Debug.WriteLine($"// ││├╾ Entry count {sequence.Children.Count}");
                 foreach (var entry in sequence)
                 {
                     if (entry.NodeType != YamlNodeType.Mapping) continue;
                     YamlMappingNode map = (YamlMappingNode)entry;
 
-                    YamlSection dropConfig = new YamlSection("", map);
+                    YamlSection dropConfig = new YamlSection(map);
 
                     string itemName = dropConfig.getString("item");
-                    System.Diagnostics.Debug.WriteLine($"// ││├┬ Processing entry for item '{itemName}'...");
+                    System.Diagnostics.Debug.WriteLine($"// ││├┬ Processing drop entry for item '{itemName}'...");
                     ParentItem item = ItemManager.getByNamespace(itemName);
                     if (item == null)
                     {
