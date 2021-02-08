@@ -44,11 +44,11 @@ namespace BasicRPGTest_Mono.Screens
             Core.graphics = _graphics.GraphicsDevice;
 
             // Load the general game objects
-            loadDataPacks();
             loadItems();
             loadTiles();
             loadBiomes();
             loadEntities();
+            loadDataPacks();
             loadGuis();
 
             loading = new Thread(() =>
@@ -79,12 +79,17 @@ namespace BasicRPGTest_Mono.Screens
             {
                 pack = new DataPack(packPath);
                 pack.loadItems();
+                pack.loadDropTables();
+                pack.loadEntities();
             }
         }
         private void setupVanillaPack(string path)
         {
+            Directory.CreateDirectory($"{path}\\");
+            return;
+
             System.Diagnostics.Debug.WriteLine("// SETTING UP DEFAULT DATA //");
-            Directory.CreateDirectory($"{path}\\default");
+            Directory.CreateDirectory($"{path}\\default_pack");
 
         }
         private void loadItems()

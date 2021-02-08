@@ -1,4 +1,5 @@
-﻿using BasicRPGTest_Mono.Engine.GUI.Text;
+﻿using BasicRPGTest_Mono.Engine.Datapacks;
+using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -16,6 +18,7 @@ namespace BasicRPGTest_Mono.Engine
     {
         public bool isMoving;
 
+        public string displayName { get; set; }
         public float speed { get; set; }
         public Vector2 velocity { get; set; }
         public Vector2 maxVelocity { get; set; }
@@ -75,6 +78,40 @@ namespace BasicRPGTest_Mono.Engine
             this.Position = Vector2.Zero;
 
             //EntityManager.add(this);
+        }
+        public LivingEntity(DataPack pack, YamlSection config) : base(new Graphic(), new Rectangle())
+        {
+            if (GetType() == typeof(LivingEntity)) id = EntityManager.livingEntities.Count;
+            this.name = config.getName();
+            this.displayName = config.getString("display_name", name);
+            this.maxHealth = config.getInt("max_health", 50);
+            this.speed = config.getInt("movement_speed", 90);
+            this.kbResist = (float)config.getDouble("knockback_resist");
+            this.immunityTime = config.getInt("immunity_ticks", 200);
+            this.boundingBox = new Rectangle(0, 0, config.getInt("hitbox.width", 32), config.getInt("hitbox.height", 32));
+
+            // These take a little more processing to validate...
+            string imgPath = config.getString("texture");
+            Texture2D texture;
+            if (!imgPath.Equals(""))
+                texture = Util.loadTexture($"{pack.packPath}\\textures\\{imgPath}");
+            else
+                texture = Util.loadTexture($"{pack.packPath}\\textures\\missing.png");
+            graphic = new Graphic(texture);
+
+            YamlNode tableInfo = config.get("droptable");
+            if (tableInfo != null)
+            {
+                if (tableInfo.NodeType == YamlNodeType.Scalar)
+                    this.dropTable = DropTableManager.getByNamespace((string)tableInfo);
+                else
+                {
+                    // TODO: Code for converting this sub-section into a datapack.
+                    YamlSection tableConfig = new YamlSection((YamlMappingNode)tableInfo);
+                    dropTable = new DropTable(pack, tableConfig);
+
+                }
+            }
         }
         public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height))
         {

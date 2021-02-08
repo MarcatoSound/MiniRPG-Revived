@@ -61,7 +61,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
 
             foreach (string file in files)
             {
-                System.Diagnostics.Debug.WriteLine($"// -- Reading file {file}");
+                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}...");
                 var reader = new StreamReader(file);
                 var input = new StringReader(reader.ReadToEnd());
 
@@ -73,12 +73,82 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 foreach (var child in mapping.Children)
                 {
                     YamlMappingNode itemYaml = new YamlMappingNode(child);
-                    System.Diagnostics.Debug.WriteLine($"// --- Loading item {child.Key}");
+                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading item {child.Key}");
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
 
                     ItemManager.add(new ParentItem(this, config));
+                    System.Diagnostics.Debug.WriteLine($"// ││└╾ SUCCESS");
                 }
+                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
             }
+
+            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading items.");
+        }
+        public void loadDropTables()
+        {
+            System.Diagnostics.Debug.WriteLine($"// LOADING DROPTABLES FOR PACK '{name}'... //");
+
+            string path = $"{packPath}\\droptables";
+            string[] files = Directory.GetFiles(path);
+
+            foreach (string file in files)
+            {
+                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}");
+                var reader = new StreamReader(file);
+                var input = new StringReader(reader.ReadToEnd());
+
+                YamlStream yaml = new YamlStream();
+                yaml.Load(input);
+
+                YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                foreach (var child in mapping.Children)
+                {
+                    YamlMappingNode itemYaml = new YamlMappingNode(child);
+                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading droptable {child.Key}...");
+                    YamlSection config = new YamlSection((string)child.Key, itemYaml);
+
+                    DropTableManager.add(new DropTable(this, config));
+                    System.Diagnostics.Debug.WriteLine($"// ││└╾ Finished loading droptable.");
+                }
+
+                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+            }
+
+            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading droptables.");
+        }
+        public void loadEntities()
+        {
+            System.Diagnostics.Debug.WriteLine($"// LOADING ENTITIES FOR PACK '{name}'... //");
+
+            string path = $"{packPath}\\entities";
+            string[] files = Directory.GetFiles(path);
+
+            foreach (string file in files)
+            {
+                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}");
+                var reader = new StreamReader(file);
+                var input = new StringReader(reader.ReadToEnd());
+
+                YamlStream yaml = new YamlStream();
+                yaml.Load(input);
+
+                YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                foreach (var child in mapping.Children)
+                {
+                    YamlMappingNode itemYaml = new YamlMappingNode(child);
+                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading entity {child.Key}...");
+                    YamlSection config = new YamlSection((string)child.Key, itemYaml);
+
+                    EntityManager.add(new LivingEntity(this, config));
+                    System.Diagnostics.Debug.WriteLine($"// ││└╾ Finished loading entity.");
+                }
+
+                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+            }
+
+            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading entities.");
         }
     }
 }

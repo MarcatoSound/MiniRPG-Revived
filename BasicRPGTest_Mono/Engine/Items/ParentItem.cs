@@ -46,7 +46,7 @@ namespace BasicRPGTest_Mono.Engine.Items
 
             // Easy ones first
             name = config.getName();
-            displayName = config.getString("display_name", "null");
+            displayName = config.getString("display_name", name);
             maxStackSize = config.getInt("max_stack", 99);
             swingDist = (float)config.getDouble("swing_distance", 0.785f);
             swingStyle = (SwingStyle)Enum.Parse(typeof(SwingStyle), config.getString("", "Slash"));

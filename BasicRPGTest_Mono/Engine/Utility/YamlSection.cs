@@ -18,8 +18,16 @@ namespace BasicRPGTest_Mono.Engine.Utility
         public YamlSection(string root, YamlMappingNode yaml)
         {
             this.root = root;
-            this.yaml = (YamlMappingNode)yaml[root];
+            if (root != "")
+                this.yaml = (YamlMappingNode)yaml[root];
+            else
+                this.yaml = yaml;
 
+        }
+        public YamlSection(YamlMappingNode yaml)
+        {
+            this.root = "";
+            this.yaml = yaml;
         }
 
         /// <summary>

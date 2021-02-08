@@ -1,12 +1,16 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BasicRPGTest_Mono.Engine.Datapacks;
+using BasicRPGTest_Mono.Engine.Utility;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine.Items
 {
     public class DropTable
     {
+        public string name;
         private List<ItemDrop> drops = new List<ItemDrop>();
         public int min = 1;
         public int max = 1;
@@ -15,6 +19,38 @@ namespace BasicRPGTest_Mono.Engine.Items
         public DropTable(List<ItemDrop> drops)
         {
             this.drops = drops;
+        }
+        public DropTable(DataPack pack, YamlSection config)
+        {
+            this.name = config.getName();
+            this.min = config.getInt("min_drops", 1);
+            this.max = config.getInt("max_drops", 1);
+
+            YamlNode dropsYaml = config.get("drops");
+            if (dropsYaml.NodeType == YamlNodeType.Sequence)
+            {
+                YamlSequenceNode sequence = (YamlSequenceNode)dropsYaml;
+
+                System.Diagnostics.Debug.WriteLine($"// ││├╾ Entry count {sequence.Children.Count}");
+                foreach (var entry in sequence)
+                {
+                    if (entry.NodeType != YamlNodeType.Mapping) continue;
+                    YamlMappingNode map = (YamlMappingNode)entry;
+
+                    YamlSection dropConfig = new YamlSection("", map);
+
+                    string itemName = dropConfig.getString("item");
+                    System.Diagnostics.Debug.WriteLine($"// ││├┬ Processing entry for item '{itemName}'...");
+                    ParentItem item = ItemManager.getByNamespace(itemName);
+                    if (item == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"// │││└╾ ERR: Unable to find item '{itemName}' when creating drop table! Skipping...");
+                        continue;
+                    }
+                    drops.Add(new ItemDrop(item, config.getInt("min", 1), config.getInt("max", 1), config.getDouble("weight", 1)));
+                    System.Diagnostics.Debug.WriteLine($"// │││└╾ SUCCESS!");
+                }
+            }
         }
 
         public void add(ItemDrop drop)

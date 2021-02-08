@@ -1,0 +1,10 @@
+testitem:
+  display_name: Test Item
+  max_stack: 5
+  texture: living_stone.png
+  hitbox:
+    width: 50
+    height: 24
+testitem2:
+  display_name: Another Test
+  max_stack: 10
