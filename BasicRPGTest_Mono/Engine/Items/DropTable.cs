@@ -94,7 +94,7 @@ namespace BasicRPGTest_Mono.Engine.Items
             {
                 drop = selectDrop();
                 if (drop == null) continue;
-                dropPos = Utility.Util.randomizePosition(pos, 8);
+                dropPos = Util.randomizePosition(pos, 8);
                 drop.drop(map, dropPos);
             }
         }

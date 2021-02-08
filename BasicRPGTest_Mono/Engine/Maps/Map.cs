@@ -224,9 +224,9 @@ namespace BasicRPGTest_Mono.Engine
         /// </summary>
         public void initSpawns()
         {
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(0), 2));
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 3));
-            spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 1));
+            //spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(0), 2));
+            //spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(1), 3));
+            //spawns.TryAdd(spawns.Keys.Count, new Spawn(EntityManager.get<LivingEntity>(2), 1));
         }
         /// <summary>
         /// Try to spawn an entity on the map.
@@ -235,6 +235,7 @@ namespace BasicRPGTest_Mono.Engine
         /// <param name="e"></param>
         public void trySpawn(Object source, ElapsedEventArgs e)
         {
+            if (spawns.Count == 0) return;
             if (livingEntities.Count >= livingEntityCap) return;
             Random rand = new Random();
 

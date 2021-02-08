@@ -44,10 +44,11 @@ namespace BasicRPGTest_Mono.Screens
             Core.graphics = _graphics.GraphicsDevice;
 
             // Load the general game objects
+
+            loadDataPacks();
             loadItems();
             loadTiles();
             loadBiomes();
-            loadEntities();
             loadGuis();
 
             loading = new Thread(() =>
@@ -59,7 +60,7 @@ namespace BasicRPGTest_Mono.Screens
                 if (loadMap())
                     Save.save(MapManager.activeMap, worldName);
 
-                loadDataPacks();
+                loadEntities();
             });
             loading.Start();
         }
@@ -74,13 +75,9 @@ namespace BasicRPGTest_Mono.Screens
 
             string[] packPaths = Directory.GetDirectories(packsFolder);
 
-            DataPack pack;
             foreach (string packPath in packPaths)
             {
-                pack = new DataPack(packPath);
-                pack.loadItems();
-                pack.loadDropTables();
-                pack.loadEntities();
+                DataPackManager.add(new DataPack(packPath));
             }
         }
         private void setupVanillaPack(string path)
@@ -111,6 +108,8 @@ namespace BasicRPGTest_Mono.Screens
             ParentTool pickaxe = new ParentTool("Crystal Sword", sprite, new Rectangle(), 5);
             pickaxe.damageTypes.Add(DamageType.Mining, 5);
             ItemManager.add(pickaxe);
+
+            DataPackManager.loadItems();
         }
         private void loadTiles()
         {
@@ -143,6 +142,8 @@ namespace BasicRPGTest_Mono.Screens
 
             tile = new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false, destructable: false);
             TileManager.add(tile);
+
+            DataPackManager.loadTiles();
         }
 
         private void loadBiomes()
@@ -199,11 +200,13 @@ namespace BasicRPGTest_Mono.Screens
             biome.coastTile = TileManager.getByName("sand");
             biome.decorations.Add(new Decoration("bush", 30, TileManager.getByName("tree")));
             BiomeManager.add(biome);
+
+            DataPackManager.loadBiomes();
         }
 
         private void loadEntities()
         {
-            Texture2D texture = Content.Load<Texture2D>("enemy1");
+            /*Texture2D texture = Content.Load<Texture2D>("enemy1");
             LivingEntity ent = new LivingEntity("purple", texture, new Rectangle(0, 0, 28, 26));
             ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
             ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
@@ -217,7 +220,9 @@ namespace BasicRPGTest_Mono.Screens
             ent = new LivingEntity("red", texture, new Rectangle(0, 0, 28, 26));
             ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
             ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
-            EntityManager.add(ent);
+            EntityManager.add(ent);*/
+
+            DataPackManager.loadEntities();
 
             foreach (LivingEntity entity in EntityManager.livingEntities.Values)
             {
