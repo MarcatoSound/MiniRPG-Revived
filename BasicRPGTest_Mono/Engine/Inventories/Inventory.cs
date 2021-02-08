@@ -46,6 +46,8 @@ namespace BasicRPGTest_Mono.Engine
         /// <param name="item">The new item we are adding to the inventory.</param>
         public void addItem(Item item)
         {
+            if (item == null) return;
+
             // Loop through existing items to see if there's already one in the inventory.
             foreach (Item i in items.Values)
             {

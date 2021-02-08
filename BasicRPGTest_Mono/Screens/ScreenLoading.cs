@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.Datapacks;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
@@ -43,6 +44,7 @@ namespace BasicRPGTest_Mono.Screens
             Core.graphics = _graphics.GraphicsDevice;
 
             // Load the general game objects
+            loadDataPacks();
             loadItems();
             loadTiles();
             loadBiomes();
@@ -63,6 +65,28 @@ namespace BasicRPGTest_Mono.Screens
         }
 
 
+        private void loadDataPacks()
+        {
+            string packsFolder = $"packs\\";
+
+            if (!Directory.Exists(packsFolder))
+                setupVanillaPack(packsFolder);
+
+            string[] packPaths = Directory.GetDirectories(packsFolder);
+
+            DataPack pack;
+            foreach (string packPath in packPaths)
+            {
+                pack = new DataPack(packPath);
+                pack.loadItems();
+            }
+        }
+        private void setupVanillaPack(string path)
+        {
+            System.Diagnostics.Debug.WriteLine("// SETTING UP DEFAULT DATA //");
+            Directory.CreateDirectory($"{path}\\default");
+
+        }
         private void loadItems()
         {
             Texture2D sprite;

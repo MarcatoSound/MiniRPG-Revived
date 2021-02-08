@@ -9,6 +9,7 @@ using RPGEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -442,6 +443,13 @@ namespace BasicRPGTest_Mono.Engine.Utility
             cropTexture.SetData(data);
 
             return cropTexture;
+        }
+        public static Texture2D loadTexture(string path)
+        {
+            FileStream setStream = File.Open(path, FileMode.Open);
+            Texture2D NewTexture = Texture2D.FromStream(Core.graphics, setStream);
+            setStream.Dispose();
+            return NewTexture;
         }
 
         public static Texture2D buildWindowTexture(Rectangle box, Texture2D spriteset, int dimensions = 16)

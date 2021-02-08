@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine.Items
 {
@@ -27,6 +28,7 @@ namespace BasicRPGTest_Mono.Engine.Items
 
         public Item(ParentItem parentItem, int quantity = 1)
         {
+            if (parentItem == null) return;
             parent = parentItem;
 
             id = parent.id;

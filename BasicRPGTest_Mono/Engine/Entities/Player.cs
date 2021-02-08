@@ -87,6 +87,9 @@ namespace BasicRPGTest_Mono.Engine
             inventory.setItem(52, new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
             inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
             inventory.addItem(new Tool((ParentTool)ItemManager.getByNamespace("crystalsword")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("testitem")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("testitem2")));
+            inventory.addItem(new Item(ItemManager.getByNamespace("testitem3")));
             inventory.hotbarPrimary.setItem(0, new Tool((ParentTool)ItemManager.getByNamespace("hollysong")));
             inventory.hotbarPrimary.setItem(1, new Item(ItemManager.getByNamespace("ironroot")));
             inventory.hotbarPrimary.setItem(2, new Item(ItemManager.getByNamespace("cryorose")));
