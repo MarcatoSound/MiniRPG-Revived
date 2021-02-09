@@ -1,0 +1,44 @@
+water:
+  texture: tiles/water.png
+  zindex: 0
+  collidable: false
+  indestructable: true
+grass:
+  texture: tiles/grass.png
+  max_health: 10
+  zindex: 4
+  collidable: false
+swamp_grass:
+  texture: tiles/grass_swamp.png
+  zindex: 3
+  max_health: 10
+  collidable: false
+dirt:
+  texture: tiles/dirt.png
+  zindex: 1
+  collidable: false
+  indestructable: true
+stone:
+  texture: tiles/stone.png
+  max_health: 35
+  zindex: 5
+  collidable: false
+sand:
+  texture: tiles/sand.png
+  max_health: 10
+  zindex: 2
+  collidable: false
+  # UNIMPLEMENTED OPTIONS
+  walkspeed: 0.85
+sandstone:
+  texture: tiles/sandstone.png
+  max_health: 10
+  zindex: 1
+  collidable: false
+  
+bush:
+  texture: tiles/bush.png
+  max_health: 20
+  zindex: 5
+  collidable: true
+  

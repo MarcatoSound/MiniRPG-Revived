@@ -48,7 +48,10 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public static void loadTiles()
         {
-            // TODO: Make this do the thing.
+            foreach (DataPack pack in packs)
+            {
+                pack.loadTiles();
+            }
         }
         public static void loadBiomes()
         {

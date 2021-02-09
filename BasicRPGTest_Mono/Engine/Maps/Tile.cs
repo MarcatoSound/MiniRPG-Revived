@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.Datapacks;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Items;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Timers;
+using YamlDotNet.RepresentationModel;
 
 namespace RPGEngine
 {
@@ -26,13 +28,13 @@ namespace RPGEngine
         public string name { get; set; }
         public int id { get; set; }
         public Graphic graphic { get; set; }
-        public Dictionary<TileSide, Graphic> sideGraphics { get; set; }
+        public Dictionary<TileSide, Graphic> sideGraphics { get; set; } = new Dictionary<TileSide, Graphic>();
         public Rectangle box { get; set; }
         public bool isCollidable { get; set; }
         public int zIndex { get; set; }
 
         public double maxHealth { get; set; }
-        public bool destructable { get; set; }
+        public bool indestructable { get; set; }
         public DropTable dropTable = new DropTable();
 
         // Instance variables
@@ -76,16 +78,15 @@ namespace RPGEngine
         private Timer restoreTimer;
 
 
-        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool destructable = true)
+        public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool indestructable = false)
         {
             id = TileManager.getTiles().Count;
             this.name = name;
             this.zIndex = z;
             isCollidable = collidable;
             isInstance = instance;
-            sideGraphics = new Dictionary<TileSide, Graphic>();
             this.maxHealth = maxHP;
-            this.destructable = destructable;
+            this.indestructable = indestructable;
 
             if (texture.Width > dimensions)
             {
@@ -105,6 +106,57 @@ namespace RPGEngine
             }
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
+        }
+        public Tile(DataPack pack, YamlSection config)
+        {
+            id = TileManager.getTiles().Count;
+            this.name = config.getName();
+            this.zIndex = config.getInt("zindex", 1);
+            this.isCollidable = config.getBool("collidable", false);
+            this.maxHealth = config.getInt("max_health", 10);
+            this.indestructable = config.getBool("indestructable", false);
+
+            // These take a little more processing to validate...
+
+            // GRAPHIC
+            string imgPath = config.getString("texture");
+            Texture2D texture;
+            if (!imgPath.Equals(""))
+                texture = Util.loadTexture($"{pack.packPath}\\textures\\{imgPath}");
+            else
+                texture = Util.loadTexture($"{pack.packPath}\\textures\\missing.png");
+
+            if (texture.Width > dimensions)
+            {
+                graphic = new Graphic(Util.getSpriteFromSet(texture, 1, 1));
+                sideGraphics.Add(TileSide.NorthWest, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+                sideGraphics.Add(TileSide.North, new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
+                sideGraphics.Add(TileSide.NorthEast, new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
+                sideGraphics.Add(TileSide.West, new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
+                sideGraphics.Add(TileSide.East, new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
+                sideGraphics.Add(TileSide.SouthWest, new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
+                sideGraphics.Add(TileSide.South, new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
+                sideGraphics.Add(TileSide.SouthEast, new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
+            }
+            else
+            {
+                graphic = new Graphic(texture);
+            }
+
+            // DROPTABLE
+            YamlNode tableInfo = config.get("droptable");
+            if (tableInfo != null)
+            {
+                if (tableInfo.NodeType == YamlNodeType.Scalar)
+                    this.dropTable = DropTableManager.getByNamespace((string)tableInfo);
+                else
+                {
+                    // TODO: Code for converting this sub-section into a datapack.
+                    YamlSection tableConfig = new YamlSection((YamlMappingNode)tableInfo);
+                    dropTable = new DropTable(pack, tableConfig);
+
+                }
+            }
         }
 
         // For instantiating an existing tile
@@ -129,7 +181,7 @@ namespace RPGEngine
 
             maxHealth = tile.maxHealth;
             health = maxHealth;
-            this.destructable = tile.destructable;
+            this.indestructable = tile.indestructable;
             restoreTimer = new Timer(10000);
             restoreTimer.Elapsed += (sender, args) =>
             {

@@ -1,0 +1,37 @@
+testentity:
+  display_name: Test Entity
+  texture: entities/enemy1.png
+  max_health: 30
+  movement_speed: 120
+  knockback_resist: 0
+  immunity_ticks: 500
+  droptable:
+    drops:
+      - item: ironroot
+        min: 1
+        max: 2
+        weight: 1
+  spawning:
+    - map: overworld
+      weight: 5
+testentity2:
+  display_name: Test Entity 2
+  texture: entities/enemy2.png
+  max_health: 60
+  spawning:
+    - map: overworld
+      weight: 3
+testentity3:
+  display_name: Test Entity 3
+  texture: entities/enemy3.png
+  max_health: 100
+  movement_speed: 50
+  knockback_resist: 0.5
+  droptable:
+    min_drops: 1
+    max_drops: 1
+    drops:
+      - item: hollysong
+  spawning:
+    - map: overworld
+      weight: 1

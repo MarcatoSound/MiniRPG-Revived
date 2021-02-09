@@ -114,34 +114,6 @@ namespace BasicRPGTest_Mono.Screens
         private void loadTiles()
         {
             TileManager.breakTexture = Content.Load<Texture2D>("breaking");
-            Texture2D tileset = Content.Load<Texture2D>("tileset_primary");
-
-            Tile tile = new Tile("grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 0, 96, 96)), false, false, 2);
-            TileManager.add(tile);
-
-            tile = new Tile("swamp_grass", Util.getSpriteFromSet(tileset, new Rectangle(160, 96, 96, 96)), false, false, 1);
-            TileManager.add(tile);
-
-            tile = new Tile("dirt", Util.getSpriteFromSet(tileset, new Rectangle(256, 0, 96, 96)), false, false, 0);
-            TileManager.add(tile);
-
-            tile = new Tile("stone", Util.getSpriteFromSet(tileset, new Rectangle(0, 160, 96, 96)), true, false, 0, 50);
-            TileManager.add(tile);
-
-            tile = new Tile("sand", Util.getSpriteFromSet(tileset, new Rectangle(0, 64, 96, 96)), false, false, 0);
-            TileManager.add(tile);
-
-            tile = new Tile("hardened_sand", Util.getSpriteFromSet(tileset, 1, 3), false, false, 0);
-            TileManager.add(tile);
-
-            tile = new Tile("tree", Util.getSpriteFromSet(tileset, 3, 4), true, false, 5);
-            tile.dropTable.max = 5;
-            tile.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot"), 1, 3));
-            tile.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3, 0.5));
-            TileManager.add(tile);
-
-            tile = new Tile("water", Util.getSpriteFromSet(tileset, 0, 4), true, false, destructable: false);
-            TileManager.add(tile);
 
             DataPackManager.loadTiles();
         }
@@ -154,17 +126,17 @@ namespace BasicRPGTest_Mono.Screens
             biome = new Biome("field", TileManager.getByName("grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Decoration("bush", 60, TileManager.getByName("tree")));
+            biome.decorations.Add(new Decoration("bush", 60, TileManager.getByName("bush")));
 
-            decoTiles.Add(new Vector2(0, 0), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(0, 1), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(0, 2), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(1, 0), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(1, 1), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(1, 2), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(2, 0), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(2, 1), TileManager.getByName("tree"));
-            decoTiles.Add(new Vector2(2, 2), TileManager.getByName("tree"));
+            decoTiles.Add(new Vector2(0, 0), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(0, 1), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(0, 2), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(1, 0), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(1, 1), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(1, 2), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(2, 0), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(2, 1), TileManager.getByName("bush"));
+            decoTiles.Add(new Vector2(2, 2), TileManager.getByName("bush"));
             biome.decorations.Add(new Decoration("bush_cluster", 10, decoTiles));
 
             decoTiles = new Dictionary<Vector2, Tile>();
@@ -190,7 +162,7 @@ namespace BasicRPGTest_Mono.Screens
 
 
             biome = new Biome("desert", TileManager.getByName("sand"));
-            biome.undergroundTile = TileManager.getByName("hardened_sand");
+            biome.undergroundTile = TileManager.getByName("sandstone");
             biome.coastTile = TileManager.getByName("sand");
             BiomeManager.add(biome);
 
@@ -198,7 +170,7 @@ namespace BasicRPGTest_Mono.Screens
             biome = new Biome("swamp", TileManager.getByName("swamp_grass"));
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
-            biome.decorations.Add(new Decoration("bush", 30, TileManager.getByName("tree")));
+            biome.decorations.Add(new Decoration("bush", 30, TileManager.getByName("bush")));
             BiomeManager.add(biome);
 
             DataPackManager.loadBiomes();

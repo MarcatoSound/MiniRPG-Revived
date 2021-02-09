@@ -1,5 +1,7 @@
 ﻿using BasicRPGTest_Mono.Engine.Items;
+using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
+using RPGEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,10 +21,6 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         public DataPack(string path)
         {
             List<string> files = new List<string>(Directory.GetFiles(path));
-            foreach (string file in files)
-            {
-                System.Diagnostics.Debug.WriteLine($"Files: {file}");
-            }
             if (!files.Contains($"{path}\\pack.yml"))
             {
                 System.Diagnostics.Debug.WriteLine($"Error!! Invalid pack: {path}");
@@ -83,6 +81,38 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
             }
 
             System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading items.");
+        }
+        public void loadTiles()
+        {
+            System.Diagnostics.Debug.WriteLine($"// LOADING TILES FOR PACK '{name}'... //");
+
+            string path = $"{packPath}\\tiles";
+            string[] files = Directory.GetFiles(path);
+
+            foreach (string file in files)
+            {
+                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}...");
+                var reader = new StreamReader(file);
+                var input = new StringReader(reader.ReadToEnd());
+
+                YamlStream yaml = new YamlStream();
+                yaml.Load(input);
+
+                YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                foreach (var child in mapping.Children)
+                {
+                    YamlMappingNode itemYaml = new YamlMappingNode(child);
+                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading tile {child.Key}");
+                    YamlSection config = new YamlSection((string)child.Key, itemYaml);
+
+                    TileManager.add(new Tile(this, config));
+                    System.Diagnostics.Debug.WriteLine($"// ││└╾ SUCCESS");
+                }
+                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+            }
+
+            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading tiles.");
         }
         public void loadDropTables()
         {

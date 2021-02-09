@@ -90,6 +90,13 @@ namespace BasicRPGTest_Mono.Engine.Utility
                 return double.Parse((string)value);
             return defaultValue;
         }
+        public bool getBool(string path, bool defaultValue = false)
+        {
+            YamlNode value = getDeepestValue(yaml, path);
+            if (value != null)
+                return bool.Parse((string)value);
+            return defaultValue;
+        }
 
         /// <summary>
         /// Gets the deepest value of a YAML key string

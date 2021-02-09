@@ -168,7 +168,7 @@ namespace BasicRPGTest_Mono.Engine
                 if (tool.damageTypes.ContainsKey(DamageType.Mining))
                 {
                     double damage;
-                    if (tile.destructable)
+                    if (!tile.indestructable)
                         damage = tool.damageTypes[DamageType.Mining];
                     else
                         damage = 0;
