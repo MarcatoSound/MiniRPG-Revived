@@ -12,6 +12,11 @@ using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Entities;
+using SharpNoise.Utilities.Imaging;
+using System.Drawing.Imaging;
+using SharpNoise.Modules;
+using SharpNoise.Builders;
+using SharpNoise;
 
 namespace BasicRPGTest_Mono
 {
@@ -33,7 +38,7 @@ namespace BasicRPGTest_Mono
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
 
-        private static bool showConsole = true;
+        private static bool showConsole = false;
 
 
         //====================================================================================
@@ -108,15 +113,43 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
+                        if (MapManager.activeMap.name == "overworld")
+                            MapManager.activeMap = MapManager.getByName("cavern");
+                        else
+                            MapManager.activeMap = MapManager.getByName("overworld");
 
-                        //new MovingText("This is a string test!", Core.dmgFont, Core.player.Position, new TextColor(new Color[]{ Color.Crimson, Color.White, Color.Aqua, Color.Orange}, 0.05f), 3000);
+                        /*Random seedGenerator = new Random();
+                        int seed = seedGenerator.Next(0, 9999999);
 
-                        /*
+                        double scale = 1;
+                        double persistance = 0.5;
+                        int octaves = 4;
+
+                        Perlin gen = new Perlin();
+                        gen.Seed = seed;
+                        gen.Frequency = scale / 66.66;
+                        gen.Persistence = persistance;
+                        gen.Lacunarity = 2.25;
+                        gen.OctaveCount = octaves;
+
+                        ScaleBias mod = new ScaleBias();
+                        mod.Source0 = gen;
+                        mod.Bias = 0.05;
+                        mod.Scale = 0.68;
+
+                        PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
+                        builder.SourceModule = mod;
+                        builder.SetBounds(0, 512, 0, 512);
+                        NoiseMap map = new NoiseMap(512, 512);
+                        builder.DestNoiseMap = map;
+                        builder.SetDestSize(512, 512);
+                        builder.Build();
+
                         Image img = new Image();
                         ImageRenderer renderer = new ImageRenderer();
                         renderer.DestinationImage = img;
                         renderer.SourceNoiseMap = map;
-                        renderer.BuildGrayscaleGradient();
+                        renderer.BuildTerrainGradient();
                         renderer.Render();
 
                         img.SaveGdiBitmap("noise.png", ImageFormat.Png);*/

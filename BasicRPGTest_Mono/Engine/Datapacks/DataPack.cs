@@ -1,5 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Maps.Generation;
 using BasicRPGTest_Mono.Engine.Utility;
 using RPGEngine;
 using System;
@@ -113,6 +114,76 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
             }
 
             Console.WriteLine($"// └╾ Finished loading tiles.");
+        }
+        public void loadBiomes()
+        {
+
+        }
+        public void loadGenerators()
+        {
+            Console.WriteLine($"// LOADING GENERATORS FOR PACK '{name}'... //");
+
+            string path = $"{packPath}\\generators";
+            string[] files = Directory.GetFiles(path);
+
+            foreach (string file in files)
+            {
+                Console.WriteLine($"// ├┬ Reading file {file}...");
+                var reader = new StreamReader(file);
+                var input = new StringReader(reader.ReadToEnd());
+
+                YamlStream yaml = new YamlStream();
+                yaml.Load(input);
+
+                YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                foreach (var child in mapping.Children)
+                {
+                    YamlMappingNode itemYaml = new YamlMappingNode(child);
+                    Console.WriteLine($"// │├┬ Loading generator {child.Key}");
+                    YamlSection config = new YamlSection((string)child.Key, itemYaml);
+
+                    GeneratorManager.add(new Generator(this, config));
+                    Console.WriteLine($"// ││└╾ SUCCESS");
+                }
+                Console.WriteLine($"// │└╾ Finished reading file.");
+            }
+
+            Console.WriteLine($"// └╾ Finished loading generators.");
+        }
+        public void loadMaps()
+        {
+            Console.WriteLine($"// LOADING MAPS FOR PACK '{name}'... //");
+
+            string path = $"{packPath}\\maps";
+            string[] files = Directory.GetFiles(path);
+
+            foreach (string file in files)
+            {
+                Console.WriteLine($"// ├┬ Reading file {file}...");
+                var reader = new StreamReader(file);
+                var input = new StringReader(reader.ReadToEnd());
+
+                YamlStream yaml = new YamlStream();
+                yaml.Load(input);
+
+                YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                foreach (var child in mapping.Children)
+                {
+                    YamlMappingNode itemYaml = new YamlMappingNode(child);
+                    Console.WriteLine($"// │├┬ Loading map {child.Key}");
+                    YamlSection config = new YamlSection((string)child.Key, itemYaml);
+                    DataPackManager.mapBeingLoaded = (string)child.Key;
+
+                    MapManager.add(new Map(this, config));
+                    Console.WriteLine($"// ││└╾ SUCCESS");
+                }
+                Console.WriteLine($"// │└╾ Finished reading file.");
+            }
+
+            DataPackManager.mapBeingLoaded = "";
+            Console.WriteLine($"// └╾ Finished loading maps.");
         }
         public void loadDropTables()
         {

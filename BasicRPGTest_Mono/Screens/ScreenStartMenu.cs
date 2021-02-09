@@ -41,7 +41,8 @@ namespace BasicRPGTest_Mono
             mainMenu.add(new MenuItem("Load World")
             {
                 run = () => {
-                    Game.loadWorldMenu();
+                    Console.WriteLine("// ERR: World loading is disabled.");
+                    //Game.loadWorldMenu();
                     }
             });
             mainMenu.add(new MenuItem("Long Test 3")

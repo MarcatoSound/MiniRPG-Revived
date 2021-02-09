@@ -26,6 +26,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public static void save(Player player, string world)
         {
+            return;
             CodeTimer codeTimer = new CodeTimer();
             codeTimer.startTimer();
 
@@ -65,6 +66,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public static void save(Map map, string world)
         {
+            return;
             if (!oldMapStates.ContainsKey(map.name))
             {
                 // This map doesn't have a previous state, therefore it is probably brand new. Don't bother saving this time.

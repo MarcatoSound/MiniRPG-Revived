@@ -151,7 +151,7 @@ namespace BasicRPGTest_Mono
             CodeTimer codeTimer = new CodeTimer();
             codeTimer.startTimer();
 
-            MapManager.add(new Map("overworld", size, Generator.generateOverworld(size)));
+            MapManager.add(new Map("overworld", size, MapGeneration.generateOverworld(size)));
 
             codeTimer.endTimer();
             Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to generate world.");

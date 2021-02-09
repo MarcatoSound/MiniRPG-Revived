@@ -1,6 +1,9 @@
-﻿using BasicRPGTest_Mono.Engine.Entities;
+﻿using BasicRPGTest_Mono.Engine.Datapacks;
+using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Maps.Generation;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -21,6 +24,7 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
 
         public string name { get; set; }
+        public Generator generator { get; private set; }
         public List<TileLayer> layers { get; set; }
         public Dictionary<string, TileLayer> layersByName = new Dictionary<string, TileLayer>();
         public Dictionary<Vector2, Region> regions { get; set; }
@@ -37,6 +41,7 @@ namespace BasicRPGTest_Mono.Engine
         public ConcurrentDictionary<int, LivingEntity> livingEntities { get; set; }
 
         public ConcurrentDictionary<int, Spawn> spawns { get; set; }
+        public double spawnRate;
         public int livingEntityCap = 50;
         public Timer spawnTimer;
 
@@ -57,6 +62,82 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
         // CONSTRUCTOR
         //====================================================================================
+        public Map(DataPack pack, YamlSection config)
+        {
+            name = config.getName();
+            string genName = config.getString("generator");
+            generator = GeneratorManager.getByNamespace(genName);
+            if (generator == null)
+            {
+                Console.WriteLine($"// ERR: No generator found with name '{genName}'!");
+                MapManager.remove(this);
+                return;
+            }
+
+            this.width = config.getInt("width", 384);
+            this.height = config.getInt("height", 384);
+            this.layers = generator.generateLayers(width);
+            this.widthInPixels = width * TileManager.dimensions;
+            this.heightInPixels = height * TileManager.dimensions;
+            regions = new Dictionary<Vector2, Region>();
+            collidables = new ConcurrentDictionary<int, Rectangle>();
+
+            this.entities = new ConcurrentDictionary<int, Entity>();
+            this.livingEntities = new ConcurrentDictionary<int, LivingEntity>();
+            this.spawns = new ConcurrentDictionary<int, Spawn>();
+            spawnRate = config.getDouble("spawn_rate", 1);
+            initSpawns();
+            spawnTimer = new Timer(spawnRate * 1000);
+            spawnTimer.Elapsed += trySpawn;
+            spawnTimer.Start();
+            livingEntityCap = config.getInt("entity_cap", 50);
+
+            Vector2 regionTruePos = new Vector2();
+            Vector2 regionPos = new Vector2();
+            for (int x = 0; x < width / 8; x++)
+            {
+                for (int y = 0; y < height / 8; y++)
+                {
+                    regionTruePos.X = x * (TileManager.dimensions * 8);
+                    regionTruePos.Y = y * (TileManager.dimensions * 8);
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    Region region = new Region(regionTruePos, regionPos);
+                    regions.Add(new Vector2(x, y), region);
+                }
+            }
+
+
+            foreach (TileLayer layer in layers)
+            {
+                // Ensure this layer is in the "ByName" dictionary
+                layersByName.Add(layer.name, layer);
+
+                Dictionary<Vector2, Tile> tiles = layer.tiles;
+                foreach (KeyValuePair<Vector2, Tile> pair in tiles)
+                {
+                    Vector2 pos = pair.Key;
+                    Tile tile = pair.Value;
+
+                    regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    tile.region = regionPos;
+                    tile.map = this;  // Tile remembers the Map it belongs to
+                    tile.layer = layer;  // Tile remembers Map's Layer it belongs to
+                    if (!regions.ContainsKey(regionPos)) continue;
+                    regions[regionPos].addTile(tile);
+
+                    tile.update();
+
+                    //if (!tile.isCollidable) continue;
+                    // Create a collidable box at the following true-map coordinate.
+                    //collidables.TryAdd(collidables.Count, new Rectangle(Convert.ToInt32(tile.pos.X), Convert.ToInt32(tile.pos.Y), TileManager.dimensions, TileManager.dimensions));
+                }
+
+            }
+
+            Save.oldMapStates.Add(name, new Map(this));
+            buildTileTemplateCache();
+        }
         public Map(string name, int size, List<TileLayer> layers)
         {
             this.name = name;

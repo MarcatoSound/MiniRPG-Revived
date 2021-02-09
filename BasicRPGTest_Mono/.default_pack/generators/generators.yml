@@ -1,0 +1,32 @@
+overworld:
+  water_frequency: 0.5
+  stone_frequency: 0.25
+  biome_size: 1.0
+  biomes:
+    - biome: field
+      weight: 10
+    - biome: desert
+      weight: 2
+    - biome: swamp
+      weight: 4
+  # Advanced Options
+  advanced:
+    scale: 1
+    roughness: 4
+    depth: 0.2
+cavern:
+  water_frequency: 0.26
+  stone_frequency: 0.5
+  biome_size: 1.0
+  biomes:
+    - biome: field
+      weight: 10
+    - biome: desert
+      weight: 2
+    - biome: swamp
+      weight: 4
+  # Advanced Options
+  advanced:
+    scale: 0.8
+    roughness: 5
+    depth: 0.2

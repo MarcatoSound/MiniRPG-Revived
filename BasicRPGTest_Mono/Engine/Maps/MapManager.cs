@@ -51,6 +51,16 @@ namespace BasicRPGTest_Mono.Engine
 
             return null;
         }
+        public static void remove(Map map)
+        {
+            maps.Remove(map);
+            mapsByName.Remove(map.name);
+        }
+        public static void removeByName(string name)
+        {
+            maps.Remove(getByName(name));
+            mapsByName.Remove(name);
+        }
 
         public static void clear()
         {

@@ -43,24 +43,25 @@ namespace BasicRPGTest_Mono.Screens
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Core.graphics = _graphics.GraphicsDevice;
 
-            // Load the general game objects
-
             loadDataPacks();
             loadItems();
             loadTiles();
-            loadBiomes();
-            loadGuis();
 
             loading = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
 
-                //loadHud();
+                // Load the general game objects
 
-                if (loadMap())
-                    Save.save(MapManager.activeMap, worldName);
+                loadBiomes();
+                loadGenerators();
+                loadMaps();
+
+                //if (loadMap())
+                //    Save.save(MapManager.activeMap, worldName);
 
                 loadEntities();
+                loadGuis();
             });
             loading.Start();
         }
@@ -176,6 +177,16 @@ namespace BasicRPGTest_Mono.Screens
             DataPackManager.loadBiomes();
         }
 
+        private void loadGenerators()
+        {
+            DataPackManager.loadGenerators();
+        }
+
+        private void loadMaps()
+        {
+            DataPackManager.loadMaps();
+        }
+
         private void loadEntities()
         {
             DataPackManager.loadEntities();
@@ -219,7 +230,7 @@ namespace BasicRPGTest_Mono.Screens
             CodeTimer codeTimer = new CodeTimer();
             codeTimer.startTimer();
 
-            MapManager.add(new Map("overworld", size, Generator.generateOverworld(size)));
+            MapManager.add(new Map("overworld", size, MapGeneration.generateOverworld(size)));
 
             codeTimer.endTimer();
             Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to generate world.");
@@ -243,7 +254,7 @@ namespace BasicRPGTest_Mono.Screens
         {
             string progress;
             if (isGenerating)
-                progress = (Generator.mapProgress * 100).ToString("#.##");
+                progress = (MapGeneration.mapProgress * 100).ToString("#.##");
             else
                 progress = (Load.mapProgress * 100).ToString("#.##");
 
@@ -251,7 +262,8 @@ namespace BasicRPGTest_Mono.Screens
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Loading... {progress}%", new Vector2(500, 25), Color.White);
+            _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Loading... {(DataPackManager.mapProgress * 100).ToString("#.##")}%", new Vector2(500, 25), Color.White);
+            _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Map: {DataPackManager.mapBeingLoaded}", new Vector2(500, 50), Color.White);
             _spriteBatch.End();
         }
     }

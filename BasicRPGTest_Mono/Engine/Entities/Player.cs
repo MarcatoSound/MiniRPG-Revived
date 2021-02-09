@@ -32,7 +32,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public PlayerInventory inventory;
         public Player(Texture2D texture) : 
-            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), 125f)
+            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), 225f)
         {
             Core.player = this;
             Camera.camera.Focus = this;

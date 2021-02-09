@@ -1,40 +1,53 @@
-﻿using BasicRPGTest_Mono.Engine.Maps;
+﻿using BasicRPGTest_Mono.Engine.Datapacks;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.Tiled;
 using RPGEngine;
+using SharpNoise;
+using SharpNoise.Builders;
+using SharpNoise.Modules;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using SharpNoise;
-using SharpNoise.Modules;
-using SharpNoise.Builders;
-using BasicRPGTest_Mono.Engine.Maps.Generation;
+using YamlDotNet.RepresentationModel;
 
-namespace BasicRPGTest_Mono.Engine
+namespace BasicRPGTest_Mono.Engine.Maps.Generation
 {
-    public static class Generator
+    public class Generator
     {
-        private static int _mapTileCount;
 
-        public static int mapTotalTiles { get; private set; }
-        public static int mapTileCount
+        public string name { get; private set; }
+
+        public double waterLevel { get; private set; }
+        public double sandLevel { get; private set; }
+        public double stoneLevel { get; private set; }
+        public double biomeSize { get; private set; }
+
+        public double scale { get; private set; }
+        public int roughness { get; private set; }
+        public double depth { get; private set; }
+
+        public Generator(DataPack pack, YamlSection config)
         {
-            get { return _mapTileCount; }
-            private set
-            {
-                mapProgress = (double)value / (double)mapTotalTiles;
-                _mapTileCount = value;
-            }
+            name = config.getName();
+
+            waterLevel = (config.getDouble("water_frequency", 0.5) * 2) - 1;
+            sandLevel = waterLevel + 0.07;
+            stoneLevel = 1 - (config.getDouble("stone_frequency", 0.25) * 2);
+
+            biomeSize = config.getDouble("biome_size", 1);
+
+            scale = config.getDouble("advanced.scale", 1);
+            roughness = config.getInt("advanced.roughness", 4);
+            depth = config.getDouble("advanced.depth", 0.2);
+
         }
-        private static int maxLayerTiles { get; set; }
-        public static double mapProgress { get; private set; }
 
-        public static List<TileLayer> generateOverworld(int size)
+        public List<TileLayer> generateLayers(int size)
         {
-            mapTileCount = 0;
-            maxLayerTiles = size * size;
-            mapTotalTiles = maxLayerTiles; 
 
+            DataPackManager.mapTileCount = 0;
+            DataPackManager.maxLayerTiles = size * size;
+            DataPackManager.mapTotalTiles = DataPackManager.maxLayerTiles;
 
             List<TileLayer> layers = new List<TileLayer>();
 
@@ -64,7 +77,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 for (int y = 0; y < size; y++)
                 {
-                    mapTileCount++;
+                    DataPackManager.mapTileCount++;
                     {
                         // Determine what biome this is.
                         if (biomeNoise[x, y] < 0)
@@ -76,19 +89,19 @@ namespace BasicRPGTest_Mono.Engine
                     }
 
                     // Water layer
-                    if (noise[x, y] < 0)
+                    if (noise[x, y] < waterLevel)
                         waterLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("water"), new Vector2(x, y), biome));
 
                     // Ground layer
-                    if (noise[x, y] >= 0 && noise[x, y] < 0.07)
+                    if (noise[x, y] >= waterLevel && noise[x, y] < sandLevel)
                         groundLayer.setTile(new Vector2(x, y), new Tile(biome.coastTile, new Vector2(x, y), biome));
-                    else if (noise[x, y] >= 0 && noise[x, y] <= 0.5)
+                    else if (noise[x, y] >= sandLevel && noise[x, y] <= stoneLevel)
                         groundLayer.setTile(new Vector2(x, y), new Tile(biome.groundTile, new Vector2(x, y), biome));
-                    else if (noise[x, y] > 0.5)
+                    else if (noise[x, y] > stoneLevel)
                         groundLayer.setTile(new Vector2(x, y), new Tile(biome.undergroundTile, new Vector2(x, y), biome));
 
                     // Stone layer
-                    if (noise[x, y] > 0.5)
+                    if (noise[x, y] > stoneLevel)
                         stoneLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("stone"), new Vector2(x, y), biome));
 
                     // Decorations layer
@@ -109,77 +122,18 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
-            /*
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    {
-                        // Determine what biome this is.
-                        if (biomeNoise[x, y] < -0.1)
-                            biome = BiomeManager.getByName("field");
-                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
-                            biome = BiomeManager.getByName("swamp");
-                        else
-                            biome = BiomeManager.getByName("desert");
-                    }
-                }
-            }
-
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    {
-                        // Determine what biome this is.
-                        if (biomeNoise[x, y] < -0.1)
-                            biome = BiomeManager.getByName("field");
-                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
-                            biome = BiomeManager.getByName("swamp");
-                        else
-                            biome = BiomeManager.getByName("desert");
-                    }
-
-                }
-            }
-
-            Vector2 decoPos = new Vector2();
-            for (int x = 0; x < size; x++)
-            {
-                for (int y = 0; y < size; y++)
-                {
-                    {
-                        // Determine what biome this is.
-                        if (biomeNoise[x, y] < -0.1)
-                            biome = BiomeManager.getByName("field");
-                        else if (biomeNoise[x, y] >= -0.1 && biomeNoise[x, y] < 0.5)
-                            biome = BiomeManager.getByName("swamp");
-                        else
-                            biome = BiomeManager.getByName("desert");
-                    }
-
-                    //decoration.setTile(new Vector2(x, y), new Tile(TileManager.getByName("tree"), new Vector2(x, y), biome));
-
-                }
-            }*/
-
             return layers;
         }
 
 
-        /// <summary>
-        /// Generates cell noise for determining the distribution of tile biomes.
-        /// </summary>
-        /// <param name="seed"></param>
-        /// <returns></returns>
-        public static NoiseMap createBiomeNoise(int seed)
+        public NoiseMap createBiomeNoise(int seed)
         {
 
             Cell gen1 = new Cell();
             gen1.Seed = seed;
-            gen1.Frequency = 0.015;
+            gen1.Frequency = biomeSize / 66.66;
             gen1.Type = Cell.CellType.Minkowsky;
-        
+
             PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
             builder.SourceModule = gen1;
             builder.SetBounds(0, 512, 0, 512);
@@ -190,24 +144,18 @@ namespace BasicRPGTest_Mono.Engine
 
             return map;
         }
-
-        /// <summary>
-        /// Generates perlin noise for determining the distribution of tile layers.
-        /// </summary>
-        /// <param name="seed"></param>
-        /// <returns></returns>
-        public static NoiseMap createLandNoise(int seed, int size)
+        public NoiseMap createLandNoise(int seed, int size)
         {
             Perlin gen = new Perlin();
             gen.Seed = seed;
-            gen.Frequency = 0.015;
+            gen.Frequency = scale / 66.66;
             gen.Persistence = 0.5;
             gen.Lacunarity = 2.25;
-            gen.OctaveCount = 4;
+            gen.OctaveCount = roughness;
 
             ScaleBias mod = new ScaleBias();
             mod.Source0 = gen;
-            mod.Bias = 0.2;
+            mod.Bias = depth;
             mod.Scale = 0.68;
 
             PlaneNoiseMapBuilder builder = new PlaneNoiseMapBuilder();
@@ -220,7 +168,5 @@ namespace BasicRPGTest_Mono.Engine
 
             return map;
         }
-
-
     }
 }

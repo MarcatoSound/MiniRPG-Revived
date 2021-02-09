@@ -9,6 +9,23 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         private static List<DataPack> packs;
         private static Dictionary<string, DataPack> packsByName;
 
+
+        private static int _mapTileCount;
+        public static int mapTotalTiles { get; set; }
+        public static int mapTileCount
+        {
+            get { return _mapTileCount; }
+            set
+            {
+                mapProgress = (double)value / (double)mapTotalTiles;
+                _mapTileCount = value;
+            }
+        }
+        public static int maxLayerTiles { get; set; }
+        public static double mapProgress { get; set; }
+        public static string mapBeingLoaded { get; set; }
+
+
         static DataPackManager()
         {
             packs = new List<DataPack>();
@@ -55,7 +72,24 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public static void loadBiomes()
         {
-            // TODO: Make this do the thing.
+            foreach (DataPack pack in packs)
+            {
+                pack.loadBiomes();
+            }
+        }
+        public static void loadGenerators()
+        {
+            foreach (DataPack pack in packs)
+            {
+                pack.loadGenerators();
+            }
+        }
+        public static void loadMaps()
+        {
+            foreach (DataPack pack in packs)
+            {
+                pack.loadMaps();
+            }
         }
         public static void loadDropTables()
         {

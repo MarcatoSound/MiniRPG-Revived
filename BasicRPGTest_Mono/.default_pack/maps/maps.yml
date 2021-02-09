@@ -1,0 +1,12 @@
+overworld:
+  generator: overworld
+  width: 384
+  height: 384
+  entity_cap: 50
+  spawn_rate: 1.0
+cavern:
+  generator: cavern
+  width: 384
+  height: 384
+  entity_cap: 70
+  spawn_rate: 0.8
