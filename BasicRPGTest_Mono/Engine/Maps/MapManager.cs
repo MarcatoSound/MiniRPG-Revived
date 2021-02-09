@@ -8,7 +8,20 @@ namespace BasicRPGTest_Mono.Engine
     {
         private static List<Map> maps;
         private static Dictionary<string, Map> mapsByName;
-        public static Map activeMap { get; set; }
+
+        private static Map _activeMap;
+        public static Map activeMap
+        {
+            get { return _activeMap; }
+            set
+            {
+                if (value != null)
+                    value.update_VisibleRegions(Camera.camera);
+                if (Core.player != null)
+                    Core.player.map = value;
+                _activeMap = value;
+            }
+        }
         static MapManager()
         {
             maps = new List<Map>();

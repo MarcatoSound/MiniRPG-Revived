@@ -252,17 +252,13 @@ namespace BasicRPGTest_Mono.Screens
         }
         public override void Draw(GameTime gameTime)
         {
-            string progress;
-            if (isGenerating)
-                progress = (MapGeneration.mapProgress * 100).ToString("#.##");
-            else
-                progress = (Load.mapProgress * 100).ToString("#.##");
+            string progress = (DataPackManager.mapProgress * 100).ToString("#.##");
 
 
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Loading... {(DataPackManager.mapProgress * 100).ToString("#.##")}%", new Vector2(500, 25), Color.White);
+            _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Loading... {progress}%", new Vector2(500, 25), Color.White);
             _spriteBatch.DrawString(FontLibrary.getFont("main"), $"Map: {DataPackManager.mapBeingLoaded}", new Vector2(500, 50), Color.White);
             _spriteBatch.End();
         }

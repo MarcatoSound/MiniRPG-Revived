@@ -772,10 +772,10 @@ namespace BasicRPGTest_Mono.Engine
             // Get Tile Bounds
             Rectangle tileViewBounds = new Rectangle();
 
-            tileViewBounds.X = (v_CameraViewBox.X / TileManager.dimensions);
-            tileViewBounds.Y = (v_CameraViewBox.Y / TileManager.dimensions);
-            tileViewBounds.Width = (v_CameraViewBox.Width / TileManager.dimensions) + 2;
-            tileViewBounds.Height = (v_CameraViewBox.Height / TileManager.dimensions) + 2;
+            tileViewBounds.X = (v_CameraViewBox.X / TileManager.dimensions) - 2;
+            tileViewBounds.Y = (v_CameraViewBox.Y / TileManager.dimensions) -2;
+            tileViewBounds.Width = (v_CameraViewBox.Width / TileManager.dimensions) + 4;
+            tileViewBounds.Height = (v_CameraViewBox.Height / TileManager.dimensions) + 4;
 
             // Go through each Layer on Map
             foreach (TileLayer layer in v_VisibleTiles.Keys)
