@@ -20,8 +20,6 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         public HotbarPrimary() : 
             base("hotbarprimary", new Vector2(Core.game.Window.ClientBounds.Width / 16, Core.game.Window.ClientBounds.Height - (Core.game.Window.ClientBounds.Height / 9)))
         {
-            System.Diagnostics.Debug.WriteLine("Hotbar 1 position: " + screenPos);
-
             slotTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 0, 64);
             selectedTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 1, 64);
 

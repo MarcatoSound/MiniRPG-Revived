@@ -85,7 +85,7 @@ namespace BasicRPGTest_Mono.Screens
             Directory.CreateDirectory($"{path}\\");
             return;
 
-            System.Diagnostics.Debug.WriteLine("// SETTING UP DEFAULT DATA //");
+            Console.WriteLine("// SETTING UP DEFAULT DATA //");
             Directory.CreateDirectory($"{path}\\default_pack");
 
         }
@@ -178,28 +178,8 @@ namespace BasicRPGTest_Mono.Screens
 
         private void loadEntities()
         {
-            /*Texture2D texture = Content.Load<Texture2D>("enemy1");
-            LivingEntity ent = new LivingEntity("purple", texture, new Rectangle(0, 0, 28, 26));
-            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
-            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
-            EntityManager.add(ent);
-            texture = Content.Load<Texture2D>("enemy2");
-            ent = new LivingEntity("blue", texture, new Rectangle(0, 0, 28, 26));
-            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
-            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
-            EntityManager.add(ent);
-            texture = Content.Load<Texture2D>("enemy3");
-            ent = new LivingEntity("red", texture, new Rectangle(0, 0, 28, 26));
-            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("unicornhorn"), 1, 3));
-            ent.dropTable.add(new ItemDrop(ItemManager.getByNamespace("ironroot")));
-            EntityManager.add(ent);*/
-
             DataPackManager.loadEntities();
 
-            foreach (LivingEntity entity in EntityManager.livingEntities.Values)
-            {
-                System.Diagnostics.Debug.WriteLine("Entity: " + entity.name);
-            }
         }
 
         private void loadGuis()

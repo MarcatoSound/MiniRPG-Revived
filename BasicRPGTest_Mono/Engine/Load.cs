@@ -113,7 +113,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 layers.Add(layer);
                 Save.layerTiles.Add(layer.name, tileArray);
-                System.Diagnostics.Debug.WriteLine("Loaded layer: " + layer.name);
+                Console.WriteLine("Loaded layer: " + layer.name);
 
                 reader.Close();
 
@@ -126,8 +126,8 @@ namespace BasicRPGTest_Mono.Engine
             codeTimer.endTimer();
             Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to LOAD the world.");
 
-            System.Diagnostics.Debug.WriteLine($"Total tiles: {mapTotalTiles}");
-            System.Diagnostics.Debug.WriteLine($"Total tiles: {mapTileCount}");
+            //Console.WriteLine($"Total tiles: {mapTotalTiles}");
+            //Console.WriteLine($"Total tiles: {mapTileCount}");
 
             return layers;
 

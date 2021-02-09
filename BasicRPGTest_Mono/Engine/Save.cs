@@ -40,7 +40,6 @@ namespace BasicRPGTest_Mono.Engine
             JObject json = new JObject();
 
             // Save the map's general info
-            System.Diagnostics.Debug.WriteLine("## Saving player info!");
 
             JObject jsonPos = new JObject();
             jsonPos.Add("x", player.Position.X);
@@ -51,14 +50,11 @@ namespace BasicRPGTest_Mono.Engine
             try
             {
                 writer.Write(json.ToString(Newtonsoft.Json.Formatting.Indented));
-                System.Diagnostics.Debug.WriteLine("Successfully saved player data!");
             }
             finally
             {
                 writer.Close();
             }
-
-            Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to SAVE the player.");
 
             GC.Collect();
 
@@ -94,7 +90,6 @@ namespace BasicRPGTest_Mono.Engine
             CodeTimer subTimer = new CodeTimer();
             subTimer.startTimer();
             // Save the map's general info
-            System.Diagnostics.Debug.WriteLine("## Saving map info!");
             JToken name = new JValue(map.name);
             JToken height = new JValue(map.height);
             JToken width = new JValue(map.width);
@@ -115,7 +110,7 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             subTimer.endTimer();
-            Util.myDebug($"Took {subTimer.getTotalTimeInMilliseconds()}ms to SAVE general world info.");
+            //Util.myDebug($"Took {subTimer.getTotalTimeInMilliseconds()}ms to SAVE general world info.");
 
             // Save the map's layer data
             JObject jsonLayer;
@@ -151,7 +146,6 @@ namespace BasicRPGTest_Mono.Engine
                 int entry = 0;
 
                 subSubTimer.endTimer();
-                Util.myDebug($"Preliminary set up took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
                 // TODO: WARNING!!! This will NOT save new tiles being placed!!
                 subSubTimer.clearTimer();
                 subSubTimer.startTimer();
@@ -189,13 +183,13 @@ namespace BasicRPGTest_Mono.Engine
                     entry++;
                 }
                 subSubTimer.endTimer();
-                Util.myDebug($"Looping through tiles took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
+                //Util.myDebug($"Looping through tiles took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
 
                 subSubTimer.clearTimer();
                 subSubTimer.startTimer();
                 jsonLayer.Add("tiles", layerTiles);
                 subSubTimer.endTimer();
-                Util.myDebug($"Adding tiles to JSON layer took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
+                //Util.myDebug($"Adding tiles to JSON layer took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
 
                 subSubTimer.clearTimer();
                 subSubTimer.startTimer();
@@ -208,7 +202,7 @@ namespace BasicRPGTest_Mono.Engine
                     writer.Close();
                 }
                 subSubTimer.endTimer();
-                Util.myDebug($"Saving tiles to file took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
+                //Util.myDebug($"Saving tiles to file took {subSubTimer.getTotalTimeInMilliseconds()}ms on layer {layer.name}.");
 
                 layerTiles = null;
                 jsonLayer = null;
@@ -217,7 +211,7 @@ namespace BasicRPGTest_Mono.Engine
 
                 layerNumber++;
                 subTimer.endTimer();
-                Util.myDebug($"Took {subTimer.getTotalTimeInMilliseconds()}ms to SAVE layer {layer.name}.");
+                //Util.myDebug($"Took {subTimer.getTotalTimeInMilliseconds()}ms to SAVE layer {layer.name}.");
             }
 
             oldMapStates.Remove(map.name);

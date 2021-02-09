@@ -60,7 +60,7 @@ namespace BasicRPGTest_Mono.Engine.Entities
                     if (map.items.ContainsKey(targetPos))
                     {
                         items.Add(map.items[targetPos]);
-                        System.Diagnostics.Debug.WriteLine($"Found item in merge radius!");
+                        //System.Diagnostics.Debug.WriteLine($"Found item in merge radius!");
                     }
                 }
 

@@ -130,15 +130,15 @@ namespace BasicRPGTest_Mono.Engine
                     YamlSection spawnConfig = new YamlSection(mapNode);
 
                     string worldName = spawnConfig.getString("map");
-                    System.Diagnostics.Debug.WriteLine($"// ││├┬ Processing spawn entry on map '{worldName}'...");
+                    Console.WriteLine($"// ││├┬ Processing spawn entry on map '{worldName}'...");
                     Map map = MapManager.getByName(worldName);
                     if (map == null)
                     {
-                        System.Diagnostics.Debug.WriteLine($"// │││└╾ ERR: Unable to find map '{worldName}' when configuring spawns! Skipping...");
+                        Console.WriteLine($"// │││└╾ ERR: Unable to find map '{worldName}' when configuring spawns! Skipping...");
                         continue;
                     }
                     map.spawns.TryAdd(map.spawns.Count, new Entities.Spawn(this, spawnConfig.getDouble("weight", 1)));
-                    System.Diagnostics.Debug.WriteLine($"// │││└╾ SUCCESS!");
+                    Console.WriteLine($"// │││└╾ SUCCESS!");
 
                 }
             }
@@ -384,7 +384,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 if (tile == null) continue;
                 if (!tile.isCollidable) continue;
-                //System.Diagnostics.Debug.WriteLine($"Tile box: {tile.box}");
+                //Console.WriteLine($"Tile box: {tile.box}");
                 if (box.Intersects(tile.box))
                     return true;
             }

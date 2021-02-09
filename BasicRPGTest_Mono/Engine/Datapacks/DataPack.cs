@@ -23,7 +23,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
             List<string> files = new List<string>(Directory.GetFiles(path));
             if (!files.Contains($"{path}\\pack.yml"))
             {
-                System.Diagnostics.Debug.WriteLine($"Error!! Invalid pack: {path}");
+                Console.WriteLine($"Error!! Invalid pack: {path}");
                 return;
             }
 
@@ -34,7 +34,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
 
         private void loadInfo()
         {
-            System.Diagnostics.Debug.WriteLine($"// LOADING PACK '{packPath}'... //");
+            Console.WriteLine($"// LOADING PACK '{packPath}'... //");
 
             var reader = new StreamReader($"{packPath}\\pack.yml");
             var input = new StringReader(reader.ReadToEnd());
@@ -52,14 +52,14 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
 
         public void loadItems()
         {
-            System.Diagnostics.Debug.WriteLine($"// LOADING ITEMS FOR PACK '{name}'... //");
+            Console.WriteLine($"// LOADING ITEMS FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\items";
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
             {
-                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}...");
+                Console.WriteLine($"// ├┬ Reading file {file}...");
                 var reader = new StreamReader(file);
                 var input = new StringReader(reader.ReadToEnd());
 
@@ -71,27 +71,27 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 foreach (var child in mapping.Children)
                 {
                     YamlMappingNode itemYaml = new YamlMappingNode(child);
-                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading item {child.Key}");
+                    Console.WriteLine($"// │├┬ Loading item {child.Key}");
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
 
                     ItemManager.add(new ParentItem(this, config));
-                    System.Diagnostics.Debug.WriteLine($"// ││└╾ SUCCESS");
+                    Console.WriteLine($"// ││└╾ SUCCESS");
                 }
-                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+                Console.WriteLine($"// │└╾ Finished reading file.");
             }
 
-            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading items.");
+            Console.WriteLine($"// └╾ Finished loading items.");
         }
         public void loadTiles()
         {
-            System.Diagnostics.Debug.WriteLine($"// LOADING TILES FOR PACK '{name}'... //");
+            Console.WriteLine($"// LOADING TILES FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\tiles";
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
             {
-                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}...");
+                Console.WriteLine($"// ├┬ Reading file {file}...");
                 var reader = new StreamReader(file);
                 var input = new StringReader(reader.ReadToEnd());
 
@@ -103,27 +103,27 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 foreach (var child in mapping.Children)
                 {
                     YamlMappingNode itemYaml = new YamlMappingNode(child);
-                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading tile {child.Key}");
+                    Console.WriteLine($"// │├┬ Loading tile {child.Key}");
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
 
                     TileManager.add(new Tile(this, config));
-                    System.Diagnostics.Debug.WriteLine($"// ││└╾ SUCCESS");
+                    Console.WriteLine($"// ││└╾ SUCCESS");
                 }
-                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+                Console.WriteLine($"// │└╾ Finished reading file.");
             }
 
-            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading tiles.");
+            Console.WriteLine($"// └╾ Finished loading tiles.");
         }
         public void loadDropTables()
         {
-            System.Diagnostics.Debug.WriteLine($"// LOADING DROPTABLES FOR PACK '{name}'... //");
+            Console.WriteLine($"// LOADING DROPTABLES FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\droptables";
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
             {
-                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}");
+                Console.WriteLine($"// ├┬ Reading file {file}");
                 var reader = new StreamReader(file);
                 var input = new StringReader(reader.ReadToEnd());
 
@@ -135,28 +135,28 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 foreach (var child in mapping.Children)
                 {
                     YamlMappingNode itemYaml = new YamlMappingNode(child);
-                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading droptable {child.Key}...");
+                    Console.WriteLine($"// │├┬ Loading droptable {child.Key}...");
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
 
                     DropTableManager.add(new DropTable(this, config));
-                    System.Diagnostics.Debug.WriteLine($"// ││└╾ Finished loading droptable.");
+                    Console.WriteLine($"// ││└╾ Finished loading droptable.");
                 }
 
-                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+                Console.WriteLine($"// │└╾ Finished reading file.");
             }
 
-            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading droptables.");
+            Console.WriteLine($"// └╾ Finished loading droptables.");
         }
         public void loadEntities()
         {
-            System.Diagnostics.Debug.WriteLine($"// LOADING ENTITIES FOR PACK '{name}'... //");
+            Console.WriteLine($"// LOADING ENTITIES FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\entities";
             string[] files = Directory.GetFiles(path);
 
             foreach (string file in files)
             {
-                System.Diagnostics.Debug.WriteLine($"// ├┬ Reading file {file}");
+                Console.WriteLine($"// ├┬ Reading file {file}");
                 var reader = new StreamReader(file);
                 var input = new StringReader(reader.ReadToEnd());
 
@@ -168,17 +168,17 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 foreach (var child in mapping.Children)
                 {
                     YamlMappingNode itemYaml = new YamlMappingNode(child);
-                    System.Diagnostics.Debug.WriteLine($"// │├┬ Loading entity {child.Key}...");
+                    Console.WriteLine($"// │├┬ Loading entity {child.Key}...");
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
 
                     EntityManager.add(new LivingEntity(this, config));
-                    System.Diagnostics.Debug.WriteLine($"// ││└╾ Finished loading entity.");
+                    Console.WriteLine($"// ││└╾ Finished loading entity.");
                 }
 
-                System.Diagnostics.Debug.WriteLine($"// │└╾ Finished reading file.");
+                Console.WriteLine($"// │└╾ Finished reading file.");
             }
 
-            System.Diagnostics.Debug.WriteLine($"// └╾ Finished loading entities.");
+            Console.WriteLine($"// └╾ Finished loading entities.");
         }
     }
 }

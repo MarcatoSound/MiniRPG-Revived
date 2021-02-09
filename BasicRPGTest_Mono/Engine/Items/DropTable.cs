@@ -39,15 +39,15 @@ namespace BasicRPGTest_Mono.Engine.Items
                     YamlSection dropConfig = new YamlSection(map);
 
                     string itemName = dropConfig.getString("item");
-                    System.Diagnostics.Debug.WriteLine($"// ││├┬ Processing drop entry for item '{itemName}'...");
+                    Console.WriteLine($"// ││├┬ Processing drop entry for item '{itemName}'...");
                     ParentItem item = ItemManager.getByNamespace(itemName);
                     if (item == null)
                     {
-                        System.Diagnostics.Debug.WriteLine($"// │││└╾ ERR: Unable to find item '{itemName}' when creating drop table! Skipping...");
+                        Console.WriteLine($"// │││└╾ ERR: Unable to find item '{itemName}' when creating drop table! Skipping...");
                         continue;
                     }
                     drops.Add(new ItemDrop(item, config.getInt("min", 1), config.getInt("max", 1), config.getDouble("weight", 1)));
-                    System.Diagnostics.Debug.WriteLine($"// │││└╾ SUCCESS!");
+                    Console.WriteLine($"// │││└╾ SUCCESS!");
                 }
             }
         }

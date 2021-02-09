@@ -92,7 +92,6 @@ namespace BasicRPGTest_Mono
 
 
             base.LoadContent();
-            System.Diagnostics.Debug.WriteLine("## Loaded game content!");
 
             GC.Collect();
         }
@@ -227,7 +226,7 @@ namespace BasicRPGTest_Mono
         {
 
             // Start Code Timer. Can be used for testing different sections of the code
-            Engine.Utility.CodeTimer codeTimer = new Engine.Utility.CodeTimer();
+            CodeTimer codeTimer = new CodeTimer();
             codeTimer.startTimer();
 
 

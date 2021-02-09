@@ -23,8 +23,6 @@ namespace BasicRPGTest_Mono.Engine.GUI.HUD
         public HotbarSecondary(Vector2 screenPos) :
             base("hotbarsecondary", screenPos)
         {
-            System.Diagnostics.Debug.WriteLine("Hotbar 2 position: " + screenPos);
-
             slotTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 0, 4, 32);
             selectedTexture = Utility.Util.getSpriteFromSet(HudManager.tileset, 1, 4, 32);
 

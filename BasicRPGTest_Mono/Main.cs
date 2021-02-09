@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using BasicRPGTest_Mono.Engine;
@@ -15,6 +17,29 @@ namespace BasicRPGTest_Mono
 {
     public class Main : Game
     {
+
+        //====================================================================================
+        // CONSOLE WINDOW HANDLING
+        //====================================================================================
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern bool AllocConsole();
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+
+        private static bool showConsole = true;
+
+
+        //====================================================================================
+        // MAIN FIELDS
+        //====================================================================================
+
         private readonly ScreenManager screenManager;
         public GraphicsDeviceManager _graphics;
 
@@ -30,6 +55,8 @@ namespace BasicRPGTest_Mono
 
         public Main()
         {
+            if (showConsole)
+                ShowConsoleWindow();
 
             // KEYBOARD INPUT HANDLING
             KeyboardListenerSettings kListenerSettings = new KeyboardListenerSettings();
@@ -38,6 +65,9 @@ namespace BasicRPGTest_Mono
             Components.Add(new InputListenerComponent(this, keyboardListener));
             keyboardListener.KeyPressed += (sender, args) =>
             {
+                if (args.Key == Keys.OemTilde)
+                    toggleConsole();
+
                 if (activeScreen is ScreenStartMenu)
                 {
                     if (args.Key == Keys.Escape) Exit();
@@ -328,6 +358,40 @@ namespace BasicRPGTest_Mono
         {
             activeScreen = new ScreenGame(this, worldName);
             screenManager.LoadScreen(activeScreen, new WipeTransition(_graphics.GraphicsDevice, Microsoft.Xna.Framework.Color.Black, 0.7F));
+        }
+
+
+
+        public static void ShowConsoleWindow()
+        {
+            var handle = GetConsoleWindow();
+
+            if (handle == IntPtr.Zero)
+            {
+                AllocConsole();
+            }
+            else
+            {
+                ShowWindow(handle, SW_SHOW);
+            }
+        }
+        public static void HideConsoleWindow()
+        {
+            var handle = GetConsoleWindow();
+            ShowWindow(handle, SW_HIDE);
+        }
+        public static void toggleConsole()
+        {
+            if (showConsole)
+            {
+                HideConsoleWindow();
+                showConsole = false;
+            }
+            else
+            {
+                ShowConsoleWindow();
+                showConsole = true;
+            }
         }
 
     }

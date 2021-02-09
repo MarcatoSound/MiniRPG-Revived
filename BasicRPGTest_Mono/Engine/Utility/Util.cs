@@ -224,7 +224,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
                     foreach (string entry in str)
                     {
 
-                        //System.Diagnostics.Debug.WriteLine("Text box height: " + ((lineHeight + lineSpacing) * ((entries.Count - 1) / 2.0)));
+                        //Console.WriteLine("Text box height: " + ((lineHeight + lineSpacing) * ((entries.Count - 1) / 2.0)));
 
                         if (textAnchor.X == -1 && textAnchor.Y == -1)
                             textAnchor = new Vector2(font.MeasureString(entry).X / 2, (font.MeasureString(entry).Y / 2));
@@ -390,8 +390,8 @@ namespace BasicRPGTest_Mono.Engine.Utility
         }
         public static int trueCoordToTileCoord(int truePos)
         {
-            //System.Diagnostics.Debug.WriteLine($"TruePos {truePos}");
-            //System.Diagnostics.Debug.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
+            //Console.WriteLine($"TruePos {truePos}");
+            //Console.WriteLine($"CalcPos {truePos / TileManager.dimensions}");
             return truePos / TileManager.dimensions;
         }
         public static Vector2 screenPosToTruePos(Vector2 truePos)
@@ -606,11 +606,11 @@ namespace BasicRPGTest_Mono.Engine.Utility
                         targetPos.Y = y;
                         tiles.Add(layer.getTile(targetPos));
                     }
-                    //System.Diagnostics.Debug.WriteLine($"Scanned position {targetPos}.");
+                    //Console.WriteLine($"Scanned position {targetPos}.");
                 }
             }
 
-            //System.Diagnostics.Debug.WriteLine($"Collected {tiles.Count} tiles.");
+            //Console.WriteLine($"Collected {tiles.Count} tiles.");
 
             return tiles;
         }
@@ -622,13 +622,13 @@ namespace BasicRPGTest_Mono.Engine.Utility
         public static void myDebug(string mMessage)
         {
             // Gives basic Debug Message
-            System.Diagnostics.Debug.WriteLine(mMessage);
+            Console.WriteLine(mMessage);
         }
 
         public static void myDebug(string mSource, string mMessage)
         {
             // Gives a Debug mMessage with given mSource String at beginning.
-            System.Diagnostics.Debug.WriteLine("<" + mSource + ">:  " + mMessage);
+            Console.WriteLine("<" + mSource + ">:  " + mMessage);
         }
 
         public static void myDebug(bool mError, string mSource, string mMessage)
@@ -637,13 +637,13 @@ namespace BasicRPGTest_Mono.Engine.Utility
             if (mError == true)
             {
                 // Gives Error message at start of mSource and Debug mMessage
-                System.Diagnostics.Debug.WriteLine("! ERROR:  <" + mSource + ">:  " + mMessage);
+                Console.WriteLine("! ERROR:  <" + mSource + ">:  " + mMessage);
 
             }
             else
             {
                 // Gives a Debug mMessage with given mSource String at beginning.
-                System.Diagnostics.Debug.WriteLine("<" + mSource + ">:  " + mMessage);
+                Console.WriteLine("<" + mSource + ">:  " + mMessage);
             }
         }
 
