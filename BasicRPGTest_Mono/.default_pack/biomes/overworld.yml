@@ -1,0 +1,19 @@
+field:
+  ground_tile: grass
+  underground_tile: dirt
+  stone_tile: stone
+  coast_tile: sand
+  decoration_frequency: 1
+  decorations:
+    - decoration: bush
+      tiles:
+        - bush: B
+      arrangement:
+        - "B"
+    - decoration: bush_cluster
+      tiles:
+        - bush: B
+      arrangement:
+        - "BBB"
+        - "BBB"
+        - "BBB"

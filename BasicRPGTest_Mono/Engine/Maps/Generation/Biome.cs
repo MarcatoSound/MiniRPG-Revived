@@ -1,4 +1,6 @@
-﻿using BasicRPGTest_Mono.Engine.Maps.Generation;
+﻿using BasicRPGTest_Mono.Engine.Datapacks;
+using BasicRPGTest_Mono.Engine.Maps.Generation;
+using BasicRPGTest_Mono.Engine.Utility;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
@@ -34,6 +36,16 @@ namespace BasicRPGTest_Mono.Engine.Maps
             this.decorations = decorations;
             decorations.Add(new Decoration("Blank", 100, tile: null));
             decoChance = 1;
+        }
+        public Biome(DataPack pack, YamlSection config)
+        {
+            this.name = config.getName();
+            this.groundTile = TileManager.getByName(config.getString(""));
+            if (groundTile == null)
+            {
+                Console.WriteLine($"");
+                return;
+            }
         }
 
 
