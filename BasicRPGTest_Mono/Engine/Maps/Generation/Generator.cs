@@ -126,29 +126,28 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
             Vector2 decoPos = new Vector2();
 
+            double cachedBiomeNoise = -2;
             for (int x = 0; x < size; x++)
             {
                 for (int y = 0; y < size; y++)
                 {
                     DataPackManager.mapTileCount++;
-                    {
 
+                    {
                         // Determine what biome this is.
                         double value = biomeNoise[x, y];
-                        foreach (KeyValuePair<Biome, double> pair in biomeChances)
+                        if (cachedBiomeNoise != value)
                         {
-                            if ((value -= pair.Value * 2) < -1)
+                            cachedBiomeNoise = value;
+                            foreach (KeyValuePair<Biome, double> pair in biomeChances)
                             {
-                                biome = pair.Key;
-                                break;
+                                if ((value -= pair.Value * 2) < -1)
+                                {
+                                    biome = pair.Key;
+                                    break;
+                                }
                             }
                         }
-                        /*if (biomeNoise[x, y] < 0)
-                            biome = BiomeManager.getByName("field");
-                        else if (biomeNoise[x, y] >= 0 && biomeNoise[x, y] < 0.5)
-                            biome = BiomeManager.getByName("swamp");
-                        else
-                            biome = BiomeManager.getByName("desert");*/
                     }
 
                     Tile groundTile = biome.groundTile == null ? defaultGround : biome.groundTile;
