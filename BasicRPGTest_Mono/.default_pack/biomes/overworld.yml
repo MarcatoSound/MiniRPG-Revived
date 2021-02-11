@@ -6,14 +6,34 @@ field:
   decoration_frequency: 1
   decorations:
     - decoration: bush
+      weight: 10
       tiles:
         - bush: B
       arrangement:
         - "B"
     - decoration: bush_cluster
+      weight: 2
       tiles:
         - bush: B
       arrangement:
         - "BBB"
         - "BBB"
         - "BBB"
+desert:
+  ground_tile: sand
+  underground_tile: sandstone
+  stone_tile: stone
+  coast_tile: sand
+  decoration_frequency: 1
+swamp:
+  ground_tile: swamp_grass
+  underground_tile: dirt
+  stone_tile: stone
+  coast_tile: dirt
+  decoration_frequency: 1
+  decorations:
+    - decoration: bush
+      tiles:
+        - bush: B
+      arrangement:
+        - "B"

@@ -35,7 +35,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
 
         private void loadInfo()
         {
-            Console.WriteLine($"// LOADING PACK '{packPath}'... //");
+            Console.WriteLine($"// ┌╾ LOADING PACK '{packPath}'... //");
 
             var reader = new StreamReader($"{packPath}\\pack.yml");
             var input = new StringReader(reader.ReadToEnd());
@@ -53,7 +53,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
 
         public void loadItems()
         {
-            Console.WriteLine($"// LOADING ITEMS FOR PACK '{name}'... //");
+            Console.WriteLine($"// ┌╾ LOADING ITEMS FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\items";
             string[] files = Directory.GetFiles(path);
@@ -85,7 +85,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public void loadTiles()
         {
-            Console.WriteLine($"// LOADING TILES FOR PACK '{name}'... //");
+            Console.WriteLine($"// ┌╾ LOADING TILES FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\tiles";
             string[] files = Directory.GetFiles(path);
@@ -117,11 +117,39 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public void loadBiomes()
         {
+            Console.WriteLine($"// ┌╾ LOADING BIOMES FOR PACK '{name}'... //");
 
+            string path = $"{packPath}\\biomes";
+            string[] files = Directory.GetFiles(path);
+
+            foreach (string file in files)
+            {
+                Console.WriteLine($"// ├┬ Reading file {file}...");
+                var reader = new StreamReader(file);
+                var input = new StringReader(reader.ReadToEnd());
+
+                YamlStream yaml = new YamlStream();
+                yaml.Load(input);
+
+                YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+                foreach (var child in mapping.Children)
+                {
+                    YamlMappingNode itemYaml = new YamlMappingNode(child);
+                    Console.WriteLine($"// │├┬ Loading biome {child.Key}");
+                    YamlSection config = new YamlSection((string)child.Key, itemYaml);
+
+                    BiomeManager.add(new Biome(this, config));
+                    Console.WriteLine($"// ││└╾ SUCCESS");
+                }
+                Console.WriteLine($"// │└╾ Finished reading file.");
+            }
+
+            Console.WriteLine($"// └╾ Finished loading biomes.");
         }
         public void loadGenerators()
         {
-            Console.WriteLine($"// LOADING GENERATORS FOR PACK '{name}'... //");
+            Console.WriteLine($"// ┌╾ LOADING GENERATORS FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\generators";
             string[] files = Directory.GetFiles(path);
@@ -153,7 +181,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public void loadMaps()
         {
-            Console.WriteLine($"// LOADING MAPS FOR PACK '{name}'... //");
+            Console.WriteLine($"// ┌╾ LOADING MAPS FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\maps";
             string[] files = Directory.GetFiles(path);
@@ -187,7 +215,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public void loadDropTables()
         {
-            Console.WriteLine($"// LOADING DROPTABLES FOR PACK '{name}'... //");
+            Console.WriteLine($"// ┌╾ LOADING DROPTABLES FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\droptables";
             string[] files = Directory.GetFiles(path);
@@ -220,7 +248,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
         }
         public void loadEntities()
         {
-            Console.WriteLine($"// LOADING ENTITIES FOR PACK '{name}'... //");
+            Console.WriteLine($"// ┌╾ LOADING ENTITIES FOR PACK '{name}'... //");
 
             string path = $"{packPath}\\entities";
             string[] files = Directory.GetFiles(path);

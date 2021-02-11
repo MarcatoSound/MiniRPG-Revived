@@ -1,4 +1,8 @@
 overworld:
+  default_ground: grass
+  default_underground: dirt
+  default_stone: stone
+  default_coast: sand
   water_frequency: 0.5
   stone_frequency: 0.25
   biome_size: 1.0
@@ -15,6 +19,10 @@ overworld:
     roughness: 4
     depth: 0.2
 cavern:
+  default_ground: grass
+  default_underground: dirt
+  default_stone: stone
+  default_coast: sand
   water_frequency: 0.26
   stone_frequency: 0.5
   biome_size: 1.0

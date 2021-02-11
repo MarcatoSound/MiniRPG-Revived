@@ -39,6 +39,12 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
             return generators;
         }
 
+        public static void remove(Generator gen)
+        {
+            generators.Remove(gen);
+            generatorsByName.Remove(gen.name);
+        }
+
         public static void Clear()
         {
             generators.Clear();

@@ -7,6 +7,7 @@ using SharpNoise.Builders;
 using SharpNoise.Modules;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using YamlDotNet.RepresentationModel;
 
@@ -17,10 +18,18 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
         public string name { get; private set; }
 
+        public Tile defaultGround { get; private set; }
+        public Tile defaultUnderground { get; private set; }
+        public Tile defaultStone { get; private set; }
+        public Tile defaultCoast { get; private set; }
+
         public double waterLevel { get; private set; }
         public double sandLevel { get; private set; }
         public double stoneLevel { get; private set; }
+
         public double biomeSize { get; private set; }
+        public Dictionary<Biome, double> biomes { get; private set; } = new Dictionary<Biome, double>();
+        public Dictionary<Biome, double> biomeChances { get; private set; } = new Dictionary<Biome, double>();
 
         public double scale { get; private set; }
         public int roughness { get; private set; }
@@ -28,14 +37,58 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
         public Generator(DataPack pack, YamlSection config)
         {
+            defaultGround = TileManager.getByName(config.getString("default_ground_tile", "grass"));
+            defaultUnderground = TileManager.getByName(config.getString("default_underground_tile", "dirt"));
+            defaultStone = TileManager.getByName(config.getString("default_stone_tile", "stone"));
+            defaultCoast = TileManager.getByName(config.getString("default_coast_tile", "sand"));
+
+            if (defaultGround == null || defaultUnderground == null || defaultStone == null || defaultCoast == null)
+            {
+                // TODO: Make this more informative.
+                Console.WriteLine($"// ERR: Failed to load generator '{config.getName()}'! Invalid default tile(s)...");
+                GeneratorManager.remove(this);
+                return;
+            }
+
             name = config.getName();
 
             waterLevel = (config.getDouble("water_frequency", 0.5) * 2) - 1;
             sandLevel = waterLevel + 0.07;
             stoneLevel = 1 - (config.getDouble("stone_frequency", 0.25) * 2);
 
+            // Biome stuff
             biomeSize = config.getDouble("biome_size", 1);
+            YamlNode biomesNode = config.get("biomes");
+            if (biomesNode != null && biomesNode.NodeType == YamlNodeType.Sequence)
+            {
+                YamlSequenceNode sequence = (YamlSequenceNode)biomesNode;
+                double totalWeight = 0;
+                // Code for converting this sub-section into a collection of biomes.
+                foreach (YamlNode node in sequence)
+                {
+                    if (node.NodeType != YamlNodeType.Mapping) continue;
+                    YamlMappingNode mapNode = (YamlMappingNode)node;
 
+                    YamlSection biomeConfig = new YamlSection(mapNode);
+                    Biome biome = BiomeManager.getByName(biomeConfig.getString("biome"));
+                    if (biome == null) continue;
+
+                    double weight = biomeConfig.getDouble("weight", 1);
+                    biomes.Add(biome, weight);
+                    totalWeight += weight;
+                }
+                double weightValue = 1 / totalWeight;
+                // Build the biome chances dictionary
+                double current = 0;
+                foreach (KeyValuePair<Biome, double> pair in biomes)
+                {
+                    current = weightValue * pair.Value;
+                    biomeChances.Add(pair.Key, current);
+                    Console.WriteLine($"// ││├╾ Biome '{pair.Key.name}' with noise value of {current}");
+                }
+            }
+
+            // Advanced stuff
             scale = config.getDouble("advanced.scale", 1);
             roughness = config.getInt("advanced.roughness", 4);
             depth = config.getDouble("advanced.depth", 0.2);
@@ -57,7 +110,7 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
             System.Diagnostics.Debug.WriteLine($"Seed: {seed}");
 
             NoiseMap biomeNoise = createBiomeNoise(seed);
-            Biome biome;
+            Biome biome = biomes.Keys.First();
 
             NoiseMap noise = createLandNoise(seed, size);
 
@@ -79,14 +132,29 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
                 {
                     DataPackManager.mapTileCount++;
                     {
+
                         // Determine what biome this is.
-                        if (biomeNoise[x, y] < 0)
+                        double value = biomeNoise[x, y];
+                        foreach (KeyValuePair<Biome, double> pair in biomeChances)
+                        {
+                            if ((value -= pair.Value * 2) < -1)
+                            {
+                                biome = pair.Key;
+                                break;
+                            }
+                        }
+                        /*if (biomeNoise[x, y] < 0)
                             biome = BiomeManager.getByName("field");
                         else if (biomeNoise[x, y] >= 0 && biomeNoise[x, y] < 0.5)
                             biome = BiomeManager.getByName("swamp");
                         else
-                            biome = BiomeManager.getByName("desert");
+                            biome = BiomeManager.getByName("desert");*/
                     }
+
+                    Tile groundTile = biome.groundTile == null ? defaultGround : biome.groundTile;
+                    Tile undergroundTile = biome.undergroundTile == null ? defaultUnderground : biome.undergroundTile;
+                    Tile stoneTile = biome.stoneTile == null ? defaultStone : biome.stoneTile;
+                    Tile coastTile = biome.coastTile == null ? defaultCoast : biome.coastTile;
 
                     // Water layer
                     if (noise[x, y] < waterLevel)
@@ -94,15 +162,15 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
                     // Ground layer
                     if (noise[x, y] >= waterLevel && noise[x, y] < sandLevel)
-                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.coastTile, new Vector2(x, y), biome));
+                        groundLayer.setTile(new Vector2(x, y), new Tile(coastTile, new Vector2(x, y), biome));
                     else if (noise[x, y] >= sandLevel && noise[x, y] <= stoneLevel)
-                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.groundTile, new Vector2(x, y), biome));
+                        groundLayer.setTile(new Vector2(x, y), new Tile(groundTile, new Vector2(x, y), biome));
                     else if (noise[x, y] > stoneLevel)
-                        groundLayer.setTile(new Vector2(x, y), new Tile(biome.undergroundTile, new Vector2(x, y), biome));
+                        groundLayer.setTile(new Vector2(x, y), new Tile(undergroundTile, new Vector2(x, y), biome));
 
                     // Stone layer
                     if (noise[x, y] > stoneLevel)
-                        stoneLayer.setTile(new Vector2(x, y), new Tile(TileManager.getByName("stone"), new Vector2(x, y), biome));
+                        stoneLayer.setTile(new Vector2(x, y), new Tile(stoneTile, new Vector2(x, y), biome));
 
                     // Decorations layer
                     if (biome.name.Equals("desert")) continue;
@@ -118,7 +186,8 @@ namespace BasicRPGTest_Mono.Engine.Maps.Generation
 
                     Decoration deco = biome.chooseDecoration();
 
-                    deco.place(layers, decoPos, biome);
+                    if (deco != null)
+                        deco.place(layers, decoPos, biome);
                 }
             }
 

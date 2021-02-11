@@ -121,7 +121,7 @@ namespace BasicRPGTest_Mono.Screens
 
         private void loadBiomes()
         {
-            Biome biome;
+            /*Biome biome;
             Dictionary<Vector2, Tile> decoTiles = new Dictionary<Vector2, Tile>();
 
             biome = new Biome("field", TileManager.getByName("grass"));
@@ -172,7 +172,7 @@ namespace BasicRPGTest_Mono.Screens
             biome.undergroundTile = TileManager.getByName("dirt");
             biome.coastTile = TileManager.getByName("sand");
             biome.decorations.Add(new Decoration("bush", 30, TileManager.getByName("bush")));
-            BiomeManager.add(biome);
+            BiomeManager.add(biome);*/
 
             DataPackManager.loadBiomes();
         }
