@@ -513,6 +513,17 @@ namespace RPGEngine
 
         }
 
+
+        public static implicit operator YamlSection(Tile tl)
+        {
+            YamlSection config = new YamlSection(tl.name);
+
+            config.set("id", tl.parent.name);
+            config.set("biome", tl.biome.name);
+
+            return config;
+        }
+
     }
 
 

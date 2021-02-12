@@ -1,8 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BasicRPGTest_Mono.Engine.Utility;
+using Microsoft.Xna.Framework;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine.Maps
 {
@@ -47,7 +49,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
             if (tiles.ContainsKey(mTile.pos))
             {
                 // Do NOT Add Tile to Map. A Tile already exists at that Position
-                Utility.Util.myDebug(true, "TileLayer.cs addTile(Tile)", "Could NOT Add Tile. A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
+                Util.myDebug(true, "TileLayer.cs addTile(Tile)", "Could NOT Add Tile. A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
                 return false;
             }
             // Otherwise...
@@ -57,6 +59,19 @@ namespace BasicRPGTest_Mono.Engine.Maps
             //this.childTiles[(int)mTile.pos.X, (int)mTile.pos.Y] = mTile;
 
             return true;
+        }
+
+
+        public static implicit operator YamlSection(TileLayer tl)
+        {
+            YamlSection config = new YamlSection(tl.name);
+
+            foreach (KeyValuePair<Vector2, Tile> pair in tl.tiles)
+            {
+                config.set($"tiles.{pair.Key.X}-{pair.Key.Y}", (YamlSection)pair.Value);
+            }
+
+            return config;
         }
     }
 }

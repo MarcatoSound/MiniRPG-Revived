@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine.Utility
 {
@@ -9,6 +10,7 @@ namespace BasicRPGTest_Mono.Engine.Utility
     {
         private YamlMappingNode yaml;
         private string root;
+
         // TODO: Create setting and adding functionality.
         /// <summary>
         /// A wrapper object to simplify YAML data retrieval and traversal.
@@ -28,6 +30,11 @@ namespace BasicRPGTest_Mono.Engine.Utility
         {
             this.root = "";
             this.yaml = yaml;
+        }
+        public YamlSection(string root)
+        {
+            this.root = root;
+            this.yaml = new YamlMappingNode();
         }
 
         /// <summary>
@@ -123,5 +130,74 @@ namespace BasicRPGTest_Mono.Engine.Utility
             // We couldn't find the key, so this is a dead path.
             return null;
         }
+
+
+
+        // SETTERS AND ADDERS
+        public void set(string path, YamlNode node)
+        {
+
+            buildPath(yaml, path, node);
+        }
+        public void setString(string path, string value)
+        {
+
+            buildPath(yaml, path, value);
+        }
+        public void setInt(string path, int value)
+        {
+
+            buildPath(yaml, path, value.ToString());
+        }
+        public void setDouble(string path, double value)
+        {
+
+            buildPath(yaml, path, value.ToString());
+        }
+        public void setBool(string path, bool value)
+        {
+
+            buildPath(yaml, path, value.ToString());
+        }
+
+        private void buildPath(YamlMappingNode node, string path, YamlNode value)
+        {
+            // Split the path string once into a key and a "sub-keys" string
+            string[] paths = path.Split(".", 2);
+
+            // We've found the end of the path; 
+            if (paths.Length == 1)
+            {
+                node.Add(paths[0], value);
+                return;
+            }
+
+            YamlNode subNode;
+            // Check if the current node has the first key in the provided path.
+            if (node.Children.ContainsKey(paths[0]))
+            {
+                subNode = node[paths[0]];
+
+                buildPath((YamlMappingNode)subNode, paths[1], value);
+                return;
+            }
+
+            // We haven't found the end of the path; create key and keep digging
+            node.Add(paths[0], new YamlMappingNode());
+            subNode = node[paths[0]];
+
+            buildPath((YamlMappingNode)subNode, paths[1], value);
+
+        }
+
+
+        public override string ToString()
+        {
+            var serializer = new SerializerBuilder().Build();
+            
+            return serializer.Serialize(yaml);
+        }
+
+        public static implicit operator YamlMappingNode(YamlSection ys) => ys.yaml;
     }
 }

@@ -84,11 +84,11 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 pack.loadGenerators();
             }
         }
-        public static void loadMaps()
+        public static void loadMaps(string world)
         {
             foreach (DataPack pack in packs)
             {
-                pack.loadMaps();
+                pack.loadMaps(world);
             }
         }
         public static void loadDropTables()

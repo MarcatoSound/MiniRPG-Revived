@@ -17,6 +17,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public static ContentManager content;
 
+        public static World activeWorld;
         public static Player player;
 
         public static bool paused;

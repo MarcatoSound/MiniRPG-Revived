@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework;
 using RPGEngine;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
+using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -66,7 +67,31 @@ namespace BasicRPGTest_Mono.Engine
 
         public static void save(Map map, string world)
         {
+            map.save();
+
+            /*string yaml = map.serialize().ToString();
+
+            path = $"save\\{world}\\maps";
+
+            if (!Directory.Exists(path))
+            {
+                DirectoryInfo dInfo = Directory.CreateDirectory(path);
+            }
+
+            writer = new StreamWriter($"save\\{world}\\maps\\{map.name}.yml", false);
+
+            try
+            {
+                writer.Write(yaml);
+            }
+            finally
+            {
+                writer.Close();
+            }*/
+
             return;
+
+
             if (!oldMapStates.ContainsKey(map.name))
             {
                 // This map doesn't have a previous state, therefore it is probably brand new. Don't bother saving this time.

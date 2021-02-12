@@ -83,10 +83,10 @@ namespace BasicRPGTest_Mono
             cloudOverlay = Content.Load<Texture2D>("cloud_overlay");
 
             texture = Content.Load<Texture2D>("player_spriteset");
-            player = new Player(texture);
+            Player.playerGraphic = new Engine.Graphics.GraphicSet(texture);
 
             if (loadPlayer())
-                Save.save(player, worldName);
+                Core.player.save();
             Camera.camera.Position = player.Position;
             Camera.camera.CameraLimits = new Rectangle(0, 0, MapManager.activeMap.widthInPixels, MapManager.activeMap.heightInPixels);
 
@@ -103,8 +103,8 @@ namespace BasicRPGTest_Mono
 
         public override void UnloadContent()
         {
-            Save.save(MapManager.activeMap, worldName);
-            Save.save(player, worldName);
+            MapManager.saveMaps();
+            Core.player.save();
             Camera.reset();
             GuiWindowManager.closeWindow();
             GuiWindowManager.Clear();
@@ -169,14 +169,19 @@ namespace BasicRPGTest_Mono
             {
                 
                 if (!File.Exists($"{path}\\player.json"))
+                {
+                    player = new Player();
                     return true;
+                }
+
                 // Load player data
-                Dictionary<string, Object> playerData = Load.loadPlayer(worldName);
-                player.Position = (Vector2)playerData["position"];
+                YamlSection playerData = Load.loadPlayer(worldName);
+                player = new Player(playerData);
 
                 return false;
             }
 
+            player = new Player();
             return true;
         }
 

@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using RPGEngine;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -39,7 +40,22 @@ namespace BasicRPGTest_Mono.Engine
             mapProgress = 0;
         }
 
-        public static Dictionary<string, Object> loadPlayer(string world)
+        public static YamlSection loadPlayer(string world)
+        {
+            string file = $"save\\{world}\\player.yml";
+
+            Console.WriteLine($"// Reading player file...");
+            var reader = new StreamReader(file);
+            var input = new StringReader(reader.ReadToEnd());
+
+            YamlStream yaml = new YamlStream();
+            yaml.Load(input);
+
+            YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+            return new YamlSection("player", mapping);
+        }
+        /*public static Dictionary<string, Object> loadPlayer(string world)
         {
             Dictionary<string, Object> playerData = new Dictionary<string, object>();
 
@@ -54,7 +70,7 @@ namespace BasicRPGTest_Mono.Engine
             reader.Close();
 
             return playerData;
-        }
+        }*/
         public static List<TileLayer> loadMap(string world, string map)
         {
 

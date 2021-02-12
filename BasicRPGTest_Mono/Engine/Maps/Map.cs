@@ -23,6 +23,7 @@ namespace BasicRPGTest_Mono.Engine
         // VARIABLES
         //====================================================================================
 
+        public string world { get; set; }
         public string name { get; set; }
         public Generator generator { get; private set; }
         public List<TileLayer> layers { get; set; }
@@ -32,8 +33,8 @@ namespace BasicRPGTest_Mono.Engine
         public int height { get; set; }
         public int widthInPixels { get; set; }
         public int heightInPixels { get; set; }
-        public int regionTilesWide { get; set; } = 8;
-        public int regionTilesHigh { get; set; } = 8;
+        public int regionTilesWide { get; set; } = 32;
+        public int regionTilesHigh { get; set; } = 32;
 
         public ConcurrentDictionary<int, Rectangle> collidables { get; set; }
 
@@ -47,6 +48,7 @@ namespace BasicRPGTest_Mono.Engine
 
         private long v_drawnTileCount;
 
+        public RegionManager regionManager { get; private set; }
         public List<Region> v_regionsVisible = new List<Region>();
         private List<Tile> v_TileTemplates = new List<Tile>();
         private Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>> v_VisibleTiles = new Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>>();
@@ -62,9 +64,10 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
         // CONSTRUCTOR
         //====================================================================================
-        public Map(DataPack pack, YamlSection config)
+        public Map(DataPack pack, YamlSection config, string world)
         {
             name = config.getName();
+            this.world = world;
             string genName = config.getString("generator");
             generator = GeneratorManager.getByNamespace(genName);
             if (generator == null)
@@ -92,17 +95,18 @@ namespace BasicRPGTest_Mono.Engine
             spawnTimer.Start();
             livingEntityCap = config.getInt("entity_cap", 50);
 
+            regionManager = new RegionManager(this);
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
             for (int x = 0; x < width / 8; x++)
             {
                 for (int y = 0; y < height / 8; y++)
                 {
-                    regionTruePos.X = x * (TileManager.dimensions * 8);
-                    regionTruePos.Y = y * (TileManager.dimensions * 8);
+                    regionTruePos.X = x * (TileManager.dimensions * 32);
+                    regionTruePos.Y = y * (TileManager.dimensions * 32);
                     regionPos.X = x;
                     regionPos.Y = y;
-                    Region region = new Region(regionTruePos, regionPos);
+                    Region region = new Region(regionTruePos, regionPos, this);
                     regions.Add(new Vector2(x, y), region);
                 }
             }
@@ -119,7 +123,7 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    regionPos = new Vector2((int)(tile.tilePos.X / 32), (int)(tile.tilePos.Y / 32));
                     tile.region = regionPos;
                     tile.map = this;  // Tile remembers the Map it belongs to
                     tile.layer = layer;  // Tile remembers Map's Layer it belongs to
@@ -135,7 +139,6 @@ namespace BasicRPGTest_Mono.Engine
 
             }
 
-            Save.oldMapStates.Add(name, new Map(this));
             buildTileTemplateCache();
         }
         public Map(string name, int size, List<TileLayer> layers)
@@ -157,6 +160,7 @@ namespace BasicRPGTest_Mono.Engine
             spawnTimer.Elapsed += trySpawn;
             spawnTimer.Start();
 
+            regionManager = new RegionManager(this);
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
             for (int x = 0; x < width / 8; x++)
@@ -167,7 +171,7 @@ namespace BasicRPGTest_Mono.Engine
                     regionTruePos.Y = y * (TileManager.dimensions * 8);
                     regionPos.X = x;
                     regionPos.Y = y;
-                    Region region = new Region(regionTruePos, regionPos);
+                    Region region = new Region(regionTruePos, regionPos, this);
                     regions.Add(new Vector2(x, y), region);
                 }
             }
@@ -322,7 +326,7 @@ namespace BasicRPGTest_Mono.Engine
 
             if (rand.Next(0, 100) >= 25) return;
 
-            Spawn spawn = Utility.Util.randomizeSpawn(spawns);
+            Spawn spawn = Util.randomizeSpawn(spawns);
 
             //System.Diagnostics.Debug.WriteLine("Successfully spawned entity " + spawn.entity.name);
 
@@ -919,6 +923,22 @@ namespace BasicRPGTest_Mono.Engine
                 {
                     list.Clear();
                 }
+            }
+        }
+
+
+        public void saveAll()
+        {
+            foreach (Region region in regions.Values)
+            {
+                region.save();
+            }
+        }
+        public void save()
+        {
+            foreach (Region region in regionManager.changedRegions.Values)
+            {
+                region.save();
             }
         }
 

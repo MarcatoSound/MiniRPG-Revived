@@ -1,9 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BasicRPGTest_Mono.Engine.Utility;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace BasicRPGTest_Mono.Engine.Maps
@@ -11,33 +13,37 @@ namespace BasicRPGTest_Mono.Engine.Maps
     public class Region
     {
         // Region sizes should be in multiples of 4
-        public const int regionSize = 8;
+        public const int regionSize = 32;
 
-        public Vector2 pos { get; set; }
-        public Vector2 regionPos { get; set; }
+        public Map map { get; private set; }
+
+        public Vector2 pos { get; private set; }
+        public Vector2 regionPos { get; private set; }
         public Rectangle box { get; set; }
         public List<Tile> tiles;
 
-        public Region(Vector2 pos, Vector2 regionPos)
+        public Region(Vector2 pos, Vector2 regionPos, Map map)
         {
             this.pos = pos;
             this.regionPos = regionPos;
+            this.map = map;
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), regionSize * TileManager.dimensions, regionSize * TileManager.dimensions);
             tiles = new List<Tile>();
         }
 
         public void addTiles(List<Tile> tiles)
         {
-            this.tiles = tiles;
+            this.tiles.AddRange(tiles);
         }
         public void addTile(Tile tile)
         {
-            this.tiles.Add(tile);
+            tiles.Add(tile);
         }
         public void removeTile(Tile mTile)
         {
             // Remove Tile from Region
             tiles.Remove(mTile);
+            map.regionManager.updateRegion(this);
         }
 
         public void draw(SpriteBatch batch, TileLayer layer)
@@ -51,6 +57,42 @@ namespace BasicRPGTest_Mono.Engine.Maps
 
             }
             //batch.DrawRectangle(box, Color.White);
+        }
+
+
+        public void save()
+        {
+
+            string path = $"save\\{map.world}\\maps\\{map.name}"; 
+            if (!Directory.Exists(path))
+            {
+                DirectoryInfo dInfo = Directory.CreateDirectory(path);
+            }
+
+            StreamWriter writer = new StreamWriter($"{path}\\reg_{regionPos.X}-{regionPos.Y}.yml", false);
+
+            try
+            {
+                writer.Write((YamlSection)this);
+            }
+            finally
+            {
+                writer.Close();
+            }
+
+        }
+
+
+        public static implicit operator YamlSection(Region r)
+        {
+            YamlSection config = new YamlSection($"{r.regionPos.X}-{r.regionPos.Y}");
+
+            foreach (Tile tile in r.tiles)
+            {
+                config.set($"tiles.{tile.layer.name}.{tile.pos.X}-{tile.pos.Y}", (YamlSection)tile);
+            }
+
+            return config;
         }
 
     }

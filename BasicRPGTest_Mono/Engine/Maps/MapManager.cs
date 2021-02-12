@@ -75,6 +75,12 @@ namespace BasicRPGTest_Mono.Engine
             mapsByName.Remove(name);
         }
 
+        public static void saveMaps()
+        {
+            foreach (Map map in maps)
+                map.save();
+        }
+
         public static void clear()
         {
             maps.Clear();

@@ -6,6 +6,7 @@ using BasicRPGTest_Mono.Engine.Inventories;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Menus;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +16,7 @@ using MonoGame.Extended.Tiled;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Timers;
 
@@ -22,6 +24,8 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Player : LivingEntity, IFocusable
     {
+
+        public static GraphicSet playerGraphic;
 
         public bool isDashing;
         public Timer dashTimer;
@@ -31,8 +35,8 @@ namespace BasicRPGTest_Mono.Engine
         public Timer attackTimer;
 
         public PlayerInventory inventory;
-        public Player(Texture2D texture) : 
-            base("player", new GraphicSet(texture), new Rectangle(0, 0, 24, 32), 225f)
+        public Player() : 
+            base("player", playerGraphic, new Rectangle(0, 0, 24, 32), 225f)
         {
             Core.player = this;
             Camera.camera.Focus = this;
@@ -97,6 +101,28 @@ namespace BasicRPGTest_Mono.Engine
             inventory.hotbarSecondary.setItem(1, new Item(ItemManager.getByNamespace("sunfeather")));
 
             GuiWindowManager.playerInv.updateGui();
+        }
+        public Player(YamlSection data) :
+            base("player", playerGraphic, new Rectangle(0, 0, 24, 32), (float)data.getDouble("stats.movement_speed", 125))
+        {
+            Core.player = this;
+            Camera.camera.Focus = this;
+
+            Position = new Vector2((float)data.getDouble("position.x", 0), (float)data.getDouble("position.y", 0));
+            map = MapManager.activeMap;
+
+            boundingBox = new Rectangle((int)Position.X, (int)Position.Y, 24, 32);
+            Camera.camPos = new Vector2(Position.X - (Camera.camera.BoundingRectangle.Width / 2), Position.Y - (Camera.camera.BoundingRectangle.Height / 2));
+            maxVelocity = new Vector2(speed, speed);
+            dashTimer = new Timer(200);
+            dashTimer.Elapsed += (sender, args) =>
+            {
+                isDashing = false;
+                dashTimer.Stop();
+                maxVelocity = new Vector2(speed, speed);
+            };
+
+            kbResist = 0.75f;
         }
         public void toggleInv()
         {
@@ -481,6 +507,42 @@ namespace BasicRPGTest_Mono.Engine
             {
                 itemSwing.Draw(batch, Position);
             }
+        }
+
+
+        public void save()
+        {
+            string path = $"save\\{map.world}";
+            if (!Directory.Exists(path))
+            {
+                DirectoryInfo dInfo = Directory.CreateDirectory(path);
+            }
+
+            StreamWriter writer = new StreamWriter($"{path}\\player.yml", false);
+
+            try
+            {
+                writer.Write((YamlSection)this);
+            }
+            finally
+            {
+                writer.Close();
+            }
+        }
+
+        public static implicit operator YamlSection(Player p)
+        {
+            YamlSection config = new YamlSection($"player");
+
+            config.setDouble("position.x", p.Position.X);
+            config.setDouble("position.y", p.Position.Y);
+            config.setDouble("stats.movement_speed", p.speed);
+
+            return config;
+        }
+        public static implicit operator Player(YamlSection config)
+        {
+            return new Player(config);
         }
 
     }

@@ -184,7 +184,7 @@ namespace BasicRPGTest_Mono.Screens
 
         private void loadMaps()
         {
-            DataPackManager.loadMaps();
+            DataPackManager.loadMaps(worldName);
         }
 
         private void loadEntities()

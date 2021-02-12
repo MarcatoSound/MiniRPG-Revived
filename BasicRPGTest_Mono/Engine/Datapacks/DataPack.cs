@@ -179,7 +179,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
 
             Console.WriteLine($"// └╾ Finished loading generators.");
         }
-        public void loadMaps()
+        public void loadMaps(string world)
         {
             Console.WriteLine($"// ┌╾ LOADING MAPS FOR PACK '{name}'... //");
 
@@ -204,7 +204,12 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
                     DataPackManager.mapBeingLoaded = (string)child.Key;
 
-                    MapManager.add(new Map(this, config));
+                    Map map = new Map(this, config, world);
+                    MapManager.add(map);
+
+                    Console.WriteLine($"// ││├╾ Saving map...");
+                    map.saveAll();
+
                     Console.WriteLine($"// ││└╾ SUCCESS");
                 }
                 Console.WriteLine($"// │└╾ Finished reading file.");
