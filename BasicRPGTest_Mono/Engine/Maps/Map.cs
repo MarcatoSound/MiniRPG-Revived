@@ -979,6 +979,23 @@ namespace BasicRPGTest_Mono.Engine
                 writer.Close();
             }
 
+            // ITEM DROPSAVING
+            YamlSequenceNode itemDrops = new YamlSequenceNode();
+            foreach (ItemEntity item in items.Values)
+            {
+                itemDrops.Add((YamlSection)item);
+            }
+            writer = new StreamWriter($"save\\{world}\\maps\\{name}\\item_drops.yml", false);
+            try
+            {
+                var serializer = new SerializerBuilder().Build();
+                writer.Write(serializer.Serialize(itemDrops));
+            }
+            finally
+            {
+                writer.Close();
+            }
+
         }
 
 

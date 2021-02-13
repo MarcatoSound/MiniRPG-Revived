@@ -1,5 +1,6 @@
 ﻿using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Items;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -99,6 +100,19 @@ namespace BasicRPGTest_Mono.Engine.Entities
 
         public void Dispose()
         {
+        }
+
+
+
+        public static implicit operator YamlSection(ItemEntity ent)
+        {
+            YamlSection config = new YamlSection($"{ent.name}");
+
+            config.set("item", (YamlSection)ent.item);
+            config.setDouble("position.x", ent.Position.X);
+            config.setDouble("position.y", ent.Position.Y);
+
+            return config;
         }
     }
 }

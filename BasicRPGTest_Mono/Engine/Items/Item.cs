@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,18 @@ namespace BasicRPGTest_Mono.Engine.Items
         public Item Clone()
         {
             return new Item(this);
+        }
+
+
+        public static implicit operator YamlSection(Item item)
+        {
+            YamlSection config = new YamlSection($"{item.name}");
+
+            config.setString("id", item.name);
+            config.setString("display_name", item.displayName);
+            config.setDouble("quantity", item.quantity);
+
+            return config;
         }
     }
 }
