@@ -12,8 +12,11 @@ using RPGEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Timers;
+using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -933,6 +936,24 @@ namespace BasicRPGTest_Mono.Engine
             {
                 region.save();
             }
+            
+            // ENTITY SAVING
+            YamlSection entities = new YamlSection("entities");
+            foreach (LivingEntity entity in livingEntities.Values)
+            {
+                entities.set($"{entity.instanceId}", (YamlSection)entity);
+            }
+
+            StreamWriter writer = new StreamWriter($"save\\{world}\\maps\\{name}\\entities.yml", false);
+
+            try
+            {
+                writer.Write(entities);
+            }
+            finally
+            {
+                writer.Close();
+            }
         }
         public void save()
         {
@@ -940,6 +961,24 @@ namespace BasicRPGTest_Mono.Engine
             {
                 region.save();
             }
+
+            // ENTITY SAVING
+            YamlSequenceNode entities = new YamlSequenceNode();
+            foreach (LivingEntity entity in livingEntities.Values)
+            {
+                entities.Add((YamlSection)entity);
+            }
+            StreamWriter writer = new StreamWriter($"save\\{world}\\maps\\{name}\\entities.yml", false);
+            try
+            {
+                var serializer = new SerializerBuilder().Build();
+                writer.Write(serializer.Serialize(entities));
+            }
+            finally
+            {
+                writer.Close();
+            }
+
         }
 
 

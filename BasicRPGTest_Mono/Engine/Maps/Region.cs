@@ -63,7 +63,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         public void save()
         {
 
-            string path = $"save\\{map.world}\\maps\\{map.name}"; 
+            string path = $"save\\{map.world}\\maps\\{map.name}\\regions"; 
             if (!Directory.Exists(path))
             {
                 DirectoryInfo dInfo = Directory.CreateDirectory(path);

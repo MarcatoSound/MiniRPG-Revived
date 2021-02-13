@@ -488,5 +488,22 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
+
+        public static implicit operator YamlSection(LivingEntity ent)
+        {
+            YamlSection config = new YamlSection($"{ent.name}");
+
+            config.setString("display_name", ent.displayName);
+            config.setDouble("position.x", ent.Position.X);
+            config.setDouble("position.y", ent.Position.Y);
+            config.setDouble("stats.health", ent.health);
+
+            return config;
+        }
+        /*public static implicit operator LivingEntity(YamlSection config)
+        {
+            return new Player(config);
+        }*/
+
     }
 }

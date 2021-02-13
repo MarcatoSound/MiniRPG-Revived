@@ -139,6 +139,10 @@ namespace BasicRPGTest_Mono.Engine.Utility
 
             buildPath(yaml, path, node);
         }
+        public void setSequence(string path, YamlSequenceNode sequence)
+        {
+
+        }
         public void setString(string path, string value)
         {
 
