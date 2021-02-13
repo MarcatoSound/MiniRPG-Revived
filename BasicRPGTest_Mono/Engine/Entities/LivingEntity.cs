@@ -146,6 +146,7 @@ namespace BasicRPGTest_Mono.Engine
         }
         public LivingEntity(LivingEntity entity, Vector2 pos, int instanceId, Map map) : base(entity.graphic, new Rectangle((int)pos.X, (int)pos.Y, entity.boundingBox.Width, entity.boundingBox.Height))
         {
+            this.name = entity.name;
             this.speed = entity.speed;
             this.Position = pos;
             this.instanceId = instanceId;
@@ -493,9 +494,10 @@ namespace BasicRPGTest_Mono.Engine
         {
             YamlSection config = new YamlSection($"{ent.name}");
 
+            config.setString("id", ent.name);
             config.setString("display_name", ent.displayName);
-            config.setDouble("position.x", ent.Position.X);
-            config.setDouble("position.y", ent.Position.Y);
+            config.setInt("position.x", Convert.ToInt32(ent.Position.X));
+            config.setInt("position.y", Convert.ToInt32(ent.Position.Y));
             config.setDouble("stats.health", ent.health);
 
             return config;

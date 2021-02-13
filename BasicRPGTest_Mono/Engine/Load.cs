@@ -71,6 +71,83 @@ namespace BasicRPGTest_Mono.Engine
 
             return playerData;
         }*/
+        public static List<Map> loadMaps(string world)
+        {
+            List<Map> maps = new List<Map>();
+
+            path = $"save\\{world}\\maps";
+
+            DirectoryInfo dirInfo = new DirectoryInfo(path);
+            DirectoryInfo[] folders = dirInfo.GetDirectories();
+
+            foreach (DirectoryInfo mapFolder in folders)
+            {
+                string mapPath = $"{path}\\{mapFolder.Name}";
+
+                YamlStream yaml = new YamlStream();
+                
+                reader = new StreamReader($"{mapPath}\\map.yml");
+                var input = new StringReader(reader.ReadToEnd());
+                yaml.Load(input);
+
+                YamlSection general = new YamlSection((YamlMappingNode)yaml.Documents[0].RootNode);
+
+                Map map = new Map(general, world);
+                reader.Close();
+                if (map.name == "") continue;
+
+                // Load the tile data
+                DirectoryInfo regionFolder = new DirectoryInfo($"{mapPath}\\regions");
+                FileInfo[] regionFiles = regionFolder.GetFiles();
+                foreach (FileInfo file in regionFiles)
+                {
+                    string regionPath = $"{mapPath}\\regions\\{file.Name}";
+
+                    reader = new StreamReader($"{regionPath}");
+                    input = new StringReader(reader.ReadToEnd());
+                    YamlStream yamlRegion = new YamlStream();
+                    yamlRegion.Load(input);
+                    YamlMappingNode region = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                    map.loadRegion(new YamlSection(region));
+                    reader.Close();
+                }
+
+                // Load the living entities
+                reader = new StreamReader($"{mapPath}\\entities.yml");
+                input = new StringReader(reader.ReadToEnd());
+                yaml.Load(input);
+
+                YamlSequenceNode entities = (YamlSequenceNode)yaml.Documents[0].RootNode;
+                foreach (YamlMappingNode entityData in entities)
+                {
+                    YamlSection entity = new YamlSection(entityData);
+                    map.loadEntity(entity);
+                }
+                reader.Close();
+
+                // Load the item entities
+                reader = new StreamReader($"{mapPath}\\item_drops.yml");
+                input = new StringReader(reader.ReadToEnd());
+                yaml.Load(input);
+
+                YamlSequenceNode itemEntities = (YamlSequenceNode)yaml.Documents[0].RootNode;
+                foreach (YamlMappingNode itemData in itemEntities)
+                {
+                    YamlSection item = new YamlSection(itemData);
+                    map.loadItemEntity(item);
+                }
+                reader.Close();
+
+                MapManager.add(map);
+                map.buildTileTemplateCache();
+                map.buildVisibleTileCache();
+            }
+
+            //reader = new StreamReader($"save\\{world}\\world.json");
+
+            return maps;
+
+        }
         public static List<TileLayer> loadMap(string world, string map)
         {
 

@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine.Maps
 {
@@ -87,10 +89,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             YamlSection config = new YamlSection($"{r.regionPos.X}-{r.regionPos.Y}");
 
+            config.setDouble("position.x", r.regionPos.X);
+            config.setDouble("position.y", r.regionPos.Y);
+
+            YamlSequenceNode sequence = new YamlSequenceNode();
             foreach (Tile tile in r.tiles)
             {
-                config.set($"tiles.{tile.layer.name}.{tile.tilePos.X}-{tile.tilePos.Y}", (YamlSection)tile);
+                sequence.Add((YamlSection)tile);
             }
+            config.set("tiles", sequence);
 
             return config;
         }

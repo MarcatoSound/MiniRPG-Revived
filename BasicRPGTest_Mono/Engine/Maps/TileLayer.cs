@@ -55,6 +55,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
             // Otherwise...
 
             tiles.Add(mTile.pos, mTile);
+            Console.WriteLine($"Added tile at: {mTile.pos}");
 
             //this.childTiles[(int)mTile.pos.X, (int)mTile.pos.Y] = mTile;
 

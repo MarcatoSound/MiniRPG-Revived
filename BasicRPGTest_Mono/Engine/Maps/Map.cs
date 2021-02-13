@@ -30,7 +30,7 @@ namespace BasicRPGTest_Mono.Engine
         public string name { get; set; }
         public Generator generator { get; private set; }
         public List<TileLayer> layers { get; set; }
-        public Dictionary<string, TileLayer> layersByName = new Dictionary<string, TileLayer>();
+        public Dictionary<string, TileLayer> layersByName { get; set; } = new Dictionary<string, TileLayer>();
         public Dictionary<Vector2, Region> regions { get; set; }
         public int width { get; set; }
         public int height { get; set; }
@@ -207,7 +207,6 @@ namespace BasicRPGTest_Mono.Engine
 
             }
 
-            Save.oldMapStates.Add(name, new Map(this));
             buildTileTemplateCache();
 
         }
@@ -227,6 +226,41 @@ namespace BasicRPGTest_Mono.Engine
             this.entities = new ConcurrentDictionary<int, Entity>(oldMap.entities);
             this.livingEntities = new ConcurrentDictionary<int, LivingEntity>(oldMap.livingEntities);
             this.spawns = new ConcurrentDictionary<int, Spawn>(oldMap.spawns);
+
+        }
+
+        public Map(YamlSection data, string world)
+        {
+            this.name = data.getString("name");
+            if (this.name == "") return;
+            this.world = world;
+            this.layers = new List<TileLayer>();
+            this.width = data.getInt("size.width", 384);
+            this.height = data.getInt("size.height", 384);
+            this.widthInPixels = width * TileManager.dimensions;
+            this.heightInPixels = height * TileManager.dimensions;
+
+            regions = new Dictionary<Vector2, Region>();
+            collidables = new ConcurrentDictionary<int, Rectangle>();
+
+            this.entities = new ConcurrentDictionary<int, Entity>();
+            this.livingEntities = new ConcurrentDictionary<int, LivingEntity>();
+            this.spawns = new ConcurrentDictionary<int, Spawn>();
+            initSpawns();
+            spawnTimer = new Timer(1000);
+            spawnTimer.Elapsed += trySpawn;
+            spawnTimer.Start();
+
+            regionManager = new RegionManager(this);
+
+            layers.Add(new TileLayer("water"));
+            layers.Add(new TileLayer("ground"));
+            layers.Add(new TileLayer("stone"));
+            layers.Add(new TileLayer("decoration"));
+            foreach (TileLayer layer in layers)
+            {
+                layersByName.Add(layer.name, layer);
+            }
 
         }
 
@@ -302,6 +336,32 @@ namespace BasicRPGTest_Mono.Engine
 
         public int getRegionSizeHighInPixels() { return regionTilesHigh * TileManager.dimensions; }
 
+        public void loadRegion(YamlSection yaml)
+        {
+            Vector2 regionPos = new Vector2((float)yaml.getDouble("position.x"), (float)yaml.getDouble("position.y"));
+            Vector2 pos = new Vector2(regionPos.X * regionTilesWide, regionPos.Y * regionTilesHigh);
+            Region region = new Region(pos, regionPos, this);
+
+            YamlSequenceNode regionTiles = (YamlSequenceNode)yaml.get("tiles");
+            foreach (YamlMappingNode regionTile in regionTiles)
+            {
+                YamlSection tileYaml = new YamlSection(regionTile);
+                Tile tile = new Tile(tileYaml);
+                if (tile.parent != null)
+                {
+                    string layerName = tileYaml.getString("layer");
+                    if (!layersByName.ContainsKey(layerName)) continue;
+                    TileLayer layer = layersByName[layerName];
+                    tile.layer = layer;
+                    tile.map = this;
+                    layer.addTile(tile);
+                    region.addTile(tile);
+                    tile.update();
+                }
+            }
+            regions.Add(regionPos, region);
+        }
+
 
         //====================================================================================
         // ENTITY FUNCTIONS
@@ -338,6 +398,28 @@ namespace BasicRPGTest_Mono.Engine
             LivingEntity ent = new LivingEntity(spawn.entity, target, livingEntities.Count, this);
             livingEntities.TryAdd(livingEntities.Keys.Count, ent);
 
+        }
+        /// <summary>
+        /// Loads an entity from YAML data.
+        /// </summary>
+        /// <param name="yaml">The YamlSection containing this entities data.</param>
+        public void loadEntity(YamlSection yaml)
+        {
+            LivingEntity parent = EntityManager.getByName<LivingEntity>(yaml.getString("id"));
+            if (parent == null) return;
+            LivingEntity entity = new LivingEntity(parent, new Vector2((float)yaml.getDouble("position.x", 0), (float)yaml.getDouble("position.y", 0)), livingEntities.Count, this);
+
+            entity.displayName = yaml.getString("display_name", parent.displayName);
+            entity.health = yaml.getDouble("stats.health", entity.maxHealth);
+
+            livingEntities.TryAdd(livingEntities.Keys.Count, entity);
+        }
+        public void loadItemEntity(YamlSection yaml)
+        {
+            YamlSection itemData = new YamlSection((YamlMappingNode)yaml.get("item"));
+            ItemEntity entity = new ItemEntity(this, new Item(itemData), new Vector2((float)yaml.getDouble("position.x", 0), (float)yaml.getDouble("position.y", 0)));
+
+            items.Add(entity.Position, entity);
         }
         /// <summary>
         /// Attempts to find a place to spawn an entity.
@@ -720,7 +802,7 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
-
+            Console.WriteLine("TileTemplates: " + v_TileTemplates.Count);
             // Prepare Visible Tile Caches for use  (will still need to be filled with "buildVisibleTileCache()")
             // Sets up Edge Tiles and Visible Tiles to work based on Time Templates
             setupVisibleTileCaches();
@@ -763,6 +845,8 @@ namespace BasicRPGTest_Mono.Engine
                 v_VisibleTiles.Add(tileLayer, new Dictionary<Tile, List<Vector2>>());
                 v_VisibleEdges.Add(tileLayer, new Dictionary<Graphic, List<Vector2>>());
             }
+
+            Console.WriteLine("TileEdges: " + v_TileEdges.Count);
         }
 
         public void buildVisibleTileCache()

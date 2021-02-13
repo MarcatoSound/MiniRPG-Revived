@@ -42,6 +42,13 @@ namespace BasicRPGTest_Mono.Engine
             maps.Add(map);
             mapsByName.Add(map.name, map);
         }
+        public static void addAll(List<Map> maps)
+        {
+            foreach (Map map in maps)
+            {
+                add(map);
+            }
+        }
         /// <summary>
         /// Retrieves a map object from the list of loaded maps.
         /// </summary>

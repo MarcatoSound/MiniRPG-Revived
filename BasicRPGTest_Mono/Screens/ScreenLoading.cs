@@ -51,14 +51,10 @@ namespace BasicRPGTest_Mono.Screens
             {
                 Thread.CurrentThread.IsBackground = true;
 
-                // Load the general game objects
-
                 loadBiomes();
                 loadGenerators();
-                loadMaps();
 
-                //if (loadMap())
-                //    Save.save(MapManager.activeMap, worldName);
+                loadMaps();
 
                 loadEntities();
                 loadGuis();
@@ -184,7 +180,10 @@ namespace BasicRPGTest_Mono.Screens
 
         private void loadMaps()
         {
-            DataPackManager.loadMaps(worldName);
+            if (isGenerating)
+                DataPackManager.loadMaps(worldName);
+            else
+                Load.loadMaps(worldName);
         }
 
         private void loadEntities()

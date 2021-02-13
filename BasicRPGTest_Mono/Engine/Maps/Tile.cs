@@ -166,6 +166,12 @@ namespace RPGEngine
         {
 
             this.parent = tile;
+            if (parent == null)
+            {
+                //TODO: Error message goes here.
+                return;
+            }
+
             this.name = tile.name;
             this.id = tile.id;
             this.isCollidable = tile.isCollidable;
@@ -190,6 +196,11 @@ namespace RPGEngine
                 Heal(maxHealth);
                 restoreTimer.Stop();
             };
+
+        }
+        public Tile(YamlSection data) : 
+            this(TileManager.getByName(data.getString("id")), new Vector2((float)data.getDouble("position.x"), (float)data.getDouble("position.y")), BiomeManager.getByName(data.getString("biome")))
+        {
 
         }
 
@@ -518,8 +529,11 @@ namespace RPGEngine
         {
             YamlSection config = new YamlSection(tl.name);
 
-            config.set("id", tl.parent.name);
-            config.set("biome", tl.biome.name);
+            config.setString("id", tl.parent.name);
+            config.setString("biome", tl.biome.name);
+            config.setString("layer", tl.layer.name);
+            config.setDouble("position.x", tl.tilePos.X);
+            config.setDouble("position.y", tl.tilePos.Y);
 
             return config;
         }
