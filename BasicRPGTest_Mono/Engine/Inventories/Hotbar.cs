@@ -1,7 +1,9 @@
 ﻿using BasicRPGTest_Mono.Engine.Items;
+using BasicRPGTest_Mono.Engine.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine.Inventories
 {
@@ -32,6 +34,26 @@ namespace BasicRPGTest_Mono.Engine.Inventories
             for (int i = 0; i < maxItems; i++)
             {
                 setItem(i, null);
+            }
+        }
+        public Hotbar(YamlSection data)
+        {
+            maxItems = data.getInt("size", 5);
+            for (int i = 0; i < maxItems; i++)
+            {
+                YamlSection itemData = data.getSection($"slots.{i}");
+                if (itemData == null)
+                    setItem(i, null);
+                else
+                {
+                    Item item = new Item(itemData);
+                    if (item.parent == null)
+                    {
+                        setItem(i, null);
+                        continue;
+                    }
+                    setItem(i, item);
+                }
             }
         }
 

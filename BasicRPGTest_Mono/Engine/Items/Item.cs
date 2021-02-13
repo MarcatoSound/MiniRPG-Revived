@@ -65,6 +65,29 @@ namespace BasicRPGTest_Mono.Engine.Items
 
             quantity = item.quantity;
         }
+        public Item(YamlSection data)
+        {
+            parent = ItemManager.getByNamespace(data.getString("id"));
+            if (parent == null)
+            {
+                // TODO: Error message here.
+                return;
+            }
+
+            id = parent.id;
+            name = parent.name;
+            displayName = data.getString("display_name", parent.displayName);
+            graphic = parent.graphic;
+            description = parent.description;
+            maxStackSize = parent.maxStackSize;
+
+            swingDist = parent.swingDist;
+            swingStyle = parent.swingStyle;
+            hitbox = parent.hitbox;
+            damage = parent.damage;
+
+            this.quantity = data.getInt("quantity", 1);
+        }
 
         public Item Clone()
         {

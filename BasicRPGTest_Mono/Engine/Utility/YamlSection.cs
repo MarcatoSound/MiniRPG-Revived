@@ -58,6 +58,13 @@ namespace BasicRPGTest_Mono.Engine.Utility
                 return value;
             return null;
         }
+        public YamlSection getSection(string path)
+        {
+            YamlNode value = getDeepestValue(yaml, path);
+            if (value != null)
+                return new YamlSection((YamlMappingNode)value);
+            return null;
+        }
         /// <summary>
         /// Gets a string from the YAML section.
         /// </summary>

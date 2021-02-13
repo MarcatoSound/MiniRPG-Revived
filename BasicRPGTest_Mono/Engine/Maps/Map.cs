@@ -101,9 +101,9 @@ namespace BasicRPGTest_Mono.Engine
             regionManager = new RegionManager(this);
             Vector2 regionTruePos = new Vector2();
             Vector2 regionPos = new Vector2();
-            for (int x = 0; x < width / 8; x++)
+            for (int x = 0; x < width / 32; x++)
             {
-                for (int y = 0; y < height / 8; y++)
+                for (int y = 0; y < height / 32; y++)
                 {
                     regionTruePos.X = x * (TileManager.dimensions * 32);
                     regionTruePos.Y = y * (TileManager.dimensions * 32);

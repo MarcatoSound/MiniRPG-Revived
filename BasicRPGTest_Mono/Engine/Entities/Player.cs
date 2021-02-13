@@ -541,10 +541,6 @@ namespace BasicRPGTest_Mono.Engine
 
             return config;
         }
-        public static implicit operator Player(YamlSection config)
-        {
-            return new Player(config);
-        }
 
     }
 }

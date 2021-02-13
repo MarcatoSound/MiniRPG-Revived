@@ -155,6 +155,7 @@ namespace BasicRPGTest_Mono.Engine
         {
             YamlSection config = new YamlSection($"inventory");
 
+            config.setInt("size", inv.maxItems);
             foreach (KeyValuePair<int, Item> pair in inv.items)
             {
                 if (pair.Value == null) continue;
