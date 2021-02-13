@@ -537,6 +537,7 @@ namespace BasicRPGTest_Mono.Engine
             config.setDouble("position.x", p.Position.X);
             config.setDouble("position.y", p.Position.Y);
             config.setDouble("stats.movement_speed", p.speed);
+            config.set("inventory", (YamlSection)p.inventory);
 
             return config;
         }

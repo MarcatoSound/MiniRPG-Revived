@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Items;
+using BasicRPGTest_Mono.Engine.Utility;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -146,6 +147,21 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             return -1;
+        }
+
+
+
+        public static implicit operator YamlSection(Inventory inv)
+        {
+            YamlSection config = new YamlSection($"inventory");
+
+            foreach (KeyValuePair<int, Item> pair in inv.items)
+            {
+                if (pair.Value == null) continue;
+                config.set($"slots.{pair.Key}", (YamlSection)pair.Value);
+            }
+
+            return config;
         }
 
     }
