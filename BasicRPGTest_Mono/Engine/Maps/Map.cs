@@ -932,43 +932,47 @@ namespace BasicRPGTest_Mono.Engine
 
         public void saveAll()
         {
+            StreamWriter writer;
+
+
+            DataPackManager.loadProgress = 0;
+            // TILE DATA SAVING
+            DataPackManager.loadStatus = $"Saving {name}: tile data...";
+            double perIteration = 1.0 / Math.Max(regions.Count, 1);
             foreach (Region region in regions.Values)
             {
+                DataPackManager.loadProgress += perIteration;
                 region.save();
             }
-            
-            // ENTITY SAVING
-            YamlSection entities = new YamlSection("entities");
-            foreach (LivingEntity entity in livingEntities.Values)
-            {
-                entities.set($"{entity.instanceId}", (YamlSection)entity);
-            }
+            DataPackManager.loadProgress = 0;
 
-            StreamWriter writer = new StreamWriter($"save\\{world}\\maps\\{name}\\entities.yml", false);
-
+            // GENERAL INFO SAVING
+            DataPackManager.loadStatus = $"Saving {name}: general info...";
+            YamlSection general = new YamlSection("general");
+            general.setString("name", name);
+            general.setInt("size.x", width);
+            general.setInt("size.y", height);
+            writer = new StreamWriter($"save\\{world}\\maps\\{name}\\map.yml", false);
             try
             {
-                writer.Write(entities);
+                writer.Write(general);
             }
             finally
             {
                 writer.Close();
             }
-        }
-        public void save()
-        {
-            foreach (Region region in regionManager.changedRegions.Values)
-            {
-                region.save();
-            }
 
             // ENTITY SAVING
+            DataPackManager.loadStatus = $"Saving {name}: entities...";
             YamlSequenceNode entities = new YamlSequenceNode();
+            perIteration = 1.0 / Math.Max(livingEntities.Count, 1);
             foreach (LivingEntity entity in livingEntities.Values)
             {
+                DataPackManager.loadProgress += perIteration;
                 entities.Add((YamlSection)entity);
+
             }
-            StreamWriter writer = new StreamWriter($"save\\{world}\\maps\\{name}\\entities.yml", false);
+            writer = new StreamWriter($"save\\{world}\\maps\\{name}\\entities.yml", false);
             try
             {
                 var serializer = new SerializerBuilder().Build();
@@ -978,11 +982,15 @@ namespace BasicRPGTest_Mono.Engine
             {
                 writer.Close();
             }
+            DataPackManager.loadProgress = 0;
 
             // ITEM DROPSAVING
             YamlSequenceNode itemDrops = new YamlSequenceNode();
+            DataPackManager.loadStatus = $"Saving {name}: item entities...";
+            perIteration = 1.0 / Math.Max(items.Count, 1);
             foreach (ItemEntity item in items.Values)
             {
+                DataPackManager.loadProgress += perIteration;
                 itemDrops.Add((YamlSection)item);
             }
             writer = new StreamWriter($"save\\{world}\\maps\\{name}\\item_drops.yml", false);
@@ -995,6 +1003,83 @@ namespace BasicRPGTest_Mono.Engine
             {
                 writer.Close();
             }
+            DataPackManager.loadProgress = 0;
+            DataPackManager.loadStatus = "";
+        }
+        public void save()
+        {
+            StreamWriter writer;
+
+
+            DataPackManager.loadProgress = 0;
+            // TILE DATA SAVING
+            DataPackManager.loadStatus = $"Saving {name}: tile data...";
+            double perIteration = 1.0 / Math.Max(regionManager.changedRegions.Count, 1);
+            foreach (Region region in regionManager.changedRegions.Values)
+            {
+                DataPackManager.loadProgress += perIteration;
+                region.save();
+            }
+            DataPackManager.loadProgress = 0;
+
+            // GENERAL INFO SAVING
+            DataPackManager.loadStatus = $"Saving {name}: general info...";
+            YamlSection general = new YamlSection("general");
+            general.setString("name", name);
+            general.setInt("size.x", width);
+            general.setInt("size.y", height);
+            writer = new StreamWriter($"save\\{world}\\maps\\{name}\\map.yml", false);
+            try
+            {
+                writer.Write(general);
+            }
+            finally
+            {
+                writer.Close();
+            }
+
+            // ENTITY SAVING
+            DataPackManager.loadStatus = $"Saving {name}: entities...";
+            YamlSequenceNode entities = new YamlSequenceNode();
+            perIteration = 1.0 / Math.Max(livingEntities.Count, 1);
+            foreach (LivingEntity entity in livingEntities.Values)
+            {
+                DataPackManager.loadProgress += perIteration;
+                entities.Add((YamlSection)entity);
+            }
+            writer = new StreamWriter($"save\\{world}\\maps\\{name}\\entities.yml", false);
+            try
+            {
+                var serializer = new SerializerBuilder().Build();
+                writer.Write(serializer.Serialize(entities));
+            }
+            finally
+            {
+                writer.Close();
+            }
+            DataPackManager.loadProgress = 0;
+
+            // ITEM DROPSAVING
+            YamlSequenceNode itemDrops = new YamlSequenceNode();
+            DataPackManager.loadStatus = $"Saving {name}: item entities...";
+            perIteration = 1.0 / Math.Max(items.Count, 1);
+            foreach (ItemEntity item in items.Values)
+            {
+                DataPackManager.loadProgress += perIteration;
+                itemDrops.Add((YamlSection)item);
+            }
+            writer = new StreamWriter($"save\\{world}\\maps\\{name}\\item_drops.yml", false);
+            try
+            {
+                var serializer = new SerializerBuilder().Build();
+                writer.Write(serializer.Serialize(itemDrops));
+            }
+            finally
+            {
+                writer.Close();
+            }
+            DataPackManager.loadProgress = 0;
+            DataPackManager.loadStatus = "";
 
         }
 

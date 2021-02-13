@@ -89,7 +89,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
 
             foreach (Tile tile in r.tiles)
             {
-                config.set($"tiles.{tile.layer.name}.{tile.pos.X}-{tile.pos.Y}", (YamlSection)tile);
+                config.set($"tiles.{tile.layer.name}.{tile.tilePos.X}-{tile.tilePos.Y}", (YamlSection)tile);
             }
 
             return config;

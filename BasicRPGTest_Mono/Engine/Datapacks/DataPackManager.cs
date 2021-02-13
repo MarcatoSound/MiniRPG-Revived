@@ -17,13 +17,13 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
             get { return _mapTileCount; }
             set
             {
-                mapProgress = (double)value / (double)mapTotalTiles;
+                loadProgress = (double)value / (double)mapTotalTiles;
                 _mapTileCount = value;
             }
         }
         public static int maxLayerTiles { get; set; }
-        public static double mapProgress { get; set; }
-        public static string mapBeingLoaded { get; set; }
+        public static double loadProgress { get; set; }
+        public static string loadStatus { get; set; }
 
 
         static DataPackManager()

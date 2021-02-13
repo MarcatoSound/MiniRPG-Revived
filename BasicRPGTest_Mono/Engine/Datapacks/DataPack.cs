@@ -202,7 +202,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                     YamlMappingNode itemYaml = new YamlMappingNode(child);
                     Console.WriteLine($"// │├┬ Loading map {child.Key}");
                     YamlSection config = new YamlSection((string)child.Key, itemYaml);
-                    DataPackManager.mapBeingLoaded = (string)child.Key;
+                    DataPackManager.loadStatus = $"Generating {child.Key}...";
 
                     Map map = new Map(this, config, world);
                     MapManager.add(map);
@@ -215,7 +215,7 @@ namespace BasicRPGTest_Mono.Engine.Datapacks
                 Console.WriteLine($"// │└╾ Finished reading file.");
             }
 
-            DataPackManager.mapBeingLoaded = "";
+            DataPackManager.loadStatus = "";
             Console.WriteLine($"// └╾ Finished loading maps.");
         }
         public void loadDropTables()
