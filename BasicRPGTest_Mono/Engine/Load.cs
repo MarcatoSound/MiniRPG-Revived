@@ -53,7 +53,7 @@ namespace BasicRPGTest_Mono.Engine
 
             YamlMappingNode mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
 
-            return new YamlSection("player", mapping);
+            return new YamlSection(mapping);
         }
         /*public static Dictionary<string, Object> loadPlayer(string world)
         {

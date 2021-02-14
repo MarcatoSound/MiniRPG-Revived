@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Timers;
+using YamlDotNet.RepresentationModel;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -123,6 +124,8 @@ namespace BasicRPGTest_Mono.Engine
             };
 
             kbResist = 0.75f;
+
+            inventory = new PlayerInventory(new YamlSection((YamlMappingNode)data.get("inventory")));
         }
         public void toggleInv()
         {

@@ -421,7 +421,6 @@ namespace BasicRPGTest_Mono.Engine
             YamlSection itemData = new YamlSection((YamlMappingNode)yaml.get("item"));
             ItemEntity entity = new ItemEntity(this, new Item(itemData), new Vector2((float)yaml.getDouble("position.x", 0), (float)yaml.getDouble("position.y", 0)));
 
-            items.Add(entity.Position, entity);
         }
         /// <summary>
         /// Attempts to find a place to spawn an entity.

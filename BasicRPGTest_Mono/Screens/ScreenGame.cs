@@ -168,7 +168,7 @@ namespace BasicRPGTest_Mono
             if (Directory.Exists(path))
             {
                 
-                if (!File.Exists($"{path}\\player.json"))
+                if (!File.Exists($"{path}\\player.yml"))
                 {
                     player = new Player();
                     return true;
@@ -177,6 +177,7 @@ namespace BasicRPGTest_Mono
                 // Load player data
                 YamlSection playerData = Load.loadPlayer(worldName);
                 player = new Player(playerData);
+                Console.WriteLine("Loading player data...");
 
                 return false;
             }
