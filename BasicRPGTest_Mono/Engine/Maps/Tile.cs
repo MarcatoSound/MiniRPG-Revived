@@ -201,7 +201,7 @@ namespace RPGEngine
         public Tile(YamlSection data) : 
             this(TileManager.getByName(data.getString("id")), new Vector2((float)data.getDouble("position.x"), (float)data.getDouble("position.y")), BiomeManager.getByName(data.getString("biome")))
         {
-
+            //Console.WriteLine($"{tilePos}");
         }
 
         private Graphic getSideGraphic(TileSide side)

@@ -339,8 +339,10 @@ namespace BasicRPGTest_Mono.Engine
         public void loadRegion(YamlSection yaml)
         {
             Vector2 regionPos = new Vector2((float)yaml.getDouble("position.x"), (float)yaml.getDouble("position.y"));
-            Vector2 pos = new Vector2(regionPos.X * regionTilesWide, regionPos.Y * regionTilesHigh);
+            Vector2 pos = new Vector2(regionPos.X * (TileManager.dimensions * regionTilesWide), regionPos.Y * (TileManager.dimensions * regionTilesHigh));
             Region region = new Region(pos, regionPos, this);
+
+            Console.WriteLine($"Region pos: {pos}");
 
             YamlSequenceNode regionTiles = (YamlSequenceNode)yaml.get("tiles");
             foreach (YamlMappingNode regionTile in regionTiles)
@@ -351,12 +353,12 @@ namespace BasicRPGTest_Mono.Engine
                 {
                     string layerName = tileYaml.getString("layer");
                     if (!layersByName.ContainsKey(layerName)) continue;
+
                     TileLayer layer = layersByName[layerName];
                     tile.layer = layer;
                     tile.map = this;
                     layer.addTile(tile);
                     region.addTile(tile);
-                    tile.update();
                 }
             }
             regions.Add(regionPos, region);
@@ -715,7 +717,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public void DrawVisibleMapCache (Camera2D camera, SpriteBatch batch)
         {
-
+            v_drawnTileCount = 0;
             // Go through each CachedTiles Layer
             batch.Begin(transformMatrix: Camera.camera.Transform);
             foreach (TileLayer tLayer in layers)

@@ -138,6 +138,17 @@ namespace BasicRPGTest_Mono.Engine
                 }
                 reader.Close();
 
+                foreach (TileLayer layer in map.layers)
+                {
+                    foreach (KeyValuePair<Vector2, Tile> pair in layer.tiles)
+                    {
+                        Vector2 pos = pair.Key;
+                        Tile tile = pair.Value;
+
+                        tile.update();
+                    }
+                }
+
                 MapManager.add(map);
                 map.buildTileTemplateCache();
                 map.buildVisibleTileCache();

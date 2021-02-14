@@ -113,7 +113,9 @@ namespace BasicRPGTest_Mono
                     {
                         // Debug key
 
-                        if (MapManager.activeMap.name == "overworld")
+                        Console.WriteLine($"{MapManager.activeMap.v_regionsVisible.Count}");
+
+                        /*if (MapManager.activeMap.name == "overworld")
                             MapManager.activeMap = MapManager.getByName("cavern");
                         else
                             MapManager.activeMap = MapManager.getByName("overworld");
