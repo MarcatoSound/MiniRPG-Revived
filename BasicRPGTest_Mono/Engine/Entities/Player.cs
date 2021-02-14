@@ -126,6 +126,7 @@ namespace BasicRPGTest_Mono.Engine
             kbResist = 0.75f;
 
             inventory = new PlayerInventory(new YamlSection((YamlMappingNode)data.get("inventory")));
+
         }
         public void toggleInv()
         {

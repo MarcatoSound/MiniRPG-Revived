@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using RPGEngine;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using YamlDotNet.RepresentationModel;
@@ -11,12 +12,12 @@ namespace BasicRPGTest_Mono.Engine.Maps
     public class TileLayer
     {
         public string name { get; set; }
-        public Dictionary<Vector2, Tile> tiles;
+        public ConcurrentDictionary<Vector2, Tile> tiles;
 
         public TileLayer(string name)
         {
             this.name = name;
-            tiles = new Dictionary<Vector2, Tile>();
+            tiles = new ConcurrentDictionary<Vector2, Tile>();
         }
 
         // Investigate if these methods are based on memory pointers or the key object's data
@@ -39,7 +40,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
         }
         public void clearTile(Vector2 pos)
         {
-            tiles.Remove(pos);
+            tiles.TryRemove(pos, out _);
         }
 
         // Add Tile to Layer
@@ -54,12 +55,20 @@ namespace BasicRPGTest_Mono.Engine.Maps
             }
             // Otherwise...
 
-            tiles.Add(mTile.tilePos, mTile);
+            tiles.TryAdd(mTile.tilePos, mTile);
             //Console.WriteLine($"Tile drawpos: {mTile.drawPos}");
 
             //this.childTiles[(int)mTile.pos.X, (int)mTile.pos.Y] = mTile;
 
             return true;
+        }
+
+        public bool hasTile(Tile mTile)
+        {
+            foreach (Tile tile in tiles.Values)
+                if (tile == mTile) return true;
+
+            return false;
         }
 
 

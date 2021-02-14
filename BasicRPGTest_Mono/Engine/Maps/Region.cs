@@ -4,9 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using RPGEngine;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 
@@ -19,6 +21,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
 
         public Map map { get; private set; }
 
+        public bool isLoaded { get; set; } = false;
         public Vector2 pos { get; private set; }
         public Vector2 regionPos { get; private set; }
         public Rectangle box { get; set; }
@@ -33,10 +36,6 @@ namespace BasicRPGTest_Mono.Engine.Maps
             tiles = new List<Tile>();
         }
 
-        public void addTiles(List<Tile> tiles)
-        {
-            this.tiles.AddRange(tiles);
-        }
         public void addTile(Tile tile)
         {
             tiles.Add(tile);
@@ -50,6 +49,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
 
         public void draw(SpriteBatch batch, TileLayer layer)
         {
+            List<Tile> tiles = new List<Tile>(this.tiles);
             foreach (Tile tile in tiles)
             {
                 /*if (tile.layer == layer)
@@ -58,7 +58,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
                 tile.draw(batch);
 
             }
-            //batch.DrawRectangle(box, Color.White);
+            batch.DrawRectangle(box, Color.White);
         }
 
 

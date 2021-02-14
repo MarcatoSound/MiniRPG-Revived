@@ -11,6 +11,7 @@ using RPGEngine;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using YamlDotNet.RepresentationModel;
+using System.Threading;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -96,21 +97,13 @@ namespace BasicRPGTest_Mono.Engine
                 reader.Close();
                 if (map.name == "") continue;
 
-                // Load the tile data
-                DirectoryInfo regionFolder = new DirectoryInfo($"{mapPath}\\regions");
-                FileInfo[] regionFiles = regionFolder.GetFiles();
-                foreach (FileInfo file in regionFiles)
-                {
-                    string regionPath = $"{mapPath}\\regions\\{file.Name}";
+                // Load the local tile data
+                /*reader = new StreamReader($"save\\{world}\\player.yml");
+                input = new StringReader(reader.ReadToEnd());
+                yaml.Load(input);
 
-                    reader = new StreamReader($"{regionPath}");
-                    input = new StringReader(reader.ReadToEnd());
-                    YamlStream yamlRegion = new YamlStream();
-                    yamlRegion.Load(input);
-                    YamlMappingNode region = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
-                    map.loadRegion(new YamlSection(region));
-                    reader.Close();
-                }
+                YamlSection player = new YamlSection((YamlMappingNode)yaml.Documents[0].RootNode);*/
+
 
                 // Load the living entities
                 reader = new StreamReader($"{mapPath}\\entities.yml");
@@ -154,10 +147,61 @@ namespace BasicRPGTest_Mono.Engine
                 map.buildVisibleTileCache();
             }
 
-            //reader = new StreamReader($"save\\{world}\\world.json");
-
             return maps;
 
+        }
+        public static void loadRegions(string world, Map map, List<Region> regions)
+        {
+            path = $"save\\{world}\\maps";
+            string mapPath = $"{path}\\{map.name}";
+
+            List<Region> loadedRegions = new List<Region>();
+
+            foreach (Region region in regions)
+            {
+                if (region.tiles.Count != 0) continue;
+                loadedRegions.Add(region);
+                string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
+
+                reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                var input = new StringReader(reader.ReadToEnd());
+                YamlStream yamlRegion = new YamlStream();
+                yamlRegion.Load(input);
+                YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                map.loadRegion(new YamlSection(regionNode));
+                reader.Close();
+            }
+
+            foreach (Region region in loadedRegions)
+            {
+                foreach (Tile tile in region.tiles)
+                {
+                    tile.update();
+                }
+            }
+        }
+        public static void loadRegion(string world, Map map, Region region)
+        {
+            if (region.tiles.Count != 0) return;
+
+            Thread thread = new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+
+                path = $"save\\{world}\\maps";
+                string mapPath = $"{path}\\{map.name}";
+
+                string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
+
+                reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                var input = new StringReader(reader.ReadToEnd());
+                YamlStream yamlRegion = new YamlStream();
+                yamlRegion.Load(input);
+                YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                map.loadRegion(new YamlSection(regionNode));
+                reader.Close();
+            });
+            thread.Start();
         }
         public static List<TileLayer> loadMap(string world, string map)
         {
