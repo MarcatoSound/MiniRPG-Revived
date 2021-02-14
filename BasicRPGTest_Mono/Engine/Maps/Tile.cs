@@ -30,7 +30,7 @@ namespace RPGEngine
         public string name { get; set; }
         public int id { get; set; }
         public Graphic graphic { get; set; }
-        public Dictionary<TileSide, Graphic> sideGraphics { get; set; } = new Dictionary<TileSide, Graphic>();
+        public List<Graphic> sideGraphics { get; set; } = new List<Graphic>();
         public Rectangle box { get; set; }
         public bool isCollidable { get; set; }
         public int zIndex { get; set; }
@@ -47,7 +47,7 @@ namespace RPGEngine
         public Vector2 tilePos { get; set; } = new Vector2(0, 0);
         public Vector2 region { get; set; } = new Vector2(0, 0);
         public TileLayer layer { get; set; }
-        public Dictionary<TileSide, bool> sides { get; set; }
+        public List<bool> sides { get; set; }
 
         private Dictionary<Graphic, Vector2> edgeCache = new Dictionary<Graphic, Vector2>();
         private bool v_Visible = true;
@@ -93,14 +93,14 @@ namespace RPGEngine
             if (texture.Width > dimensions)
             {
                 graphic = new Graphic(Util.getSpriteFromSet(texture, 1, 1));
-                sideGraphics.Add(TileSide.NorthWest, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
-                sideGraphics.Add(TileSide.North, new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
-                sideGraphics.Add(TileSide.NorthEast, new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
-                sideGraphics.Add(TileSide.West, new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
-                sideGraphics.Add(TileSide.East, new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
-                sideGraphics.Add(TileSide.SouthWest, new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
-                sideGraphics.Add(TileSide.South, new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
-                sideGraphics.Add(TileSide.SouthEast, new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
             }
             else
             {
@@ -131,14 +131,14 @@ namespace RPGEngine
             if (texture.Width > dimensions)
             {
                 graphic = new Graphic(Util.getSpriteFromSet(texture, 1, 1));
-                sideGraphics.Add(TileSide.NorthWest, new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
-                sideGraphics.Add(TileSide.North, new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
-                sideGraphics.Add(TileSide.NorthEast, new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
-                sideGraphics.Add(TileSide.West, new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
-                sideGraphics.Add(TileSide.East, new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
-                sideGraphics.Add(TileSide.SouthWest, new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
-                sideGraphics.Add(TileSide.South, new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
-                sideGraphics.Add(TileSide.SouthEast, new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 1)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 2)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 1, 0)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 1, 2)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 2, 0)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 2, 1)));
+                sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 2, 2)));
             }
             else
             {
@@ -182,7 +182,7 @@ namespace RPGEngine
             this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
             sideGraphics = tile.sideGraphics;
-            sides = new Dictionary<TileSide, bool>();
+            sides = new List<bool>(new bool[8]);
             dropTable = tile.dropTable;
 
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
@@ -190,12 +190,6 @@ namespace RPGEngine
             maxHealth = tile.maxHealth;
             health = maxHealth;
             this.indestructable = tile.indestructable;
-            restoreTimer = new Timer(10000);
-            restoreTimer.Elapsed += (sender, args) =>
-            {
-                Heal(maxHealth);
-                restoreTimer.Stop();
-            };
 
         }
         public Tile(YamlSection data) : 
@@ -206,10 +200,7 @@ namespace RPGEngine
 
         private Graphic getSideGraphic(TileSide side)
         {
-            if (sideGraphics.ContainsKey(side))
-                return sideGraphics[side];
-            else
-                return null;
+            return sideGraphics[(int)side];
         }
 
         public void drawAdjacentTiles(SpriteBatch batch)
@@ -217,11 +208,11 @@ namespace RPGEngine
             if (sideGraphics.Count == 0) return;
             Vector2 drawPos;
             int drawnEdgesCount = 0;
-            foreach (KeyValuePair<TileSide, bool> pair in sides)
+            for (int i = 0; i < 8; i++)
             {
-                bool draw = pair.Value;
+                bool draw = sides[i];
                 if (!draw) continue;
-                TileSide side = pair.Key;
+                TileSide side = (TileSide)i;
                 if (getSideGraphic(side) == null) continue;
                 drawPos = pos;
 
@@ -257,7 +248,7 @@ namespace RPGEngine
                         break;
                 }
 
-                sideGraphics[side].draw(batch, drawPos, 0f, Vector2.Zero, 1, 0);
+                sideGraphics[(int)side].draw(batch, drawPos, 0f, Vector2.Zero, 1, 0);
                 //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
 
                 drawnEdgesCount++;
@@ -345,15 +336,13 @@ namespace RPGEngine
                         Tile west = layer.getTile(checkPos.X + 1, checkPos.Y);
                         if ((north == null || north.zIndex < zIndex) && (south == null || south.zIndex < zIndex) && (east == null || east.zIndex < zIndex) && (west == null || west.zIndex < zIndex))
                         {
-                            sides.Remove(side);
-                            sides.Add(side, true);
+                            sides[(int)side] = true;
                         }
 
                     } 
                     else
                     {
-                        sides.Remove(side);
-                        sides.Add(side, true);
+                        sides[(int)side] = true;
                     }
                 }
                 else
@@ -364,8 +353,7 @@ namespace RPGEngine
                     }
                     else
                     {
-                        sides.Remove(side);
-                        sides.Add(side, false);
+                        sides[(int)side] = false;
                     }
                 }
             }
@@ -397,6 +385,14 @@ namespace RPGEngine
         public void Damage(double dmg)
         {
             restoreTimer.Stop();
+            restoreTimer = new Timer(10000);
+            restoreTimer.Elapsed += (sender, args) =>
+            {
+                Heal(maxHealth);
+                restoreTimer.Stop();
+                restoreTimer = null;
+                restoreTimer.Dispose();
+            };
             restoreTimer.Start();
             health -= dmg;
 
@@ -543,13 +539,13 @@ namespace RPGEngine
 
     public enum TileSide
     {
-        NorthWest,
-        North,
-        NorthEast,
-        West,
-        East,
-        SouthWest,
-        South,
-        SouthEast
+        NorthWest = 0,
+        North = 1,
+        NorthEast = 2,
+        West = 3,
+        East = 4,
+        SouthWest = 5,
+        South = 6,
+        SouthEast = 7
     }
 }

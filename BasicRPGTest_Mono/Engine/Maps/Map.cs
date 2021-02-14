@@ -821,11 +821,8 @@ namespace BasicRPGTest_Mono.Engine
             foreach (Tile tile in v_TileTemplates)
             {
                 // Go through Edges (if any)
-                foreach (KeyValuePair<TileSide, Graphic> pair in tile.sideGraphics)
+                foreach (Graphic graphic in tile.sideGraphics)
                 {
-                    TileSide side = pair.Key;
-                    Graphic graphic = pair.Value;
-
                     if (graphic != null)
                     {
                         // If this Graphic does NOT already exist in Collection
@@ -928,13 +925,13 @@ namespace BasicRPGTest_Mono.Engine
 
 
                         // Go through Edges (if any)
-                        foreach (KeyValuePair<TileSide, bool> pair in tile.sides)
+                        for (int i = 0; i < 8; i++)
                         {
 
-                            if (!pair.Value) continue;
+                            if (!tile.sides[i]) continue;
 
-                            TileSide side = pair.Key;
-                            Graphic graphic = tile.sideGraphics[side];
+                            TileSide side = (TileSide)i;
+                            Graphic graphic = tile.sideGraphics[(int)side];
                             Vector2 drawPos = new Vector2(tile.drawPos.X, tile.drawPos.Y);
                             int tileSize = TileManager.dimensions;
 
