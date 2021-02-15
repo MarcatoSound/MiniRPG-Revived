@@ -53,7 +53,7 @@ namespace BasicRPGTest_Mono.Engine
         private long v_drawnTileCount;
 
         public RegionManager regionManager { get; private set; }
-        public List<Region> v_regionsVisible = new List<Region>();
+        public List<Vector2> v_regionsVisible = new List<Vector2>();
         public ConcurrentDictionary<Vector2, Region> regionsBeingLoaded = new ConcurrentDictionary<Vector2, Region>();
         private List<Tile> v_TileTemplates = new List<Tile>();
         private Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>> v_VisibleTiles = new Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>>();
@@ -711,7 +711,7 @@ namespace BasicRPGTest_Mono.Engine
 
             // Update Tile rendering Cache
             // Update Visible Tiles if Tile belongs to any Visible Region
-            if (v_regionsVisible.Contains(region)) { buildVisibleTileCache(); }
+            if (v_regionsVisible.Contains(region.regionPos)) { buildVisibleTileCache(); }
 
             return true;
         }
@@ -722,6 +722,8 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
         public void update_VisibleRegions(Camera2D camera)
         {
+            //CodeTimer codeTimer = new CodeTimer();
+            //codeTimer.startTimer();
 
             // Clear Visible Regions collection
             v_regionsVisible.Clear();
@@ -734,26 +736,26 @@ namespace BasicRPGTest_Mono.Engine
             v_CameraViewBox.Width = camera.BoundingRectangle.Width;
             v_CameraViewBox.Height = camera.BoundingRectangle.Height;
 
+            Rectangle regionViewBox = new Rectangle(v_CameraViewBox.X - 2048, v_CameraViewBox.Y - 2048, v_CameraViewBox.Width + 2048, v_CameraViewBox.Height + 2048);
+
             bool loadingRegions = false;
             // Go through each Region on Map  (to re-populate Visible Regions collection)
             foreach (Region region in regions.Values)
             {
 
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
-                if (v_CameraViewBox.Intersects(region.box))
+                if (regionViewBox.Intersects(region.box))
                 //if (camera.BoundingRectangle.Intersects(region.box))
                 {
                     // If List Does NOT Contain this Region
-                    if (!v_regionsVisible.Contains(region))
+                    if (!v_regionsVisible.Contains(region.regionPos))
                     {
                         // Add this Region to Collection
-                        v_regionsVisible.Add(region);
+                        v_regionsVisible.Add(region.regionPos);
 
                         if (!region.isLoaded)
                         {
                             loadingRegions = true;
-                            Load.loadRegion(world, this, region);
-                            region.isLoaded = true;
                         }
                         //Utility.Util.myDebug("Region Added:  " + region.box);
 
@@ -765,24 +767,42 @@ namespace BasicRPGTest_Mono.Engine
 
             //Utility.Util.myDebug("Visible Regions of Total:  " + VisibleRegions.Count + " / " + regions.Count);
 
-            if (loadingRegions) 
+            if (loadingRegions)
             {
-                Thread thread = new Thread(() =>
+                Thread thread = new Thread(async () =>
                 {
+                    CodeTimer codeTimer = new CodeTimer();
+                    codeTimer.startTimer();
                     Thread.CurrentThread.IsBackground = true;
-                    List<Region> regions = new List<Region>(v_regionsVisible);
-                    foreach (Region region in regions)
+                    List<Vector2> regions = new List<Vector2>(v_regionsVisible);
+                    foreach (Vector2 regionPos in regions)
                     {
+                        Region region = this.regions[regionPos];
+                        if (region.isLoaded) continue;
+
+                        region.isLoaded = true;
+                        await Load.loadRegionAsync(world, this, region);
+                    }
+
+                    foreach (Vector2 regionPos in regions)
+                    {
+                        Region region = this.regions[regionPos];
                         foreach (Tile tile in region.tiles)
                         {
                             tile.update();
                         }
                     }
+                    codeTimer.endTimer();
+                    Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load regions.");
                 });
                 thread.Start();
             }
+
             // Build Tile Cache (including Edges) for Drawing Map
             buildVisibleTileCache();
+
+            //codeTimer.endTimer();
+            //Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to update visible regions.");
 
         }
 
@@ -821,8 +841,9 @@ namespace BasicRPGTest_Mono.Engine
                 }
 
                 // Loop through regions to draw tile edges and highlights
-                foreach (Region region in v_regionsVisible)
+                foreach (Vector2 regionPos in v_regionsVisible)
                 {
+                    Region region = regions[regionPos];
                     region.draw(batch, tLayer);
                 }
             }

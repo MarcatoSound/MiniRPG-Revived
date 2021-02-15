@@ -201,9 +201,9 @@ namespace BasicRPGTest_Mono.Engine
         {
             if (region.tiles.Count != 0) return;
 
-            Thread thread = new Thread(() =>
+            /*Thread thread = new Thread(() =>
             {
-                Thread.CurrentThread.IsBackground = true;
+                Thread.CurrentThread.IsBackground = true;*/
 
                 path = $"save\\{world}\\maps";
                 string mapPath = $"{path}\\{map.name}";
@@ -218,8 +218,32 @@ namespace BasicRPGTest_Mono.Engine
                 map.loadRegion(new YamlSection(regionNode));
 
                 reader.Close();
-            });
-            thread.Start();
+            /*});
+            thread.Start();*/
+        }
+        public static async System.Threading.Tasks.Task loadRegionAsync(string world, Map map, Region region)
+        {
+            if (region.tiles.Count != 0) return;
+
+            /*Thread thread = new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;*/
+
+                path = $"save\\{world}\\maps";
+                string mapPath = $"{path}\\{map.name}";
+
+                string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
+
+                StreamReader reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                var input = new StringReader(await reader.ReadToEndAsync());
+                YamlStream yamlRegion = new YamlStream();
+                yamlRegion.Load(input);
+                YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                map.loadRegion(new YamlSection(regionNode));
+
+                reader.Close();
+            /*});
+            thread.Start();*/
         }
         public static List<TileLayer> loadMap(string world, string map)
         {
