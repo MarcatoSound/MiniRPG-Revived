@@ -54,6 +54,7 @@ namespace BasicRPGTest_Mono.Engine
 
         public RegionManager regionManager { get; private set; }
         public List<Region> v_regionsVisible = new List<Region>();
+        public ConcurrentDictionary<Vector2, Region> regionsBeingLoaded = new ConcurrentDictionary<Vector2, Region>();
         private List<Tile> v_TileTemplates = new List<Tile>();
         private Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>> v_VisibleTiles = new Dictionary<TileLayer, Dictionary<Tile, List<Vector2>>>();
 
@@ -376,7 +377,35 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
+
+            region.isLoaded = true;
             regions[regionPos] = region;
+
+            regionsBeingLoaded.TryAdd(regionPos, region);
+
+            /*int checkedTileCount = 0;
+            for (int x = 0; x < 32; x++)
+            {
+                int tileX = (int)(pos.X + (x * 32));
+                for (int y = 0; y < 32; y++)
+                {
+                    int tileY = (int)(pos.Y + (y * 32));
+                    if (x > 0 && x < 31 && y > 0 && y < 31) continue;
+
+                    foreach (TileLayer layer in layers)
+                    {
+                        Vector2 tilePos = Util.getTilePosition(new Vector2(tileX, tileY));
+
+                        Tile tile = getTile(layer, tilePos);
+                        if (tile == null) continue;
+                        tile.update();
+                        checkedTileCount++;
+                    }
+                }
+            }
+
+            Console.WriteLine($"// Loaded region {regionPos}! Checked {checkedTileCount} tiles!");*/
+
         }
 
 
@@ -691,7 +720,7 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
         // RENDER AND CACHE FUNCTIONS
         //====================================================================================
-        public void update_VisibleRegions (Camera2D camera)
+        public void update_VisibleRegions(Camera2D camera)
         {
 
             // Clear Visible Regions collection
@@ -709,7 +738,7 @@ namespace BasicRPGTest_Mono.Engine
             // Go through each Region on Map  (to re-populate Visible Regions collection)
             foreach (Region region in regions.Values)
             {
-                
+
                 // If THIS Region is INSIDE Camera's view (BoundingRectangle)
                 if (v_CameraViewBox.Intersects(region.box))
                 //if (camera.BoundingRectangle.Intersects(region.box))
@@ -735,17 +764,23 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             //Utility.Util.myDebug("Visible Regions of Total:  " + VisibleRegions.Count + " / " + regions.Count);
-            if (loadingRegions)
-            {
-                foreach (Region region in v_regionsVisible)
-                {
-                    foreach (Tile tile in region.tiles)
-                    {
-                        tile.update();
-                    }
-                }
-            }
 
+            if (loadingRegions) 
+            {
+                Thread thread = new Thread(() =>
+                {
+                    Thread.CurrentThread.IsBackground = true;
+                    List<Region> regions = new List<Region>(v_regionsVisible);
+                    foreach (Region region in regions)
+                    {
+                        foreach (Tile tile in region.tiles)
+                        {
+                            tile.update();
+                        }
+                    }
+                });
+                thread.Start();
+            }
             // Build Tile Cache (including Edges) for Drawing Map
             buildVisibleTileCache();
 

@@ -11,6 +11,7 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Timers;
 using YamlDotNet.RepresentationModel;
 
@@ -77,7 +78,7 @@ namespace RPGEngine
         public bool isBeingDamaged;
         public double healthPercent;
         private int breakTexture;
-        private Timer restoreTimer;
+        private System.Timers.Timer restoreTimer;
 
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool indestructable = false)
@@ -205,12 +206,15 @@ namespace RPGEngine
 
         public void update()
         {
+
             if (sideGraphics.Count == 0) return;
             Graphic graphic;
             Vector2 checkPos;
             Tile checkTile;
             bool isCorner;
-            foreach (TileSide side in Enum.GetValues(typeof(TileSide)))
+            List<bool> sides = new List<bool>(this.sides);
+            Array sidesEnums = Enum.GetValues(typeof(TileSide));
+            foreach (TileSide side in sidesEnums)
             {
                 isCorner = false;
                 graphic = getSideGraphic(side);
@@ -265,7 +269,7 @@ namespace RPGEngine
                             sides[(int)side] = true;
                         }
 
-                    } 
+                    }
                     else
                     {
                         sides[(int)side] = true;
@@ -284,7 +288,8 @@ namespace RPGEngine
                 }
             }
 
-            return;
+            this.sides = sides;
+
         }
 
         public void draw(SpriteBatch batch)
@@ -311,7 +316,7 @@ namespace RPGEngine
         public void Damage(double dmg)
         {
             restoreTimer.Stop();
-            restoreTimer = new Timer(10000);
+            restoreTimer = new System.Timers.Timer(10000);
             restoreTimer.Elapsed += (sender, args) =>
             {
                 Heal(maxHealth);
@@ -332,7 +337,7 @@ namespace RPGEngine
                 breakTexture = 4;
 
             isBeingDamaged = true;
-            Timer timer = new Timer(500);
+            System.Timers.Timer timer = new System.Timers.Timer(500);
             timer.Elapsed += (sender, args) =>
             {
                 isBeingDamaged = false;
