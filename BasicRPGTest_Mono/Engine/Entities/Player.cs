@@ -538,6 +538,7 @@ namespace BasicRPGTest_Mono.Engine
         {
             YamlSection config = new YamlSection($"player");
 
+            config.setString("map", p.map.name);
             config.setDouble("position.x", p.Position.X);
             config.setDouble("position.y", p.Position.Y);
             config.setDouble("stats.movement_speed", p.speed);

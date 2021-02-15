@@ -81,14 +81,24 @@ namespace BasicRPGTest_Mono.Engine
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             DirectoryInfo[] folders = dirInfo.GetDirectories();
 
+            StreamReader reader = new StreamReader($"save\\{world}\\player.yml");
+            var input = new StringReader(reader.ReadToEnd());
+
+            YamlStream yaml = new YamlStream();
+            yaml.Load(input);
+
+            YamlSection player = new YamlSection((YamlMappingNode)yaml.Documents[0].RootNode);
+            Vector2 playerPos = new Vector2((float)player.getDouble("position.x"), (float)player.getDouble("position.y"));
+            string playerMap = player.getString("map");
+            reader.Close();
+
             foreach (DirectoryInfo mapFolder in folders)
             {
                 string mapPath = $"{path}\\{mapFolder.Name}";
 
-                YamlStream yaml = new YamlStream();
                 
                 reader = new StreamReader($"{mapPath}\\map.yml");
-                var input = new StringReader(reader.ReadToEnd());
+                input = new StringReader(reader.ReadToEnd());
                 yaml.Load(input);
 
                 YamlSection general = new YamlSection((YamlMappingNode)yaml.Documents[0].RootNode);
@@ -98,12 +108,18 @@ namespace BasicRPGTest_Mono.Engine
                 if (map.name == "") continue;
 
                 // Load the local tile data
-                /*reader = new StreamReader($"save\\{world}\\player.yml");
-                input = new StringReader(reader.ReadToEnd());
-                yaml.Load(input);
+                if (playerMap.Equals(map.name))
+                {
+                    MapManager.activeMap = map;
 
-                YamlSection player = new YamlSection((YamlMappingNode)yaml.Documents[0].RootNode);*/
+                    Vector2 tilePos = Util.getTilePosition(playerPos);
+                    List<Region> regions = map.getRegionsInRange(tilePos, 2);
 
+                    foreach (Region region in regions)
+                    {
+                        loadRegion(world, map, region);
+                    }
+                }
 
                 // Load the living entities
                 reader = new StreamReader($"{mapPath}\\entities.yml");
@@ -131,6 +147,7 @@ namespace BasicRPGTest_Mono.Engine
                 }
                 reader.Close();
 
+                // Update the tile edges
                 foreach (TileLayer layer in map.layers)
                 {
                     foreach (KeyValuePair<Vector2, Tile> pair in layer.tiles)
@@ -193,12 +210,13 @@ namespace BasicRPGTest_Mono.Engine
 
                 string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
 
-                reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                StreamReader reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
                 var input = new StringReader(reader.ReadToEnd());
                 YamlStream yamlRegion = new YamlStream();
                 yamlRegion.Load(input);
                 YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
                 map.loadRegion(new YamlSection(regionNode));
+
                 reader.Close();
             });
             thread.Start();

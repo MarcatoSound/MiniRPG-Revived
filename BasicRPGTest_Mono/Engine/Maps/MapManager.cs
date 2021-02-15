@@ -38,7 +38,7 @@ namespace BasicRPGTest_Mono.Engine
             /* TODO: Rewrite this later when we have multiple maps to handle; 
              * probably use a parameter in the "world.json" save file to remember the active map.
              */
-            if (maps.Count == 0) activeMap = map;
+            if (maps.Count == 0 && activeMap == null) activeMap = map;
             maps.Add(map);
             mapsByName.Add(map.name, map);
         }

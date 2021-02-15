@@ -40,7 +40,7 @@ namespace RPGEngine
         public DropTable dropTable = new DropTable();
 
         // Instance variables
-        public bool isInstance { get; set; }
+        private bool isInstance;
         public Tile parent { get; set; }
         public Vector2 pos { get; set; } = new Vector2(0, 0);
         public Vector2 drawPos { get; set; } = new Vector2(0, 0);
@@ -201,80 +201,6 @@ namespace RPGEngine
         private Graphic getSideGraphic(TileSide side)
         {
             return sideGraphics[(int)side];
-        }
-
-        public void drawAdjacentTiles(SpriteBatch batch)
-        {
-            if (sideGraphics.Count == 0) return;
-            Vector2 drawPos;
-            int drawnEdgesCount = 0;
-            for (int i = 0; i < 8; i++)
-            {
-                bool draw = sides[i];
-                if (!draw) continue;
-                TileSide side = (TileSide)i;
-                if (getSideGraphic(side) == null) continue;
-                drawPos = pos;
-
-                switch (side)
-                {
-                    case TileSide.NorthWest:
-                        drawPos.X -= TileManager.dimensions;
-                        drawPos.Y -= TileManager.dimensions;
-                        break;
-                    case TileSide.North:
-                        drawPos.Y -= TileManager.dimensions;
-                        break;
-                    case TileSide.NorthEast:
-                        drawPos.X += TileManager.dimensions;
-                        drawPos.Y -= TileManager.dimensions;
-                        break;
-                    case TileSide.West:
-                        drawPos.X -= TileManager.dimensions;
-                        break;
-                    case TileSide.East:
-                        drawPos.X += TileManager.dimensions;
-                        break;
-                    case TileSide.SouthWest:
-                        drawPos.X -= TileManager.dimensions;
-                        drawPos.Y += TileManager.dimensions;
-                        break;
-                    case TileSide.South:
-                        drawPos.Y += TileManager.dimensions;
-                        break;
-                    case TileSide.SouthEast:
-                        drawPos.X += TileManager.dimensions;
-                        drawPos.Y += TileManager.dimensions;
-                        break;
-                }
-
-                sideGraphics[(int)side].draw(batch, drawPos, 0f, Vector2.Zero, 1, 0);
-                //batch.DrawRectangle(new Rectangle(Convert.ToInt32(drawPos.X), Convert.ToInt32(drawPos.Y), 32, 32), Color.White);
-
-                drawnEdgesCount++;
-            }
-
-            return;
-
-        }
-        public void drawAdjacentTiles2(SpriteBatch batch)
-        {
-
-            int drawnEdgesCount = 0;
-
-            foreach (KeyValuePair<Graphic, Vector2> pair in edgeCache)
-            {
-                //if (pair.Key == null) { continue; }
-                pair.Key.draw(batch, pair.Value, 0f, Vector2.Zero, 1, 0);
-
-                //batch.DrawRectangle(new Rectangle((int)pair.Value.X, (int)pair.Value.Y, 32, 32), Color.Red);
-
-                drawnEdgesCount++;
-            }
-
-            // Show count of this Tile's number of Drawn Edges
-            //batch.DrawString(Core.mainFont, drawnEdgesCount.ToString(), pos, Microsoft.Xna.Framework.Color.Black);
-
         }
 
         public void update()

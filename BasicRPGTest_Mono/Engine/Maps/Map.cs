@@ -370,6 +370,9 @@ namespace BasicRPGTest_Mono.Engine
                     tile.map = this;
                     layer.addTile(tile);
                     region.addTile(tile);
+
+                    if (!v_TileTemplates.Contains(tile.parent))
+                        v_TileTemplates.Add(tile.parent);
                 }
             }
 
@@ -516,7 +519,9 @@ namespace BasicRPGTest_Mono.Engine
         /// <returns>The region the provided tile position resides in.</returns>
         public Region getRegionByTilePosition(Vector2 tilePos)
         {
-            Vector2 regionPos = new Vector2((int)(tilePos.X / 8), (int)(tilePos.Y / 8));
+            Vector2 regionPos = new Vector2((int)(tilePos.X / 32), (int)(tilePos.Y / 32));
+
+            if (!regions.ContainsKey(regionPos)) return null;
 
             return regions[regionPos];
         }
@@ -533,6 +538,11 @@ namespace BasicRPGTest_Mono.Engine
             Region centerRegion = getRegionByTilePosition(tilePos);
             Vector2 topLeftRegion = new Vector2(centerRegion.regionPos.X - radius, centerRegion.regionPos.Y - radius);
             Vector2 bottomLeftRegion = new Vector2(centerRegion.regionPos.X + radius, centerRegion.regionPos.Y + radius);
+
+            if (topLeftRegion.X < 0) topLeftRegion.X = 0;
+            if (topLeftRegion.Y < 0) topLeftRegion.Y = 0;
+            if (bottomLeftRegion.X < 0) bottomLeftRegion.X = 0;
+            if (bottomLeftRegion.Y < 0) bottomLeftRegion.Y = 0;
 
             Vector2 regionPos = new Vector2();
             for (int x = (int)topLeftRegion.X; x < bottomLeftRegion.X; x++)
@@ -773,8 +783,6 @@ namespace BasicRPGTest_Mono.Engine
                 {
                     // Draw ALL matching Visible Edges at once
                     pair2.Key.draw_Tiles(batch, pair2.Value);
-
-                    v_drawnTileCount += pair2.Value.Count;  // Count drawn Tiles
                 }
 
                 // Loop through regions to draw tile edges and highlights
@@ -892,6 +900,11 @@ namespace BasicRPGTest_Mono.Engine
             tileViewBounds.Y = (v_CameraViewBox.Y / TileManager.dimensions) -2;
             tileViewBounds.Width = (v_CameraViewBox.Width / TileManager.dimensions) + 4;
             tileViewBounds.Height = (v_CameraViewBox.Height / TileManager.dimensions) + 4;
+
+            if (v_TileEdges.Count == 0)
+            {
+                setupVisibleTileCaches();
+            }
 
             // Go through each Layer on Map
             foreach (TileLayer layer in v_VisibleTiles.Keys)

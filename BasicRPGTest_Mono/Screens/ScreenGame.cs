@@ -327,6 +327,7 @@ namespace BasicRPGTest_Mono
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(FontLibrary.getFont("dmg"), fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.DrawString(FontLibrary.getFont("dmg"), $"{MapManager.activeMap.name} tiles: {MapManager.activeMap.getTilesTotalCountDrawn()}", new Vector2(25, 50), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             // End Code Timer for speed test
