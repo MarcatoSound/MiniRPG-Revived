@@ -737,7 +737,7 @@ namespace BasicRPGTest_Mono.Engine
             v_CameraViewBox.Width = camera.BoundingRectangle.Width;
             v_CameraViewBox.Height = camera.BoundingRectangle.Height;
 
-            Rectangle regionViewBox = new Rectangle(v_CameraViewBox.X - 2048, v_CameraViewBox.Y - 2048, v_CameraViewBox.Width + 2048, v_CameraViewBox.Height + 2048);
+            Rectangle regionViewBox = new Rectangle(v_CameraViewBox.X - 1024, v_CameraViewBox.Y - 1024, v_CameraViewBox.Width + 1024, v_CameraViewBox.Height + 1024);
 
             bool loadingRegions = false;
             // Go through each Region on Map  (to re-populate Visible Regions collection)
@@ -754,10 +754,10 @@ namespace BasicRPGTest_Mono.Engine
                         // Add this Region to Collection
                         v_regionsVisible.Add(region.regionPos);
 
-                        if (!region.isLoaded)
+                        /*if (!region.isLoaded)
                         {
                             loadingRegions = true;
-                        }
+                        }*/
                         //Utility.Util.myDebug("Region Added:  " + region.box);
 
                         // TODO: Add Event for on Region ADDED to regionsVisible List
@@ -768,7 +768,7 @@ namespace BasicRPGTest_Mono.Engine
 
             //Utility.Util.myDebug("Visible Regions of Total:  " + VisibleRegions.Count + " / " + regions.Count);
 
-            if (loadingRegions)
+            /*if (loadingRegions)
             {
                 Task task = new Task(async () =>
                 {
@@ -790,10 +790,10 @@ namespace BasicRPGTest_Mono.Engine
                         {
                             tile.update();
                         }
-                    }*/
+                    }
                 });
                 task.Start();
-            }
+            }*/
 
             // Build Tile Cache (including Edges) for Drawing Map
             buildVisibleTileCache();

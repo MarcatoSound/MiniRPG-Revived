@@ -13,6 +13,7 @@ using BasicRPGTest_Mono.Engine.Utility;
 using YamlDotNet.RepresentationModel;
 using System.Threading;
 using System.Threading.Tasks;
+using BasicRPGTest_Mono.Engine.Datapacks;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -95,6 +96,8 @@ namespace BasicRPGTest_Mono.Engine
 
             foreach (DirectoryInfo mapFolder in folders)
             {
+                CodeTimer codeTimer = new CodeTimer();
+                codeTimer.startTimer();
                 string mapPath = $"{path}\\{mapFolder.Name}";
 
                 
@@ -109,7 +112,9 @@ namespace BasicRPGTest_Mono.Engine
                 if (map.name == "") continue;
 
                 // Load the local tile data
-                if (playerMap.Equals(map.name))
+                if (map.name.Equals(playerMap))
+                    loadAllRegions(world, map);
+                /*if (playerMap.Equals(map.name))
                 {
                     MapManager.activeMap = map;
 
@@ -120,7 +125,8 @@ namespace BasicRPGTest_Mono.Engine
                     {
                         loadRegion(world, map, region);
                     }
-                }
+                }*/
+
 
                 // Load the living entities
                 reader = new StreamReader($"{mapPath}\\entities.yml");
@@ -149,7 +155,7 @@ namespace BasicRPGTest_Mono.Engine
                 reader.Close();
 
                 // Update the tile edges
-                foreach (TileLayer layer in map.layers)
+                /*foreach (TileLayer layer in map.layers)
                 {
                     foreach (KeyValuePair<Vector2, Tile> pair in layer.tiles)
                     {
@@ -158,11 +164,14 @@ namespace BasicRPGTest_Mono.Engine
 
                         tile.update();
                     }
-                }
+                }*/
 
                 MapManager.add(map);
                 map.buildTileTemplateCache();
                 map.buildVisibleTileCache();
+
+                codeTimer.endTimer();
+                Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load map {map.name}.");
             }
 
             return maps;
@@ -174,21 +183,31 @@ namespace BasicRPGTest_Mono.Engine
             string mapPath = $"{path}\\{map.name}";
 
             List<Region> loadedRegions = new List<Region>();
+            Task[] loadTasks = new Task[regions.Count];
 
-            foreach (Region region in regions)
+            for (int i = 0; i < regions.Count; i++)
             {
+                Region region = regions[i];
                 if (region.tiles.Count != 0) continue;
-                loadedRegions.Add(region);
-                string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
+                Task task = new Task(() =>
+                {
+                    loadedRegions.Add(region);
+                    string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
 
-                reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
-                var input = new StringReader(reader.ReadToEnd());
-                YamlStream yamlRegion = new YamlStream();
-                yamlRegion.Load(input);
-                YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
-                map.loadRegion(new YamlSection(regionNode));
-                reader.Close();
+                    reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                    var input = new StringReader(reader.ReadToEnd());
+                    YamlStream yamlRegion = new YamlStream();
+                    yamlRegion.Load(input);
+                    YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                    map.loadRegion(new YamlSection(regionNode));
+                    reader.Close();
+                });
+                loadTasks[i] = task;
+                task.Start();
+
             }
+
+            Task.WaitAll(loadTasks);
 
             foreach (Region region in loadedRegions)
             {
@@ -197,6 +216,53 @@ namespace BasicRPGTest_Mono.Engine
                     tile.update();
                 }
             }
+        }
+        public static void loadAllRegions(string world, Map map)
+        {
+            path = $"save\\{world}\\maps";
+            string mapPath = $"{path}\\{map.name}";
+
+            List<Region> regions = new List<Region>(map.regions.Values);
+            List<Region> loadedRegions = new List<Region>();
+            Task[] loadTasks = new Task[regions.Count];
+
+            double progressPer = 1.0 / regions.Count;
+            DataPackManager.loadStatus = "Loading map...";
+
+            for (int i = 0; i < regions.Count; i++)
+            {
+                Region region = regions[i];
+                if (region.tiles.Count != 0) continue;
+                Task task = new Task(() =>
+                {
+                    loadedRegions.Add(region);
+                    string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
+
+                    StreamReader reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                    var input = new StringReader(reader.ReadToEnd());
+                    YamlStream yamlRegion = new YamlStream();
+                    yamlRegion.Load(input);
+                    YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                    map.loadRegion(new YamlSection(regionNode));
+                    reader.Close();
+                    DataPackManager.loadProgress += progressPer;
+                });
+                loadTasks[i] = task;
+                task.Start();
+
+            }
+
+            Task.WaitAll(loadTasks);
+
+            foreach (Region region in loadedRegions)
+            {
+                foreach (Tile tile in region.tiles)
+                {
+                    tile.update();
+                }
+            }
+
+            DataPackManager.loadProgress = 0;
         }
         public static void loadRegion(string world, Map map, Region region)
         {
@@ -229,8 +295,7 @@ namespace BasicRPGTest_Mono.Engine
             /*Thread thread = new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;*/
-
-            new Task(async () =>
+            Task.Factory.StartNew(async () =>
             {
                 CodeTimer codeTimer = new CodeTimer();
                 codeTimer.startTimer();
@@ -242,6 +307,7 @@ namespace BasicRPGTest_Mono.Engine
                 StreamReader reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
                 Task<string> fileContents = reader.ReadToEndAsync();
                 var input = new StringReader(await fileContents);
+
                 YamlStream yamlRegion = new YamlStream();
                 yamlRegion.Load(input);
                 YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
@@ -250,7 +316,29 @@ namespace BasicRPGTest_Mono.Engine
                 reader.Close();
                 codeTimer.endTimer();
                 Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load region {regionFile}.");
-            }).Start();
+            });
+            /*new Task(async () =>
+            {
+                CodeTimer codeTimer = new CodeTimer();
+                codeTimer.startTimer();
+                path = $"save\\{world}\\maps";
+                string mapPath = $"{path}\\{map.name}";
+
+                string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
+
+                StreamReader reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
+                Task<string> fileContents = reader.ReadToEndAsync();
+                var input = new StringReader(await fileContents);
+
+                YamlStream yamlRegion = new YamlStream();
+                yamlRegion.Load(input);
+                YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
+                map.loadRegion(new YamlSection(regionNode));
+
+                reader.Close();
+                codeTimer.endTimer();
+                Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load region {regionFile}.");
+            }).Start();*/
             /*});
             thread.Start();*/
         }
