@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
@@ -769,10 +770,8 @@ namespace BasicRPGTest_Mono.Engine
 
             if (loadingRegions)
             {
-                Thread thread = new Thread(async () =>
+                Task task = new Task(async () =>
                 {
-                    CodeTimer codeTimer = new CodeTimer();
-                    codeTimer.startTimer();
                     Thread.CurrentThread.IsBackground = true;
                     List<Vector2> regions = new List<Vector2>(v_regionsVisible);
                     foreach (Vector2 regionPos in regions)
@@ -781,21 +780,19 @@ namespace BasicRPGTest_Mono.Engine
                         if (region.isLoaded) continue;
 
                         region.isLoaded = true;
-                        await Load.loadRegionAsync(world, this, region);
+                        Load.loadRegionAsync(world, this, region);
                     }
 
-                    foreach (Vector2 regionPos in regions)
+                    /*foreach (Vector2 regionPos in regions)
                     {
                         Region region = this.regions[regionPos];
                         foreach (Tile tile in region.tiles)
                         {
                             tile.update();
                         }
-                    }
-                    codeTimer.endTimer();
-                    Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load regions.");
+                    }*/
                 });
-                thread.Start();
+                task.Start();
             }
 
             // Build Tile Cache (including Edges) for Drawing Map

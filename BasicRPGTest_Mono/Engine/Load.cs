@@ -12,6 +12,7 @@ using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using YamlDotNet.RepresentationModel;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BasicRPGTest_Mono.Engine
 {
@@ -221,7 +222,7 @@ namespace BasicRPGTest_Mono.Engine
             /*});
             thread.Start();*/
         }
-        public static async System.Threading.Tasks.Task loadRegionAsync(string world, Map map, Region region)
+        public static void loadRegionAsync(string world, Map map, Region region)
         {
             if (region.tiles.Count != 0) return;
 
@@ -229,19 +230,27 @@ namespace BasicRPGTest_Mono.Engine
             {
                 Thread.CurrentThread.IsBackground = true;*/
 
+            new Task(async () =>
+            {
+                CodeTimer codeTimer = new CodeTimer();
+                codeTimer.startTimer();
                 path = $"save\\{world}\\maps";
                 string mapPath = $"{path}\\{map.name}";
 
                 string regionFile = $"reg_{(int)region.regionPos.X}-{(int)region.regionPos.Y}";
 
                 StreamReader reader = new StreamReader($"{mapPath}\\regions\\{regionFile}.yml");
-                var input = new StringReader(await reader.ReadToEndAsync());
+                Task<string> fileContents = reader.ReadToEndAsync();
+                var input = new StringReader(await fileContents);
                 YamlStream yamlRegion = new YamlStream();
                 yamlRegion.Load(input);
                 YamlMappingNode regionNode = (YamlMappingNode)yamlRegion.Documents[0].RootNode;
                 map.loadRegion(new YamlSection(regionNode));
 
                 reader.Close();
+                codeTimer.endTimer();
+                Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load region {regionFile}.");
+            }).Start();
             /*});
             thread.Start();*/
         }
