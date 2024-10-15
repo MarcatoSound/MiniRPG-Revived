@@ -179,11 +179,11 @@ namespace BasicRPGTest_Mono
                         if (args.Key == Keys.F) Core.player.swapHotbars();
                         if (args.Key == Keys.E) Core.player.toggleInv();
 
-                        if (args.Key == Keys.NumPad1) Core.player.inventory.hotbarPrimary.setSlot(0);
-                        if (args.Key == Keys.NumPad2) Core.player.inventory.hotbarPrimary.setSlot(1);
-                        if (args.Key == Keys.NumPad3) Core.player.inventory.hotbarPrimary.setSlot(2);
-                        if (args.Key == Keys.NumPad4) Core.player.inventory.hotbarPrimary.setSlot(3);
-                        if (args.Key == Keys.NumPad5) Core.player.inventory.hotbarPrimary.setSlot(4);
+                        if (args.Key == Keys.D1) Core.player.inventory.hotbarPrimary.setSlot(0);
+                        if (args.Key == Keys.D2) Core.player.inventory.hotbarPrimary.setSlot(1);
+                        if (args.Key == Keys.D3) Core.player.inventory.hotbarPrimary.setSlot(2);
+                        if (args.Key == Keys.D4) Core.player.inventory.hotbarPrimary.setSlot(3);
+                        if (args.Key == Keys.D5) Core.player.inventory.hotbarPrimary.setSlot(4);
                     } else
                     {
                         if (args.Key == Keys.E) Core.player.toggleInv();
@@ -331,6 +331,9 @@ namespace BasicRPGTest_Mono
 
             _graphics.PreferredBackBufferWidth = 1280;
             _graphics.PreferredBackBufferHeight = 720;
+            // Unlock FPS (turn off vsync)
+            _graphics.SynchronizeWithVerticalRetrace = false;  // VSync?
+            Core.game.IsFixedTimeStep = false;
             _graphics.ApplyChanges();
 
             Window.ClientSizeChanged += (sender, args) =>

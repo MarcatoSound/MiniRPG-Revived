@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using YamlDotNet.RepresentationModel;
@@ -71,8 +72,12 @@ namespace BasicRPGTest_Mono.Engine.Maps
                 DirectoryInfo dInfo = Directory.CreateDirectory(path);
             }
 
-            StreamWriter writer = new StreamWriter($"{path}\\reg_{regionPos.X}-{regionPos.Y}.yml", false);
+            YamlSection data = (YamlSection)this;
+            FileStream stream = File.Create($"{path}\\{regionPos.X}-{regionPos.Y}.rg");
+            stream.Write(ZipUtils.Zip(data.ToString()));
+            stream.Close();
 
+            /*StreamWriter writer = new StreamWriter($"{path}\\reg_{regionPos.X}-{regionPos.Y}.yml", false);
             try
             {
                 writer.Write((YamlSection)this);
@@ -80,7 +85,7 @@ namespace BasicRPGTest_Mono.Engine.Maps
             finally
             {
                 writer.Close();
-            }
+            }*/
 
         }
 
@@ -89,8 +94,8 @@ namespace BasicRPGTest_Mono.Engine.Maps
         {
             YamlSection config = new YamlSection($"{r.regionPos.X}-{r.regionPos.Y}");
 
-            config.setDouble("position.x", r.regionPos.X);
-            config.setDouble("position.y", r.regionPos.Y);
+            config.setDouble("x", r.regionPos.X);
+            config.setDouble("y", r.regionPos.Y);
 
             YamlSequenceNode sequence = new YamlSequenceNode();
             foreach (Tile tile in r.tiles)

@@ -1,4 +1,5 @@
-﻿using BasicRPGTest_Mono.Engine.Datapacks;
+﻿using BasicRPGTest_Mono.Engine.Data;
+using BasicRPGTest_Mono.Engine.Datapacks;
 using BasicRPGTest_Mono.Engine.Entities;
 using BasicRPGTest_Mono.Engine.Items;
 using BasicRPGTest_Mono.Engine.Maps;
@@ -9,10 +10,12 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
 using RPGEngine;
+using SharpNoise;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +25,7 @@ using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine
 {
+    [MiniSerializable]
     public class Map
     {
         //====================================================================================
@@ -29,12 +33,15 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
 
         public string world { get; set; }
+        [SavedProperty]
         public string name { get; set; }
         public Generator generator { get; private set; }
         public List<TileLayer> layers { get; set; }
         public Dictionary<string, TileLayer> layersByName { get; set; } = new Dictionary<string, TileLayer>();
         public ConcurrentDictionary<Vector2, Region> regions { get; set; }
+        [SavedProperty]
         public int width { get; set; }
+        [SavedProperty]
         public int height { get; set; }
         public int widthInPixels { get; set; }
         public int heightInPixels { get; set; }
@@ -66,6 +73,21 @@ namespace BasicRPGTest_Mono.Engine
 
 
         public Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>();
+
+
+        [SavedProperty]
+        internal List<Tile> _tiles
+        {
+            get
+            {
+                List<Tile> tiles = new List<Tile>();
+                foreach (Region region in regions.Values)
+                {
+                    tiles.AddRange(region.tiles);
+                }
+                return tiles;
+            }
+        }
 
         //====================================================================================
         // CONSTRUCTOR
@@ -279,6 +301,54 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
+        public Map(string name, int width, int height, string world)
+        {
+            this.name = name;
+            if (this.name == "") return;
+            this.world = world;
+            this.layers = new List<TileLayer>();
+            this.width = width;
+            this.height = height;
+            this.widthInPixels = width * TileManager.dimensions;
+            this.heightInPixels = height * TileManager.dimensions;
+
+            regions = new ConcurrentDictionary<Vector2, Region>();
+            collidables = new ConcurrentDictionary<int, Rectangle>();
+
+            this.entities = new ConcurrentDictionary<int, Entity>();
+            this.livingEntities = new ConcurrentDictionary<int, LivingEntity>();
+            this.spawns = new ConcurrentDictionary<int, Spawn>();
+            initSpawns();
+            spawnTimer = new System.Timers.Timer(1000);
+            spawnTimer.Elapsed += trySpawn;
+            spawnTimer.Start();
+
+            regionManager = new RegionManager(this);
+            Vector2 regionTruePos = new Vector2();
+            Vector2 regionPos = new Vector2();
+            for (int x = 0; x < width / 32; x++)
+            {
+                for (int y = 0; y < height / 32; y++)
+                {
+                    regionTruePos.X = x * (TileManager.dimensions * 32);
+                    regionTruePos.Y = y * (TileManager.dimensions * 32);
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    Region region = new Region(regionTruePos, regionPos, this);
+                    regions.TryAdd(new Vector2(x, y), region);
+                }
+            }
+
+            layers.Add(new TileLayer("water"));
+            layers.Add(new TileLayer("ground"));
+            layers.Add(new TileLayer("stone"));
+            layers.Add(new TileLayer("decoration"));
+            foreach (TileLayer layer in layers)
+            {
+                layersByName.Add(layer.name, layer);
+            }
+        }
+
 
         //====================================================================================
         // PROPERTIES
@@ -351,9 +421,9 @@ namespace BasicRPGTest_Mono.Engine
 
         public int getRegionSizeHighInPixels() { return regionTilesHigh * TileManager.dimensions; }
 
-        public void loadRegion(YamlSection yaml)
+        public Region loadRegion(YamlSection yaml)
         {
-            Vector2 regionPos = new Vector2((float)yaml.getDouble("position.x"), (float)yaml.getDouble("position.y"));
+            Vector2 regionPos = new Vector2((float)yaml.getDouble("x"), (float)yaml.getDouble("y"));
             Vector2 pos = new Vector2(regionPos.X * (TileManager.dimensions * regionTilesWide), regionPos.Y * (TileManager.dimensions * regionTilesHigh));
             Region region = new Region(pos, regionPos, this);
 
@@ -383,6 +453,8 @@ namespace BasicRPGTest_Mono.Engine
             regions[regionPos] = region;
 
             regionsBeingLoaded.TryAdd(regionPos, region);
+
+            return region;
 
             /*int checkedTileCount = 0;
             for (int x = 0; x < 32; x++)
@@ -500,8 +572,8 @@ namespace BasicRPGTest_Mono.Engine
         /// <returns></returns>
         public bool isLocationSafe(Rectangle location)
         {
-            Vector2 tilePos = Utility.Util.getTilePosition(new Vector2(location.X, location.Y));
-            List<Tile> nearbyTiles = Utility.Util.getSurroundingTiles(this, 2, tilePos);
+            Vector2 tilePos = Util.getTilePosition(new Vector2(location.X, location.Y));
+            List<Tile> nearbyTiles = Util.getSurroundingTiles(this, 2, tilePos);
 
             Rectangle collidable;
             foreach (Tile tile in nearbyTiles)
@@ -583,6 +655,41 @@ namespace BasicRPGTest_Mono.Engine
                     regionPos.Y = y;
                     if (this.regions.ContainsKey(regionPos))
                         regions.Add(this.regions[regionPos]);
+                }
+            }
+
+            return regions;
+
+        }
+        /// <summary>
+        /// Get unloaded regions surrounding the region a tile belongs to.
+        /// </summary>
+        /// <param name="tilePos">The position of the tile we are using as our starting point.</param>
+        /// <param name="radius">How many regions around we want to retrieve.</param>
+        /// <returns>A list of regions found nearby.</returns>
+        public List<Region> getUnloadedRegionsInRange(Vector2 tilePos, int radius)
+        {
+            List<Region> regions = new List<Region>();
+
+            Region centerRegion = getRegionByTilePosition(tilePos);
+            Vector2 topLeftRegion = new Vector2(centerRegion.regionPos.X - radius, centerRegion.regionPos.Y - radius);
+            Vector2 bottomLeftRegion = new Vector2(centerRegion.regionPos.X + radius, centerRegion.regionPos.Y + radius);
+
+            if (topLeftRegion.X < 0) topLeftRegion.X = 0;
+            if (topLeftRegion.Y < 0) topLeftRegion.Y = 0;
+            if (bottomLeftRegion.X < 0) bottomLeftRegion.X = 0;
+            if (bottomLeftRegion.Y < 0) bottomLeftRegion.Y = 0;
+
+            Vector2 regionPos = new Vector2();
+            for (int x = (int)topLeftRegion.X; x < bottomLeftRegion.X; x++)
+            {
+                for (int y = (int)topLeftRegion.Y; y < bottomLeftRegion.Y; y++)
+                {
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    if (this.regions.ContainsKey(regionPos) && !this.regions[regionPos].isLoaded)
+                        regions.Add(this.regions[regionPos]);
+                    
                 }
             }
 
@@ -671,7 +778,7 @@ namespace BasicRPGTest_Mono.Engine
             if (mTile.layer == null)
             {
                 // Do NOT Add Tile to Map. Tile had no Layer information.
-                Utility.Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). Tile had no assigned Layer.");
+                Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). Tile had no assigned Layer.");
                 return false;
             }
             // Otherwise continue...
@@ -680,7 +787,7 @@ namespace BasicRPGTest_Mono.Engine
             if (mTile.layer.tiles.ContainsKey(mTile.pos))
             {
                 // Do NOT Add Tile to Map. A Tile already exists at that Position
-                Utility.Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
+                Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
                 return false;
             }
             // Otherwise continue...
@@ -891,7 +998,7 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
-            Console.WriteLine("TileTemplates: " + v_TileTemplates.Count);
+            //Console.WriteLine("TileTemplates: " + v_TileTemplates.Count);
             // Prepare Visible Tile Caches for use  (will still need to be filled with "buildVisibleTileCache()")
             // Sets up Edge Tiles and Visible Tiles to work based on Time Templates
             setupVisibleTileCaches();
@@ -932,7 +1039,7 @@ namespace BasicRPGTest_Mono.Engine
                 v_VisibleEdges.Add(tileLayer, new Dictionary<Graphic, List<Vector2>>());
             }
 
-            Console.WriteLine("TileEdges: " + v_TileEdges.Count);
+            //Console.WriteLine("TileEdges: " + v_TileEdges.Count);
         }
 
         public void buildVisibleTileCache()
@@ -1189,12 +1296,18 @@ namespace BasicRPGTest_Mono.Engine
             DataPackManager.loadProgress = 0;
             // TILE DATA SAVING
             DataPackManager.loadStatus = $"Saving {name}: tile data...";
-            double perIteration = 1.0 / Math.Max(regionManager.changedRegions.Count, 1);
-            foreach (Region region in regionManager.changedRegions.Values)
+            double perIteration = 1.0 / Math.Max(regions.Count, 1);
+            YamlSection fullYaml = new YamlSection(name);
+            foreach (Region region in regions.Values)
             {
+                fullYaml.set($"{region.pos.X}-{region.pos.Y}", (YamlSection)region);
                 DataPackManager.loadProgress += perIteration;
-                region.save();
+                //region.save();
             }
+            FileStream stream = File.Create($"save\\{world}\\maps\\{name}\\mapdata.rg");
+            stream.Write(ZipUtils.Zip(fullYaml.ToString()));
+            stream.Close();
+
             DataPackManager.loadProgress = 0;
 
             // GENERAL INFO SAVING

@@ -240,7 +240,7 @@ namespace BasicRPGTest_Mono
             _frameCounter.Update(deltaTime);
             var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
 
-            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.Black);
+            GraphicsDevice.Clear(Microsoft.Xna.Framework.Color.White);
 
             //GraphicsDevice.SetRenderTarget(Game.renderTarget);
 

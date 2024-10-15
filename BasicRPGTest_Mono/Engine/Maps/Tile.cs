@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine;
+using BasicRPGTest_Mono.Engine.Data;
 using BasicRPGTest_Mono.Engine.Datapacks;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.Text;
@@ -18,6 +19,7 @@ using YamlDotNet.RepresentationModel;
 namespace RPGEngine
 {
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+    [MiniSerializable]
     public class Tile
 #pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     {
@@ -32,6 +34,7 @@ namespace RPGEngine
         public int id { get; set; }
         public Graphic graphic { get; set; }
         public List<Graphic> sideGraphics { get; set; } = new List<Graphic>();
+        public List<Graphic> innerCorners { get; set; } = new List<Graphic>();
         public Rectangle box { get; set; }
         public bool isCollidable { get; set; }
         public int zIndex { get; set; }
@@ -79,6 +82,18 @@ namespace RPGEngine
         public double healthPercent;
         private int breakTexture;
         private System.Timers.Timer restoreTimer;
+
+        // SERIALIZABLES
+        [SavedProperty]
+        internal string _id { get { return parent.name; }}
+        [SavedProperty]
+        internal string _biome { get { return biome.name; }}
+        [SavedProperty]
+        internal string _layer { get { return layer.name; }}
+        [SavedProperty]
+        internal short _x { get { return (short)tilePos.X; }}
+        [SavedProperty]
+        internal short _y { get { return (short)tilePos.Y; }}
 
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool indestructable = false)
@@ -129,7 +144,7 @@ namespace RPGEngine
             else
                 texture = Util.loadTexture($"{pack.packPath}\\textures\\missing.png");
 
-            if (texture.Width > dimensions)
+            if (texture.Height > dimensions)
             {
                 graphic = new Graphic(Util.getSpriteFromSet(texture, 1, 1));
                 sideGraphics.Add(new Graphic(Util.getSpriteFromSet(texture, 0, 0)));
@@ -144,6 +159,73 @@ namespace RPGEngine
             else
             {
                 graphic = new Graphic(texture);
+            }
+
+            if (texture.Width > dimensions * 3)
+            {
+                int dimHalf = dimensions / 2;
+                // Corners
+                Texture2D nw = Util.getSpriteFromSet(texture, 1, 8, dimHalf);
+                Texture2D ne = Util.getSpriteFromSet(texture, 1, 9, dimHalf);
+                Texture2D sw = Util.getSpriteFromSet(texture, 2, 8, dimHalf);
+                Texture2D se = Util.getSpriteFromSet(texture, 2, 9, dimHalf);
+
+                Texture2D nL = Util.getSpriteFromSet(texture, 1, 2, dimHalf);
+                Texture2D nR = Util.getSpriteFromSet(texture, 1, 3, dimHalf);
+                Texture2D eT = Util.getSpriteFromSet(texture, 2, 4, dimHalf);
+                Texture2D eB = Util.getSpriteFromSet(texture, 3, 4, dimHalf);
+                Texture2D wT = Util.getSpriteFromSet(texture, 2, 1, dimHalf);
+                Texture2D wB = Util.getSpriteFromSet(texture, 3, 1, dimHalf);
+                Texture2D sL = Util.getSpriteFromSet(texture, 4, 2, dimHalf);
+                Texture2D sR = Util.getSpriteFromSet(texture, 4, 3, dimHalf);
+
+                // NW needs nL + wT
+                RenderTarget2D target = new RenderTarget2D(Core.graphics, dimensions, dimensions);
+                Core.graphics.SetRenderTarget(target);
+                SpriteBatch batch = new SpriteBatch(Core.graphics);
+                batch.Begin();
+                batch.Draw(nw, new Vector2(dimHalf, dimHalf), Color.White);
+                batch.Draw(nL, new Vector2(0, dimHalf), Color.White);
+                batch.Draw(wT, new Vector2(dimHalf, 0), Color.White);
+                batch.End();
+                innerCorners.Add(new Graphic(target));
+
+                // NE needs nR + eT
+                target = new RenderTarget2D(Core.graphics, dimensions, dimensions);
+                Core.graphics.SetRenderTarget(target);
+                batch = new SpriteBatch(Core.graphics);
+                batch.Begin();
+                batch.Draw(ne, new Vector2(0, dimHalf), Color.White);
+                batch.Draw(nR, new Vector2(dimHalf, dimHalf), Color.White);
+                batch.Draw(eT, new Vector2(0, dimHalf), Color.White);
+                batch.End();
+                innerCorners.Add(new Graphic(target));
+
+                // SW needs sL + wB
+                target = new RenderTarget2D(Core.graphics, dimensions, dimensions);
+                Core.graphics.SetRenderTarget(target);
+                batch = new SpriteBatch(Core.graphics);
+                batch.Begin();
+                batch.Draw(sw, new Vector2(dimHalf, 0), Color.White);
+                batch.Draw(sL, new Vector2(0, dimHalf), Color.White);
+                batch.Draw(wB, new Vector2(dimHalf, dimHalf), Color.White);
+                batch.End();
+                innerCorners.Add(new Graphic(target));
+
+                // SE needs sR + eB
+                target = new RenderTarget2D(Core.graphics, dimensions, dimensions);
+                Core.graphics.SetRenderTarget(target);
+                batch = new SpriteBatch(Core.graphics);
+                batch.Begin();
+                batch.Draw(se, new Vector2(0, 0), Color.White);
+                batch.Draw(sR, new Vector2(dimHalf, 0), Color.White);
+                batch.Draw(eB, new Vector2(0, dimHalf), Color.White);
+                batch.End();
+                innerCorners.Add(new Graphic(target));
+
+
+                Core.graphics.SetRenderTarget(null);
+
             }
 
             // DROPTABLE
@@ -194,7 +276,7 @@ namespace RPGEngine
 
         }
         public Tile(YamlSection data) : 
-            this(TileManager.getByName(data.getString("id")), new Vector2((float)data.getDouble("position.x"), (float)data.getDouble("position.y")), BiomeManager.getByName(data.getString("biome")))
+            this(TileManager.getByName(data.getString("id")), new Vector2((float)data.getDouble("x"), (float)data.getDouble("y")), BiomeManager.getByName(data.getString("biome")))
         {
             //Console.WriteLine($"{tilePos}");
         }
@@ -202,6 +284,10 @@ namespace RPGEngine
         private Graphic getSideGraphic(TileSide side)
         {
             return sideGraphics[(int)side];
+        }
+        private Graphic getCornerGraphic(TileCorner corner)
+        {
+            return innerCorners[(int)corner];
         }
 
         public void update()
@@ -288,6 +374,23 @@ namespace RPGEngine
                 }
             }
 
+            /*bool isInner;
+            Array cornersEnum = Enum.GetValues(typeof(TileCorner));
+            foreach (TileCorner corner in cornersEnum)
+            {
+                isInner = false;
+                graphic = getCornerGraphic(corner);
+                if (graphic == null) continue;
+                checkPos = tilePos;
+
+                switch (corner)
+                {
+                    case TileCorner.NorthWest:
+                        checkPos = ;
+                        break;
+                }
+            }*/
+
             this.sides = sides;
 
         }
@@ -315,14 +418,14 @@ namespace RPGEngine
 
         public void Damage(double dmg)
         {
-            restoreTimer.Stop();
+            if (restoreTimer != null) restoreTimer.Stop();
             restoreTimer = new System.Timers.Timer(10000);
             restoreTimer.Elapsed += (sender, args) =>
             {
                 Heal(maxHealth);
                 restoreTimer.Stop();
-                restoreTimer = null;
                 restoreTimer.Dispose();
+                restoreTimer = null;
             };
             restoreTimer.Start();
             health -= dmg;
@@ -459,8 +562,8 @@ namespace RPGEngine
             config.setString("id", tl.parent.name);
             config.setString("biome", tl.biome.name);
             config.setString("layer", tl.layer.name);
-            config.setDouble("position.x", tl.tilePos.X);
-            config.setDouble("position.y", tl.tilePos.Y);
+            config.setDouble("x", tl.tilePos.X);
+            config.setDouble("y", tl.tilePos.Y);
 
             return config;
         }
@@ -478,5 +581,13 @@ namespace RPGEngine
         SouthWest = 5,
         South = 6,
         SouthEast = 7
+    }
+
+    public enum TileCorner
+    {
+        NorthWest = 0,
+        NorthEast = 1,
+        SouthWest = 2,
+        SouthEast = 3,
     }
 }

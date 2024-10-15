@@ -84,4 +84,11 @@ namespace BasicRPGTest_Mono.Engine.Maps
             return config;
         }
     }
+
+    public enum TileLayerType
+    {
+        Ground,
+        Object,
+        Overlay
+    }
 }

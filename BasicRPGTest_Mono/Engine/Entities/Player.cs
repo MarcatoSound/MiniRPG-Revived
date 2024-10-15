@@ -127,6 +127,8 @@ namespace BasicRPGTest_Mono.Engine
 
             inventory = new PlayerInventory(new YamlSection((YamlMappingNode)data.get("inventory")));
 
+            //Load.loadRegions(map.world, map, map.getUnloadedRegionsInRange(getPlayerTilePosition(), 3));
+
         }
         public void toggleInv()
         {
@@ -289,6 +291,8 @@ namespace BasicRPGTest_Mono.Engine
             }
 
             Position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
+
+            //Load.loadRegionsAsync(map.world, map, map.getUnloadedRegionsInRange(getPlayerTilePosition(), 3));
 
         }
 

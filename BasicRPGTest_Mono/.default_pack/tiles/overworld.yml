@@ -1,7 +1,7 @@
 water:
   texture: tiles/water.png
   zindex: 0
-  collidable: false
+  collidable: true
   indestructable: true
 grass:
   texture: tiles/grass.png
@@ -22,7 +22,7 @@ stone:
   texture: tiles/stone.png
   max_health: 35
   zindex: 5
-  collidable: false
+  collidable: true
 sand:
   texture: tiles/sand.png
   max_health: 10
