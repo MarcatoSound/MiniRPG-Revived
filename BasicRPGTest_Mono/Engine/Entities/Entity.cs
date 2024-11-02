@@ -1,4 +1,7 @@
-﻿using BasicRPGTest_Mono.Engine.Maps;
+﻿using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Entities.Tags;
+using BasicRPGTest_Mono.Engine.Graphics;
+using BasicRPGTest_Mono.Engine.Maps;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -10,14 +13,14 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Engine
 {
-    public class Entity
+    public class Entity : LightSource, ITaggable
     {
         public string name { get; set; }
         public int id { get; set; }
         public int instanceId { get; set; }
         public Graphic graphic { get; set; }
         public Rectangle boundingBox { get; set; }
-        public Vector2 Position { get; set; }
+        //override public Vector2 Position { get; set; }
         public Vector2 TilePosition
         {
             get
@@ -49,6 +52,8 @@ namespace BasicRPGTest_Mono.Engine
         }
 
 
+        public TagContainer Tags { get; private set; }
+
         public Entity(Graphic graphic) : this(graphic, new Rectangle(0, 0, graphic.width, graphic.height)) { }
         public Entity(Graphic graphic, Rectangle box)
         {
@@ -69,6 +74,8 @@ namespace BasicRPGTest_Mono.Engine
 
         public virtual void update()
         {
+            if (!LightManager.HasLight(this) && GlowSize > 0) LightManager.AddLight(this);
+            else if (LightManager.HasLight(this)) LightManager.RemoveLight(this);
         }
         public virtual void draw(SpriteBatch batch)
         {

@@ -3,6 +3,8 @@ water:
   zindex: 0
   collidable: true
   indestructable: true
+  glow_strength: 0.5
+  glow_color: '#82c7ff'
 grass:
   texture: tiles/grass.png
   max_health: 10

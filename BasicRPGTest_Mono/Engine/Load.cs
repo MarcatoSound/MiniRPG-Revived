@@ -1,21 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using MonoGame.Extended.Tiled;
 using Newtonsoft.Json.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using RPGEngine;
 using BasicRPGTest_Mono.Engine.Maps;
 using BasicRPGTest_Mono.Engine.Utility;
 using YamlDotNet.RepresentationModel;
-using System.Threading;
 using System.Threading.Tasks;
 using BasicRPGTest_Mono.Engine.Datapacks;
-using System.IO.Compression;
-using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine
@@ -103,19 +96,23 @@ namespace BasicRPGTest_Mono.Engine
                 codeTimer.startTimer();
                 string mapPath = $"{path}\\{mapFolder.Name}";
 
-                
-                reader = new StreamReader($"{mapPath}\\map.yml");
+                var mapDataFile = File.OpenRead($"{mapPath}\\mapdata.dat");
+                Map map = ProtoBuf.Serializer.Deserialize<Map>(mapDataFile);
+                map.world = world;
+
+                /*reader = new StreamReader($"{mapPath}\\map.yml");
                 input = new StringReader(reader.ReadToEnd());
                 yaml.Load(input);
 
                 YamlSection general = new YamlSection((YamlMappingNode)yaml.Documents[0].RootNode);
 
-                Map map = new Map(general, world);
+
+                //Map map = new Map(general, world);
                 reader.Close();
                 if (map.name == "") continue;
 
                 // Load the local tile data
-                if (map.name.Equals(playerMap))
+                /*if (map.name.Equals(playerMap))
                 {
                     string regionFile = $"mapdata";
 
@@ -135,7 +132,7 @@ namespace BasicRPGTest_Mono.Engine
                     }
                 }
 
-                DataPackManager.loadProgress = 0;
+                DataPackManager.loadProgress = 0;*/
                 //if (map.name.Equals(playerMap))
                 //    loadAllRegions(world, map);
                 /*if (playerMap.Equals(map.name))
@@ -200,9 +197,66 @@ namespace BasicRPGTest_Mono.Engine
 
             MapManager.activeMap = MapManager.getByName(playerMap);
 
+            foreach (Region region in MapManager.activeMap.regions.Values)
+            {
+                foreach (Tile tile in region.tiles)
+                {
+                    tile.update();
+                }
+            }
+
             return maps;
 
         }
+        /*public static Map loadMap(string world, string mapName)
+        {
+            CodeTimer codeTimer = new CodeTimer();
+            codeTimer.startTimer();
+
+            path = $"save\\{world}\\maps";
+
+            string mapPath = $"{path}\\{mapName}";
+
+            var mapDataFile = File.OpenRead($"{mapPath}\\mapdata.dat");
+            Map map = ProtoBuf.Serializer.Deserialize<Map>(mapDataFile);
+            map.world = world;
+
+
+            // Load the living entities
+            StreamReader reader = new StreamReader($"{mapPath}\\entities.yml");
+            var input = new StringReader(reader.ReadToEnd());
+            YamlStream yaml = new YamlStream();
+            yaml.Load(input);
+
+            YamlSequenceNode entities = (YamlSequenceNode)yaml.Documents[0].RootNode;
+            foreach (YamlMappingNode entityData in entities)
+            {
+                YamlSection entity = new YamlSection(entityData);
+                map.loadEntity(entity);
+            }
+            reader.Close();
+
+            // Load the item entities
+            reader = new StreamReader($"{mapPath}\\item_drops.yml");
+            input = new StringReader(reader.ReadToEnd());
+            yaml.Load(input);
+
+            YamlSequenceNode itemEntities = (YamlSequenceNode)yaml.Documents[0].RootNode;
+            foreach (YamlMappingNode itemData in itemEntities)
+            {
+                YamlSection item = new YamlSection(itemData);
+                map.loadItemEntity(item);
+            }
+            reader.Close();
+
+            map.buildTileTemplateCache();
+            map.buildVisibleTileCache();
+
+            codeTimer.endTimer();
+            Util.myDebug($"Took {codeTimer.getTotalTimeInMilliseconds()}ms to load map {map.name}.");
+
+            return map;
+        }*/
         public static void loadRegions(string world, Map map, List<Region> regions)
         {
             path = $"save\\{world}\\maps";

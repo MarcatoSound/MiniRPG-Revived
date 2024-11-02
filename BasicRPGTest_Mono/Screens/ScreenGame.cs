@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Graphics;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.HUD;
 using BasicRPGTest_Mono.Engine.Items;
@@ -90,6 +91,7 @@ namespace BasicRPGTest_Mono
             Camera.camera.Position = player.Position;
             Camera.camera.CameraLimits = new Rectangle(0, 0, MapManager.activeMap.widthInPixels, MapManager.activeMap.heightInPixels);
 
+            EntityManager.entities[0].GetTag
 
             base.LoadContent();
 
@@ -103,12 +105,13 @@ namespace BasicRPGTest_Mono
 
         public override void UnloadContent()
         {
-            MapManager.saveMaps();
             Core.player.save();
+            MapManager.saveMaps();
             Camera.reset();
             GuiWindowManager.closeWindow();
             GuiWindowManager.Clear();
             HudManager.Clear();
+            GFX2DEngine.Hud.HudManager.Clear();
             EntityManager.clear();
             TileManager.Clear();
 
@@ -226,6 +229,15 @@ namespace BasicRPGTest_Mono
                 MapManager.activeMap.update_VisibleRegions(Camera.camera);
             }
 
+            LightManager.Update();
+
+            List<PopupText> popups = new List<PopupText>(Core.popupTexts);
+            foreach (PopupText popup in popups)
+            {
+                if (popup == null) continue;
+                popup.update(gameTime);
+            }
+
         }
 
         public override void Draw(GameTime gameTime)
@@ -292,10 +304,32 @@ namespace BasicRPGTest_Mono
 
             _spriteBatch.End();
 
+            //GraphicsDevice.SetRenderTarget(null);
+
+            BlendState state = new BlendState()
+            {
+                ColorBlendFunction = BlendFunction.Add,
+                ColorSourceBlend = Blend.DestinationColor,
+                ColorDestinationBlend = Blend.Zero,
+            };
+            //state.AlphaSourceBlend = Blend.Zero;
+            //state.ColorSourceBlend = Blend.Zero;
+            //state.AlphaDestinationBlend = Blend.SourceColor;
+            //state.ColorDestinationBlend = Blend.SourceColor;
+
+            //state.ColorBlendFunction = BlendFunction.Add;
+            //state.ColorSourceBlend = Blend.DestinationColor;
+            //state.ColorDestinationBlend = Blend.Zero;
+            if (LightManager.LightMap == null) LightManager.Update();
+            _spriteBatch.Begin(SpriteSortMode.Immediate, state);
+            _spriteBatch.Draw(LightManager.LightMap, Vector2.Zero, Microsoft.Xna.Framework.Color.White);
+            _spriteBatch.End();
+
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             HudManager.Draw(_spriteBatch);
+            GFX2DEngine.Hud.HudManager.Draw(_spriteBatch);
 
             if (GuiWindowManager.activeWindow != null)
             {
@@ -328,6 +362,7 @@ namespace BasicRPGTest_Mono
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.DrawString(FontLibrary.getFont("dmg"), fps, new Vector2(25, 25), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.DrawString(FontLibrary.getFont("dmg"), $"{MapManager.activeMap.name} tiles: {MapManager.activeMap.getTilesTotalCountDrawn()}", new Vector2(25, 50), Microsoft.Xna.Framework.Color.Black);
+            _spriteBatch.DrawString(FontLibrary.getFont("dmg"), $"{MapManager.activeMap.v_regionsVisible.Count} regions visible.", new Vector2(25, 75), Microsoft.Xna.Framework.Color.Black);
             _spriteBatch.End();
 
             // End Code Timer for speed test

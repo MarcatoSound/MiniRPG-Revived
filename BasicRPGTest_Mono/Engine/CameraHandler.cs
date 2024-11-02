@@ -1,4 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Maps;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -88,6 +89,7 @@ namespace BasicRPGTest_Mono.Engine
         protected float _viewportWidth;
         private float _scale;
         private float _oldScale;
+        private Vector2 _tilePos;
 
         public Camera2D(Game game)
             : base(game)
@@ -146,8 +148,8 @@ namespace BasicRPGTest_Mono.Engine
             maxZoom = 1.5f;
             minZoom = 0.8f;
             //minZoom = 0.3f;
-            Scale = 1.25f;
-            _oldScale = 1.25f;
+            Scale = 1.0f;
+            _oldScale = 1.0f;
             MoveSpeed = 5f;
 
             base.Initialize();
@@ -187,6 +189,17 @@ namespace BasicRPGTest_Mono.Engine
 
             BoundingRectangle = new Rectangle(Convert.ToInt32(_position.X - (_viewportWidth / 2 / newScale)), Convert.ToInt32(_position.Y - (_viewportHeight / 2 / newScale)), Convert.ToInt32(_viewportWidth / newScale), Convert.ToInt32(_viewportHeight / newScale));
 
+            Vector2 newTilePos = Util.getTilePosition(new Vector2(BoundingRectangle.Left, BoundingRectangle.Top));
+            if (newTilePos != _tilePos)
+            {
+                CameraTileChange?.Invoke(this, new CameraTileChangeEventArgs() 
+                 {
+                     OldPosition = _tilePos,
+                     NewPosition = newTilePos
+                 });
+                _tilePos = newTilePos;
+            }
+
             base.Update(gameTime);
         }
 
@@ -214,5 +227,41 @@ namespace BasicRPGTest_Mono.Engine
             // In View
             return true;
         }
+        public bool IsInViewWithBuffer(Vector2 position, Texture2D texture, double buffer)
+        {
+            // If the object is not within the horizontal bounds of the screen
+
+            if ((position.X + texture.Width) < (Position.X - Origin.X - buffer) || (position.X) > (Position.X + Origin.X + buffer))
+                return false;
+
+            // If the object is not within the vertical bounds of the screen
+            if ((position.Y + texture.Height) < (Position.Y - Origin.Y - buffer) || (position.Y) > (Position.Y + Origin.Y + buffer))
+                return false;
+
+            // In View
+            return true;
+        }
+
+        public Vector2 screenPosToWorldPos(Vector2 screenPos)
+        {
+            Vector2 pos = new Vector2(screenPos.X, screenPos.Y);
+
+            pos.X /= Scale;
+            pos.Y /= Scale;
+            pos.X += BoundingRectangle.X;
+            pos.Y += BoundingRectangle.Y;
+
+            return pos;
+        }
+
+
+        // EVENTS
+        public event EventHandler<CameraTileChangeEventArgs> CameraTileChange;
+    }
+
+    public class CameraTileChangeEventArgs
+    {
+        public Vector2 OldPosition { get; set; }
+        public Vector2 NewPosition { get; set; }
     }
 }

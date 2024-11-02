@@ -6,15 +6,15 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Engine.Data
 {
-    public class MiniSerializable : Attribute
+    public class MiniSerializable
     {
         public string serialize()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("{");
 
-            PropertyInfo[] properties = this.GetType().GetProperties();
-            PropertyInfo last = properties[properties.Length - 1];
+            List<PropertyInfo> properties = (List<PropertyInfo>)this.GetType().GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(SavedProperty)));
+            PropertyInfo last = properties[properties.Count - 1];
 
             foreach (PropertyInfo property in properties)
             {
@@ -37,7 +37,7 @@ namespace BasicRPGTest_Mono.Engine.Data
                         foreach (MiniSerializable obj in iterable)
                         {
                             sb.Append(obj.serialize());
-                            if (obj != miniLast) sb.Append(",");
+                            if (obj != miniLast) sb.Append("|");
                         }
                         sb.Append("]");
                     }
@@ -55,6 +55,13 @@ namespace BasicRPGTest_Mono.Engine.Data
 
             return sb.ToString();
         }
+
+        /*public static T deserialize<T>(string data)
+        {
+            List<PropertyInfo> properties = (List<PropertyInfo>)typeof(T).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(SavedProperty)));
+
+            data.Split("|");
+        }*/
     }
 
     public class SavedProperty : Attribute

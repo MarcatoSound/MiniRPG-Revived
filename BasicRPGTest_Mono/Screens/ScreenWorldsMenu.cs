@@ -34,9 +34,9 @@ namespace BasicRPGTest_Mono.Screens
             DirectoryInfo dirInfo = new DirectoryInfo(path);
             DirectoryInfo[] dirs = dirInfo.GetDirectories();
 
-            int menuX = _graphics.PreferredBackBufferWidth / 3;
-            int menuY = _graphics.PreferredBackBufferHeight / 3;
-            worldMenu = new Menu("mainmenu", new Rectangle(menuX, menuY, 400, 240), Color.Gray, Color.White, font);
+            int menuX = _graphics.PreferredBackBufferWidth / 2;
+            int menuY = _graphics.PreferredBackBufferHeight / 2;
+            worldMenu = new Menu("mainmenu", new Rectangle(menuX-200, menuY-120, 400, 240), Color.Gray, Color.White, font);
 
             foreach (DirectoryInfo dir in dirs)
             {

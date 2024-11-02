@@ -1,6 +1,8 @@
 ﻿using BasicRPGTest_Mono.Engine;
 using BasicRPGTest_Mono.Engine.Data;
 using BasicRPGTest_Mono.Engine.Datapacks;
+using BasicRPGTest_Mono.Engine.Entities;
+using BasicRPGTest_Mono.Engine.Graphics;
 using BasicRPGTest_Mono.Engine.GUI;
 using BasicRPGTest_Mono.Engine.GUI.Text;
 using BasicRPGTest_Mono.Engine.Items;
@@ -9,8 +11,10 @@ using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Timers;
@@ -19,25 +23,41 @@ using YamlDotNet.RepresentationModel;
 namespace RPGEngine
 {
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-    [MiniSerializable]
-    public class Tile
+    [ProtoContract]
+    public class Tile : LightSource
 #pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     {
         //====================================================================================
         // VARIABLES
         //====================================================================================
 
-        public Map map;
-
+        //---------------------------------------
+        // Render Data
+        //---------------------------------------
         public const int dimensions = 32;
-        public string name { get; set; }
-        public int id { get; set; }
         public Graphic graphic { get; set; }
         public List<Graphic> sideGraphics { get; set; } = new List<Graphic>();
         public List<Graphic> innerCorners { get; set; } = new List<Graphic>();
+        public int zIndex { get; set; }
+        public Vector2 drawPos { get; set; } = new Vector2(0, 0);
+        public List<bool> sides { get; set; }
+
+        private Dictionary<Graphic, Vector2> edgeCache = new Dictionary<Graphic, Vector2>();
+        private bool v_Visible = true;
+        public bool seeThrough = false;
+        private int breakTexture;
+
+        //---------------------------------------
+        // World Data
+        //---------------------------------------
+
+        public Map map;
+
+        [ProtoMember(1)]
+        public string name { get; set; }
+        public int id { get; set; }
         public Rectangle box { get; set; }
         public bool isCollidable { get; set; }
-        public int zIndex { get; set; }
 
         public double maxHealth { get; set; }
         public bool indestructable { get; set; }
@@ -45,17 +65,42 @@ namespace RPGEngine
 
         // Instance variables
         private bool isInstance;
-        public Tile parent { get; set; }
+        public Tile parent 
+        {
+            get { return TileManager.getByName(name); }
+            set { name = value.name; }
+        }
         public Vector2 pos { get; set; } = new Vector2(0, 0);
-        public Vector2 drawPos { get; set; } = new Vector2(0, 0);
-        public Vector2 tilePos { get; set; } = new Vector2(0, 0);
+        public Vector2 tilePos { get; private set; } = new Vector2(0, 0);
+        [ProtoMember(2)]
+        public int x
+        {
+            get { return (int)tilePos.X; }
+            set
+            {
+                tilePos = new Vector2(value, y);
+            }
+        }
+        [ProtoMember(3)]
+        public int y
+        { 
+            get { return (int)tilePos.Y; }
+            set 
+            { 
+                tilePos = new Vector2(x, value);
+            }
+        }
         public Vector2 region { get; set; } = new Vector2(0, 0);
-        public TileLayer layer { get; set; }
-        public List<bool> sides { get; set; }
-
-        private Dictionary<Graphic, Vector2> edgeCache = new Dictionary<Graphic, Vector2>();
-        private bool v_Visible = true;
-        public bool seeThrough = false;
+        public TileLayer layer 
+        { 
+            get { return _layer; }
+            set 
+            {
+                _layer = value;
+                layerName = value.name;
+            }
+        }
+        private TileLayer _layer;
 
         public Biome biome { get; set; }
 
@@ -80,20 +125,24 @@ namespace RPGEngine
         }
         public bool isBeingDamaged;
         public double healthPercent;
-        private int breakTexture;
         private System.Timers.Timer restoreTimer;
 
         // SERIALIZABLES
-        [SavedProperty]
-        internal string _id { get { return parent.name; }}
-        [SavedProperty]
-        internal string _biome { get { return biome.name; }}
-        [SavedProperty]
-        internal string _layer { get { return layer.name; }}
-        [SavedProperty]
-        internal short _x { get { return (short)tilePos.X; }}
-        [SavedProperty]
-        internal short _y { get { return (short)tilePos.Y; }}
+        [ProtoMember(4)]
+        internal string _biome 
+        { 
+            get { return biome.name; }
+            set
+            {
+                biome = BiomeManager.getByName(value);
+            }
+        }
+        [ProtoMember(5)]
+        internal string layerName
+        {
+            get;
+            set;
+        }
 
 
         public Tile(string name, Texture2D texture, bool collidable = false, bool instance = true, int z = 1, double maxHP = 20, bool indestructable = false)
@@ -133,6 +182,8 @@ namespace RPGEngine
             this.isCollidable = config.getBool("collidable", false);
             this.maxHealth = config.getInt("max_health", 10);
             this.indestructable = config.getBool("indestructable", false);
+            this.GlowSize = (float)config.getDouble("glow_strength", 0);
+            this.GlowColor = Util.colorFromHex(config.getString("glow_color", "#FFFFFF"));
 
             // These take a little more processing to validate...
 
@@ -248,15 +299,14 @@ namespace RPGEngine
         public Tile(Tile tile, Vector2 tilePos, Biome biome)
         {
 
-            this.parent = tile;
+            this.name = tile.name;
+            this.id = tile.id;
             if (parent == null)
             {
                 //TODO: Error message goes here.
                 return;
             }
 
-            this.name = tile.name;
-            this.id = tile.id;
             this.isCollidable = tile.isCollidable;
             this.isInstance = true;
             this.zIndex = tile.zIndex;
@@ -264,6 +314,10 @@ namespace RPGEngine
             this.biome = biome;
             this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
             this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
+            this.GlowSize = tile.GlowSize;
+            this.GlowColor = tile.GlowColor;
+            this.Position = tilePos;
+            if (GlowSize > 0) map.lightTiles.Add(tilePos, this);
             sideGraphics = tile.sideGraphics;
             sides = new List<bool>(new bool[8]);
             dropTable = tile.dropTable;
@@ -280,6 +334,14 @@ namespace RPGEngine
         {
             //Console.WriteLine($"{tilePos}");
         }
+        // Makes protobuf serialization happy.
+        private Tile() { }
+
+
+        //---------------------------------------
+        // Render Methods
+        //---------------------------------------
+        #region Render Methods
 
         private Graphic getSideGraphic(TileSide side)
         {
@@ -290,6 +352,31 @@ namespace RPGEngine
             return innerCorners[(int)corner];
         }
 
+        public void draw(SpriteBatch batch)
+        {
+            if (!isInstance) return;
+
+            if (healthPercent < 1)
+                drawBreakTexture(batch);
+
+            if (isBeingDamaged)
+                batch.DrawRectangle(box, Color.Red);
+        }
+        public void drawBreakTexture(SpriteBatch batch)
+        {
+            Texture2D spriteSet = TileManager.breakTexture;
+            if (spriteSet == null) return;
+
+            Rectangle targetRect = new Rectangle(TileManager.dimensions * breakTexture, 0, TileManager.dimensions, TileManager.dimensions);
+
+            batch.Draw(spriteSet, pos, targetRect, Color.White);
+        }
+        #endregion
+
+        //---------------------------------------
+        // World Methods
+        //---------------------------------------
+        #region World Methods
         public void update()
         {
 
@@ -392,29 +479,9 @@ namespace RPGEngine
             }*/
 
             this.sides = sides;
+            if (GlowSize > 0) map.lightTiles.Add(tilePos, this);
 
         }
-
-        public void draw(SpriteBatch batch)
-        {
-            if (!isInstance) return;
-
-            if (healthPercent < 1)
-                drawBreakTexture(batch);
-
-            if (isBeingDamaged)
-                batch.DrawRectangle(box, Color.Red);
-        }
-        public void drawBreakTexture(SpriteBatch batch)
-        {
-            Texture2D spriteSet = TileManager.breakTexture;
-            if (spriteSet == null) return;
-
-            Rectangle targetRect = new Rectangle(TileManager.dimensions * breakTexture, 0, TileManager.dimensions, TileManager.dimensions);
-
-            batch.Draw(spriteSet, pos, targetRect, Color.White);
-        }
-
 
         public void Damage(double dmg)
         {
@@ -485,6 +552,7 @@ namespace RPGEngine
 
             // Rebuilds updated Visible Tile Cache
             map.buildVisibleTileCache();
+            map.redraw = true;
 
         }
 
@@ -502,7 +570,12 @@ namespace RPGEngine
 
             new MovingText(dmg.ToString(), font, stringPos, new TextColor(Color.Crimson), 500);
         }
+        #endregion
 
+        //---------------------------------------
+        // Other Utilities
+        //---------------------------------------
+        #region Other Utilities
 
         public override bool Equals(object obj)
         {
@@ -568,7 +641,47 @@ namespace RPGEngine
             return config;
         }
 
+
+        [OnDeserialized]
+        public void onDeserialized()
+        {
+            if (parent == null)
+            {
+                //TODO: Error message goes here.
+                return;
+            }
+            this.id = parent.id;
+
+            this.isCollidable = parent.isCollidable;
+            this.isInstance = true;
+            this.zIndex = parent.zIndex;
+            this.tilePos = tilePos;
+            this.biome = biome;
+            this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
+            this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
+            this.GlowSize = parent.GlowSize;
+            this.GlowColor = parent.GlowColor;
+            this.Position = pos;
+            //if (GlowStrength > 0) map.lightTiles.Add(tilePos, this);
+            sideGraphics = parent.sideGraphics;
+            sides = new List<bool>(new bool[8]);
+            dropTable = parent.dropTable;
+
+            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
+
+            maxHealth = parent.maxHealth;
+            health = maxHealth;
+            this.indestructable = parent.indestructable;
+
+        }
+        #endregion
+
     }
+
+
+    //---------------------------------------
+    // Render Enums
+    //---------------------------------------
 
 
     public enum TileSide

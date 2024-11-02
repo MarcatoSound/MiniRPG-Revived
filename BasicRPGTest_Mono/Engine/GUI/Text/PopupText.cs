@@ -51,16 +51,21 @@ namespace BasicRPGTest_Mono.Engine.GUI
             timer.Start();
         }
 
-        public virtual void draw(SpriteBatch batch)
+        public virtual void update(GameTime gameTime)
         {
+            var delta = gameTime.ElapsedGameTime.TotalSeconds;
+
             textColor.update();
 
             if (alpha < 256)
             {
                 textColor.color.A = (byte)alpha;
             }
-            alpha = Math.Max(alpha - alphaRate, 0);
+            alpha = (int)Math.Max(alpha - (alphaRate * delta), 0);
+        }
 
+        public virtual void draw(SpriteBatch batch)
+        {
             batch.DrawString(font, text, pos, textColor);
         }
 

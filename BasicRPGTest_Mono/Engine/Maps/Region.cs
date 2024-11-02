@@ -1,13 +1,17 @@
-﻿using BasicRPGTest_Mono.Engine.Utility;
+﻿using BasicRPGTest_Mono.Engine.Data;
+using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using ProtoBuf;
 using RPGEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection.Emit;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using YamlDotNet.RepresentationModel;
@@ -15,17 +19,54 @@ using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine.Maps
 {
+    [ProtoContract]
     public class Region
     {
         // Region sizes should be in multiples of 4
         public const int regionSize = 32;
 
-        public Map map { get; private set; }
+        public Map map 
+        {
+            get { return _map; } 
+            internal set 
+            {
+                _map = value;
+                if (tiles == null) return;
+                foreach (var tile in tiles)
+                {
+                    tile.map = _map;
+                    TileLayer layer = map.layersByName[tile.layerName];
+                    tile.layer = layer;
+                    layer.addTile(tile);
+                }
+            } 
+        }
+        private Map _map;
 
         public bool isLoaded { get; set; } = false;
         public Vector2 pos { get; private set; }
         public Vector2 regionPos { get; private set; }
+        [ProtoMember(1)]
+        internal int x
+        {
+            get { return (int)regionPos.X; }
+            set
+            {
+                pos = new Vector2(value, regionPos.Y);
+            }
+        }
+        [ProtoMember(2)]
+        internal int y
+        {
+            get { return (int)regionPos.Y; }
+            set
+            {
+                pos = new Vector2(regionPos.X, value);
+            }
+        }
+
         public Rectangle box { get; set; }
+        [ProtoMember(3)]
         public List<Tile> tiles;
 
         public Region(Vector2 pos, Vector2 regionPos, Map map)
@@ -36,6 +77,8 @@ namespace BasicRPGTest_Mono.Engine.Maps
             box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), regionSize * TileManager.dimensions, regionSize * TileManager.dimensions);
             tiles = new List<Tile>();
         }
+        // Makes protobuf serialization happy.
+        private Region() { }
 
         public void addTile(Tile tile)
         {
@@ -105,6 +148,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
             config.set("tiles", sequence);
 
             return config;
+        }
+
+
+        [OnDeserialized]
+        public void onDeserialized()
+        {
+            pos = new Vector2(x * (TileManager.dimensions * 32), y * (TileManager.dimensions * 32));
+            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), regionSize * TileManager.dimensions, regionSize * TileManager.dimensions);
+            //Console.WriteLine($"== {tiles.Count} tiles in region!");
         }
 
     }

@@ -102,7 +102,7 @@ namespace BasicRPGTest_Mono.Screens
             sprite = Content.Load<Texture2D>("iron_root");
             ItemManager.add(new ParentItem("Iron Root", sprite));
             sprite = Content.Load<Texture2D>("crystal_sword");
-            ParentTool pickaxe = new ParentTool("Crystal Sword", sprite, new Rectangle(), 5);
+            ParentTool pickaxe = new ParentTool("Crystal Sword", sprite, new Rectangle(0, 0, 24, 24), 5);
             pickaxe.damageTypes.Add(DamageType.Mining, 5);
             ItemManager.add(pickaxe);
 

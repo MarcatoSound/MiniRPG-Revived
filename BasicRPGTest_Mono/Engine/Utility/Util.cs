@@ -9,6 +9,7 @@ using RPGEngine;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -397,9 +398,11 @@ namespace BasicRPGTest_Mono.Engine.Utility
         public static Vector2 screenPosToTruePos(Vector2 truePos)
         {
             Vector2 pos = new Vector2(truePos.X, truePos.Y);
+            Console.WriteLine(pos);
 
             pos.X += Camera.camera.BoundingRectangle.X;
             pos.Y += Camera.camera.BoundingRectangle.Y;
+            Console.WriteLine(pos);
 
             return pos;
         }
@@ -450,6 +453,12 @@ namespace BasicRPGTest_Mono.Engine.Utility
             Texture2D NewTexture = Texture2D.FromStream(Core.graphics, setStream);
             setStream.Dispose();
             return NewTexture;
+        }
+        public static void saveTexture(Texture2D texture, string path)
+        {
+            FileStream setStream = File.Open(path, FileMode.Create);
+            texture.SaveAsPng(setStream, texture.Width, texture.Height);
+            setStream.Dispose();
         }
 
         public static Texture2D buildWindowTexture(Rectangle box, Texture2D spriteset, int dimensions = 16)
@@ -613,6 +622,28 @@ namespace BasicRPGTest_Mono.Engine.Utility
             //Console.WriteLine($"Collected {tiles.Count} tiles.");
 
             return tiles;
+        }
+
+        public static Color invertColor(Color color)
+        {
+            Color newCol = new Color(255 - color.R, 255 - color.G, 255 - color.B, color.A);
+
+            return newCol;
+        }
+        /// <summary>
+        /// Retrieves an XNA Color from an HTML hex code color. (Does not support alpha.)
+        /// </summary>
+        /// <param name="hex">An HTML hex code. E.g. #FFFFFF</param>
+        /// <returns></returns>
+        public static Color colorFromHex(string hex)
+        {
+            if (hex.Length != 7)
+                return Color.Gray;
+
+            int r = Convert.ToInt32(hex.Substring(1, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(3, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(5, 2), 16);
+            return new Color(r, g, b);
         }
 
 

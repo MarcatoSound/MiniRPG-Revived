@@ -1,6 +1,5 @@
 ﻿using BasicRPGTest_Mono.Engine.Maps;
 using Microsoft.Xna.Framework;
-using MonoGame.Extended.Tiled;
 using RPGEngine;
 using System;
 using System.Collections.Generic;

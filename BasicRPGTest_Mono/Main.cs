@@ -17,6 +17,9 @@ using System.Drawing.Imaging;
 using SharpNoise.Modules;
 using SharpNoise.Builders;
 using SharpNoise;
+using BasicRPGTest_Mono.Engine.Graphics;
+using BasicRPGTest_Mono.Engine.GUI.HUD;
+using GFX2DEngine.Hud;
 
 namespace BasicRPGTest_Mono
 {
@@ -72,6 +75,20 @@ namespace BasicRPGTest_Mono
             {
                 if (args.Key == Keys.OemTilde)
                     toggleConsole();
+                if (args.Key == Keys.G)
+                    MapManager.activeMap.redraw = true;
+                if (args.Key == Keys.B)
+                    LightManager.AddDarkness();
+                if (args.Key == Keys.N)
+                    Console.WriteLine(MapManager.activeMap.lightTiles.Count);
+
+                if (args.Key == Keys.K)
+                    GFX2DEngine.Hud.HudManager.AddElement(new HudMeter("metertest", Util.loadTexture("metertest_bg.png"), Util.loadTexture("metertest_fill.png"), 0.5F, 0.025F));
+                if (args.Key == Keys.Add)
+                    ((HudMeter)GFX2DEngine.Hud.HudManager.GetElement("metertest")).Progress += 0.025F;
+                if (args.Key == Keys.Subtract)
+                    ((HudMeter)GFX2DEngine.Hud.HudManager.GetElement("metertest")).Progress -= 0.025F;
+
 
                 if (activeScreen is ScreenStartMenu)
                 {
@@ -161,23 +178,42 @@ namespace BasicRPGTest_Mono
 
                     if (!Core.paused)
                     {
-                        if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
+                        if (args.Key == Keys.D6) Core.ControlScheme = "";
+                        if (args.Key == Keys.D7) Core.ControlScheme = "minicraft";
+
+                        if (Core.ControlScheme == "")
                         {
-                            Core.player.Dash();
+                            if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
+                                Core.player.Dash();
+
+                            if (args.Key == Keys.W) Core.player.setDirection(Direction.Up);
+                            if (args.Key == Keys.S) Core.player.setDirection(Direction.Down);
+                            if (args.Key == Keys.A) Core.player.setDirection(Direction.Left);
+                            if (args.Key == Keys.D) Core.player.setDirection(Direction.Right);
+
+                            if (args.Key == Keys.Up) Core.player.attack(Direction.Up);
+                            if (args.Key == Keys.Down) Core.player.attack(Direction.Down);
+                            if (args.Key == Keys.Left) Core.player.attack(Direction.Left);
+                            if (args.Key == Keys.Right) Core.player.attack(Direction.Right);
+
+                            if (args.Key == Keys.F) Core.player.swapHotbars();
+                            if (args.Key == Keys.E) Core.player.toggleInv();
+                        } else if (Core.ControlScheme == "minicraft")
+                        {
+                            if (args.Key == Keys.LeftShift || args.Key == Keys.RightShift)
+                                Core.player.Dash();
+
+                            //if (args.Key == Keys.Up) Core.player.move(Direction.Up);
+                            //if (args.Key == Keys.Down) Core.player.move(Direction.Down);
+                            //if (args.Key == Keys.Left) Core.player.move(Direction.Left);
+                            //if (args.Key == Keys.Right) Core.player.move(Direction.Right);
+
+                            if (args.Key == Keys.Z) Core.player.attack();
+                            if (args.Key == Keys.X) Core.player.attack();
+
+                            if (args.Key == Keys.V) Core.player.swapHotbars();
+                            if (args.Key == Keys.C) Core.player.toggleInv();
                         }
-
-                        if (args.Key == Keys.W) Core.player.setDirection(Direction.Up);
-                        if (args.Key == Keys.S) Core.player.setDirection(Direction.Down);
-                        if (args.Key == Keys.A) Core.player.setDirection(Direction.Left);
-                        if (args.Key == Keys.D) Core.player.setDirection(Direction.Right);
-
-                        if (args.Key == Keys.Up) Core.player.attack(Direction.Up);
-                        if (args.Key == Keys.Down) Core.player.attack(Direction.Down);
-                        if (args.Key == Keys.Left) Core.player.attack(Direction.Left);
-                        if (args.Key == Keys.Right) Core.player.attack(Direction.Right);
-
-                        if (args.Key == Keys.F) Core.player.swapHotbars();
-                        if (args.Key == Keys.E) Core.player.toggleInv();
 
                         if (args.Key == Keys.D1) Core.player.inventory.hotbarPrimary.setSlot(0);
                         if (args.Key == Keys.D2) Core.player.inventory.hotbarPrimary.setSlot(1);
@@ -302,7 +338,7 @@ namespace BasicRPGTest_Mono
                         if (args.Button == MonoGame.Extended.Input.MouseButton.Left)
                         {
                             Vector2 clickPos = new Vector2(args.Position.X, args.Position.Y);
-                            clickPos = Util.screenPosToTruePos(clickPos);
+                            clickPos = Camera.camera.screenPosToWorldPos(clickPos);
                             new ItemEntity(MapManager.activeMap, new Item(ItemManager.getByNamespace("unicornhorn")), clickPos);
                         }
                     }
@@ -346,6 +382,7 @@ namespace BasicRPGTest_Mono
                 _graphics.PreferredBackBufferHeight = Window.ClientBounds.Height;
                 renderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
                 Camera.camera.Initialize();
+                GFX2DEngine.Hud.HudManager.UpdateWindow();
             };
 
             Camera.camera = new Camera2D(this);

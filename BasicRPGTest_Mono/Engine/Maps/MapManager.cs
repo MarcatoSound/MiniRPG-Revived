@@ -4,6 +4,7 @@ using System.Text;
 
 namespace BasicRPGTest_Mono.Engine
 {
+    // Manages the maps for the currently loaded world.
     public static class MapManager
     {
         private static List<Map> maps;
@@ -31,12 +32,12 @@ namespace BasicRPGTest_Mono.Engine
         /// <summary>
         /// Adds and stores a map in the list of loaded maps.
         /// </summary>
-        /// <param name="tile">The map object that is being stored.</param>
+        /// <param name="map">The map object that is being stored.</param>
         public static void add(Map map)
         {
             // If this is the first map being loaded, make it the active map.
             /* TODO: Rewrite this later when we have multiple maps to handle; 
-             * probably use a parameter in the "world.json" save file to remember the active map.
+             * probably use a parameter in the "world" save file to remember the active map.
              */
             if (maps.Count == 0 && activeMap == null) activeMap = map;
             maps.Add(map);

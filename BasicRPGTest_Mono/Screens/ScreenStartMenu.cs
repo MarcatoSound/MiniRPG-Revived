@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using MonoGame.Extended.Input.InputListeners;
 using BasicRPGTest_Mono.Engine.Menus;
+using System.Timers;
 
 namespace BasicRPGTest_Mono
 {
@@ -29,23 +30,32 @@ namespace BasicRPGTest_Mono
 
             font = Content.Load<SpriteFont>("main_font");
 
-            int menuX = _graphics.PreferredBackBufferWidth / 3;
-            int menuY = _graphics.PreferredBackBufferHeight / 3;
-            mainMenu = new Menu("mainmenu", new Rectangle(menuX, menuY, 400, 240), Color.Gray, Color.White, font);
-            mainMenu.add(new MenuItem("New World")
-            {
-                run = () => {
-                    Game.newWorldMenu();
-                    }
-            });
-            mainMenu.add(new MenuItem("Load World")
-            {
-                run = () => {
-                    Game.loadWorldMenu();
-                    }
-            });
-
             base.LoadContent();
+
+            Timer menuDelay = new Timer(100);
+            menuDelay.Elapsed += (sender, args) =>
+            {
+                int menuX = GraphicsDevice.Viewport.Width / 2;
+                int menuY = GraphicsDevice.Viewport.Height / 2;
+                Rectangle menuBox = new Rectangle(menuX - 200, menuY - 120, 400, 240);
+                mainMenu = new Menu("mainmenu", menuBox, Color.Gray, Color.White, font);
+                mainMenu.add(new MenuItem("New World")
+                {
+                    run = () => {
+                        Game.newWorldMenu();
+                    }
+                });
+                mainMenu.add(new MenuItem("Load World")
+                {
+                    run = () => {
+                        Game.loadWorldMenu();
+                    }
+                });
+
+                menuDelay.Stop();
+                menuDelay.Close();
+            };
+            menuDelay.Start();
         }
 
         public void down()
@@ -71,7 +81,7 @@ namespace BasicRPGTest_Mono
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            mainMenu.Draw(_spriteBatch, Alignment.Center, Alignment.Top);
+            if (mainMenu != null) mainMenu.Draw(_spriteBatch, Alignment.Center, Alignment.Top);
             _spriteBatch.End();
         }
     }

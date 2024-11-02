@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
-using MonoGame.Extended.Tiled;
 using RPGEngine;
 using System;
 using System.Collections.Generic;
@@ -36,6 +35,7 @@ namespace BasicRPGTest_Mono.Engine
         public Timer attackTimer;
 
         public PlayerInventory inventory;
+
         public Player() : 
             base("player", playerGraphic, new Rectangle(0, 0, 24, 32), 225f)
         {
@@ -102,6 +102,7 @@ namespace BasicRPGTest_Mono.Engine
             inventory.hotbarSecondary.setItem(1, new Item(ItemManager.getByNamespace("sunfeather")));
 
             GuiWindowManager.playerInv.updateGui();
+            GlowSize = 0.5F;
         }
         public Player(YamlSection data) :
             base("player", playerGraphic, new Rectangle(0, 0, 24, 32), (float)data.getDouble("stats.movement_speed", 125))
@@ -128,6 +129,7 @@ namespace BasicRPGTest_Mono.Engine
             inventory = new PlayerInventory(new YamlSection((YamlMappingNode)data.get("inventory")));
 
             //Load.loadRegions(map.world, map, map.getUnloadedRegionsInRange(getPlayerTilePosition(), 3));
+            GlowSize = 0.5F;
 
         }
         public void toggleInv()
@@ -150,6 +152,10 @@ namespace BasicRPGTest_Mono.Engine
             inventory.hotbarSecondary = oldPrimary;
         }
 
+        public void attack()
+        {
+            attack(direction);
+        }
         public void attack(Direction direction)
         {
             if (isAttacking) return;
@@ -160,8 +166,8 @@ namespace BasicRPGTest_Mono.Engine
             Item mainhand = inventory.hotbarPrimary.hand;
 
             isAttacking = true;
-            itemSwing = new ItemSwing(direction, 200, this, mainhand, Position, mainhand.swingStyle, mainhand.swingDist);
-            attackTimer = new Timer(200);
+            itemSwing = new ItemSwing(direction, 125, this, mainhand, Position, mainhand.swingStyle, mainhand.swingDist);
+            attackTimer = new Timer(125);
             attackTimer.Elapsed += (sender, args) =>
             {
                 isAttacking = false;
@@ -222,73 +228,125 @@ namespace BasicRPGTest_Mono.Engine
         {
             this.direction = direction;
         }
+        public void move(Direction direction)
+        {
+            this.direction = direction;
+            Vector2 newVel = velocity;
+
+            if (direction == Direction.Up)
+            {
+                newVel = new Vector2(velocity.X, velocity.Y - (float)(maxVelocity.Y / 5));
+                if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
+            }
+            else if (newVel.Y < 0) newVel.Y += maxVelocity.Y / 5;
+
+
+            if (direction == Direction.Down)
+            {
+                newVel = new Vector2(velocity.X, velocity.Y + (float)(maxVelocity.Y / 5));
+                if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
+            }
+            else if (newVel.Y > 0) newVel.Y -= maxVelocity.Y / 5;
+
+
+            if (direction == Direction.Left)
+            {
+                newVel = new Vector2(velocity.X - (float)(maxVelocity.X / 5), velocity.Y);
+                if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
+            }
+            else if (newVel.X < 0) newVel.X += maxVelocity.X / 5;
+
+
+            if (direction == Direction.Right)
+            {
+                newVel = new Vector2(velocity.X + (float)(maxVelocity.X / 5), velocity.Y);
+                if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
+            }
+            else if (newVel.X > 0) newVel.X -= maxVelocity.X / 5;
+
+
+            /*switch (direction)
+            {
+                case Direction.Up:
+                    {
+                        newVel = new Vector2(velocity.X, velocity.Y - (float)(maxVelocity.Y / 5));
+                        if (newVel.Y < -maxVelocity.Y) newVel.Y = -maxVelocity.Y;
+                        break;
+                    }
+                    case Direction.Down:
+                    {
+                        newVel = new Vector2(velocity.X, velocity.Y + (float)(maxVelocity.Y / 5));
+                        if (newVel.Y > maxVelocity.Y) newVel.Y = maxVelocity.Y;
+                        break;
+                    }
+                    case Direction.Left:
+                    {
+                        newVel = new Vector2(velocity.X - (float)(maxVelocity.X / 5), velocity.Y);
+                        if (newVel.X < -maxVelocity.X) newVel.X = -maxVelocity.X;
+                        break;
+                    }
+                    case Direction.Right:
+                    {
+                        newVel = new Vector2(velocity.X + (float)(maxVelocity.X / 5), velocity.Y);
+                        if (newVel.X > maxVelocity.X) newVel.X = maxVelocity.X;
+                        break;
+                    }
+            }*/
+
+            velocity = newVel;
+        }
         public override void move()
         {
             Vector2 newPlayerPos = Position;
 
+            float distX = velocity.X * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
+            float distY = velocity.Y * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
+            if (isAttacking)
+            {
+                // SLOW THE PLAYER WHILE ATTACKING
+                distX *= 0.3F;
+                distY *= 0.3F;
+            }
+            newPlayerPos.X += distX;
+            newPlayerPos.Y += distY;
+
             if (velocity.X > 0)
             {
 
-                newPlayerPos.X += velocity.X * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
 
                 if (newPlayerPos.X > (MapManager.activeMap.widthInPixels - (graphic.width / 2)))
                     newPlayerPos.X = MapManager.activeMap.widthInPixels - (graphic.width / 2);
 
 
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.X = Position.X;
-                }
-
             }
             else if (velocity.X < 0)
             {
 
-                newPlayerPos.X += velocity.X * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
                 if (newPlayerPos.X < 0 + (graphic.width / 2))
                     newPlayerPos.X = 0 + (graphic.width / 2);
 
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.X = Position.X;
-                }
-
             }
+
 
             if (velocity.Y > 0)
             {
 
-                newPlayerPos.Y += velocity.Y * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
                 if (newPlayerPos.Y > (MapManager.activeMap.heightInPixels - (graphic.width / 2)))
                     newPlayerPos.Y = MapManager.activeMap.heightInPixels - (graphic.width / 2);
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.Y = Position.Y;
-                }
 
             }
             else if (velocity.Y < 0)
             {
 
-                newPlayerPos.Y += velocity.Y * (float)Core.globalTime.ElapsedGameTime.TotalSeconds;
-
                 if (newPlayerPos.Y < 0 + (graphic.height / 2))
                     newPlayerPos.Y = 0 + (graphic.height / 2);
 
-
-
-                if (isColliding(getBox(newPlayerPos)))
-                {
-                    newPlayerPos.Y = Position.Y;
-                }
-
             }
+
+
+
+            if (isColliding(getBox(newPlayerPos))) newPlayerPos.X = Position.X;
+            if (isColliding(getBox(newPlayerPos))) newPlayerPos.Y = Position.Y;
 
             Position = new Vector2(newPlayerPos.X, newPlayerPos.Y);
 
@@ -346,22 +404,51 @@ namespace BasicRPGTest_Mono.Engine
                     item.pickUp(this);
             }
 
+            Vector2 slowdown = velocity;
             var kstate = Keyboard.GetState();
-
-            if (kstate.IsKeyDown(Keys.W) || kstate.IsKeyDown(Keys.S) || kstate.IsKeyDown(Keys.A) || kstate.IsKeyDown(Keys.D))
+            if (Core.ControlScheme == "minicraft")
             {
-                isMoving = true;
+                bool up = kstate.IsKeyDown(Keys.Up);
+                bool down = kstate.IsKeyDown(Keys.Down);
+                bool left = kstate.IsKeyDown(Keys.Left);
+                bool right = kstate.IsKeyDown(Keys.Right);
+                if (up || down || left || right)
+                {
+                    isMoving = true;
+                    if (up) move(Direction.Up);
+                    else if (down) move(Direction.Down);
+                    //else if (velocity.Y > 0) slowdown.Y = 0;
+                    //else if (newVel.Y > 0) newVel.Y = 0;
+
+                    if (left) move(Direction.Left);
+                    else if (right) move(Direction.Right);
+                    //else if (velocity.X < 0) slowdown.X = 0;
+                    //else if (newVel.X < 0) newVel.X = 0;
+
+                    //velocity = new Vector2(velocity.X, velocity.Y);
+                }
+                else
+                {
+                    isMoving = false;
+                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Idle, direction);
+                }
             } else
             {
-                isMoving = false;
-                if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Idle, direction);
+                if (kstate.IsKeyDown(Keys.W) || kstate.IsKeyDown(Keys.S) || kstate.IsKeyDown(Keys.A) || kstate.IsKeyDown(Keys.D))
+                {
+                    isMoving = true;
+                }
+                else
+                {
+                    isMoving = false;
+                    if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Idle, direction);
+                }
             }
 
-            Vector2 newVel = velocity;
 
             if (!isGettingKnockedBack)
             {
-                if (kstate.IsKeyDown(Keys.W))
+                /*if (kstate.IsKeyDown(Keys.W))
                 {
                     if (!kstate.IsKeyDown(Keys.S))
                         if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, Direction.Up);
@@ -439,10 +526,13 @@ namespace BasicRPGTest_Mono.Engine
                             newVel = new Vector2(0, velocity.X);
                     }
                     velocity = newVel;
-                }
+                }*/
             }
 
             move();
+
+            if (!LightManager.HasLight(this) && GlowSize > 0) LightManager.AddLight(this);
+            else if (LightManager.HasLight(this) && GlowSize == 0) LightManager.RemoveLight(this);
 
         }
         public override void hurt(double dmg, Vector2 sourcePos)

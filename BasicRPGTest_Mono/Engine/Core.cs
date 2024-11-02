@@ -25,6 +25,8 @@ namespace BasicRPGTest_Mono.Engine
         public static List<PopupText> popupTexts;
         public static List<PopupText> anchoredPopupTexts;
 
+        public static string ControlScheme = "";
+
         static Core()
         {
             popupTexts = new List<PopupText>();

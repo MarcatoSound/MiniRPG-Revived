@@ -8,7 +8,7 @@ using BasicRPGTest_Mono.Engine.Utility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
-using MonoGame.Extended.Tiled;
+using ProtoBuf;
 using RPGEngine;
 using SharpNoise;
 using System;
@@ -16,6 +16,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Reflection.Emit;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,7 +27,7 @@ using YamlDotNet.Serialization;
 
 namespace BasicRPGTest_Mono.Engine
 {
-    [MiniSerializable]
+    [ProtoContract]
     public class Map
     {
         //====================================================================================
@@ -33,15 +35,18 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
 
         public string world { get; set; }
-        [SavedProperty]
+        [ProtoMember(1)]
         public string name { get; set; }
+        public bool loaded { get; set; }
         public Generator generator { get; private set; }
-        public List<TileLayer> layers { get; set; }
+        public List<TileLayer> layers { get; set; } = new List<TileLayer>();
         public Dictionary<string, TileLayer> layersByName { get; set; } = new Dictionary<string, TileLayer>();
-        public ConcurrentDictionary<Vector2, Region> regions { get; set; }
-        [SavedProperty]
+        [ProtoMember(2)]
+        [ProtoMap]
+        public ConcurrentDictionary<Vector2i, Region> regions { get; set; } = new ConcurrentDictionary<Vector2i, Region> { };
+        [ProtoMember(3)]
         public int width { get; set; }
-        [SavedProperty]
+        [ProtoMember(4)]
         public int height { get; set; }
         public int widthInPixels { get; set; }
         public int heightInPixels { get; set; }
@@ -75,19 +80,23 @@ namespace BasicRPGTest_Mono.Engine
         public Dictionary<Vector2, ItemEntity> items = new Dictionary<Vector2, ItemEntity>();
 
 
-        [SavedProperty]
+        internal Dictionary<Vector2, Tile> tiles = new Dictionary<Vector2, Tile>();
         internal List<Tile> _tiles
         {
             get
             {
-                List<Tile> tiles = new List<Tile>();
-                foreach (Region region in regions.Values)
+                return new List<Tile>(tiles.Values);
+            }
+
+            set
+            {
+                foreach (var tile in value)
                 {
-                    tiles.AddRange(region.tiles);
+                    tiles.Add(tile.tilePos, tile);
                 }
-                return tiles;
             }
         }
+        internal Dictionary<Vector2, Tile> lightTiles = new Dictionary<Vector2, Tile>();
 
         //====================================================================================
         // CONSTRUCTOR
@@ -110,7 +119,7 @@ namespace BasicRPGTest_Mono.Engine
             this.layers = generator.generateLayers(width);
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
-            regions = new ConcurrentDictionary<Vector2, Region>();
+            regions = new ConcurrentDictionary<Vector2i, Region>();
             collidables = new ConcurrentDictionary<int, Rectangle>();
 
             this.entities = new ConcurrentDictionary<int, Entity>();
@@ -135,7 +144,7 @@ namespace BasicRPGTest_Mono.Engine
                     regionPos.X = x;
                     regionPos.Y = y;
                     Region region = new Region(regionTruePos, regionPos, this);
-                    regions.TryAdd(new Vector2(x, y), region);
+                    regions.TryAdd(new Vector2i(x, y), region);
                 }
             }
 
@@ -176,7 +185,7 @@ namespace BasicRPGTest_Mono.Engine
             this.height = size;
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
-            regions = new ConcurrentDictionary<Vector2, Region>();
+            regions = new ConcurrentDictionary<Vector2i, Region>();
             collidables = new ConcurrentDictionary<int, Rectangle>();
 
             this.entities = new ConcurrentDictionary<int, Entity>();
@@ -199,7 +208,7 @@ namespace BasicRPGTest_Mono.Engine
                     regionPos.X = x;
                     regionPos.Y = y;
                     Region region = new Region(regionTruePos, regionPos, this);
-                    regions.TryAdd(new Vector2(x, y), region);
+                    regions.TryAdd(new Vector2i(x, y), region);
                 }
             }
 
@@ -243,7 +252,7 @@ namespace BasicRPGTest_Mono.Engine
             this.height = oldMap.height;
             this.widthInPixels = oldMap.widthInPixels;
             this.heightInPixels = oldMap.height;
-            regions = new ConcurrentDictionary<Vector2, Region>(oldMap.regions);
+            regions = new ConcurrentDictionary<Vector2i, Region>(oldMap.regions);
             collidables = new ConcurrentDictionary<int, Rectangle>(oldMap.collidables);
 
             this.entities = new ConcurrentDictionary<int, Entity>(oldMap.entities);
@@ -263,7 +272,7 @@ namespace BasicRPGTest_Mono.Engine
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
 
-            regions = new ConcurrentDictionary<Vector2, Region>();
+            regions = new ConcurrentDictionary<Vector2i, Region>();
             collidables = new ConcurrentDictionary<int, Rectangle>();
 
             this.entities = new ConcurrentDictionary<int, Entity>();
@@ -286,7 +295,7 @@ namespace BasicRPGTest_Mono.Engine
                     regionPos.X = x;
                     regionPos.Y = y;
                     Region region = new Region(regionTruePos, regionPos, this);
-                    regions.TryAdd(new Vector2(x, y), region);
+                    regions.TryAdd(new Vector2i(x, y), region);
                 }
             }
 
@@ -312,7 +321,7 @@ namespace BasicRPGTest_Mono.Engine
             this.widthInPixels = width * TileManager.dimensions;
             this.heightInPixels = height * TileManager.dimensions;
 
-            regions = new ConcurrentDictionary<Vector2, Region>();
+            regions = new ConcurrentDictionary<Vector2i, Region>();
             collidables = new ConcurrentDictionary<int, Rectangle>();
 
             this.entities = new ConcurrentDictionary<int, Entity>();
@@ -335,10 +344,22 @@ namespace BasicRPGTest_Mono.Engine
                     regionPos.X = x;
                     regionPos.Y = y;
                     Region region = new Region(regionTruePos, regionPos, this);
-                    regions.TryAdd(new Vector2(x, y), region);
+                    regions.TryAdd(new Vector2i(x, y), region);
                 }
             }
 
+            layers.Add(new TileLayer("water"));
+            layers.Add(new TileLayer("ground"));
+            layers.Add(new TileLayer("stone"));
+            layers.Add(new TileLayer("decoration"));
+            foreach (TileLayer layer in layers)
+            {
+                layersByName.Add(layer.name, layer);
+            }
+        }
+        // Makes protobuf serialization happy.
+        private Map()
+        {
             layers.Add(new TileLayer("water"));
             layers.Add(new TileLayer("ground"));
             layers.Add(new TileLayer("stone"));
@@ -830,6 +851,7 @@ namespace BasicRPGTest_Mono.Engine
         //====================================================================================
         public void update_VisibleRegions(Camera2D camera)
         {
+            return;
             //CodeTimer codeTimer = new CodeTimer();
             //codeTimer.startTimer();
 
@@ -910,47 +932,84 @@ namespace BasicRPGTest_Mono.Engine
 
         }
 
+        public bool redraw = true;
+        private Texture2D mesh;
+
         public void DrawVisibleMapCache (Camera2D camera, SpriteBatch batch)
         {
             v_drawnTileCount = 0;
             // Go through each CachedTiles Layer
-            batch.Begin(transformMatrix: Camera.camera.Transform);
-            foreach (TileLayer tLayer in layers)
+            if (redraw || mesh == null)
             {
+                mesh = null;
+                SpriteBatch batch2 = new SpriteBatch(Core.graphics);
+                batch2.Begin();
 
-                // ------------------------------------------------------------------
-                // DRAW TILES - By Cached Tile Parent (Template)
-                // ------------------------------------------------------------------
-                // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
-                Dictionary<Tile, List<Vector2>> templateList = v_VisibleTiles[tLayer];
-
-                // Go through each Tile Template in the Layer
-                foreach (KeyValuePair<Tile, List<Vector2>> pair2 in templateList)
+                RenderTarget2D target = new RenderTarget2D(Core.graphics, widthInPixels, heightInPixels);
+                Core.graphics.SetRenderTarget(target);
+                foreach (TileLayer tLayer in layers)
                 {
-                    pair2.Key.graphic.draw_Tiles(batch, pair2.Value);
+                    Console.WriteLine($"Drawing layer {tLayer.name}, which contains {tLayer.tiles.Count} tiles...");
+                    /*List<Tile> parentCache = new List<Tile>();
+                    foreach (var pair in tLayer.tiles)
+                    {
+                        Tile tile = pair.Value;
+                        Vector2 tilePos = pair.Key;
+                        batch.Draw(tile.parent.graphic.texture, new Vector2(tilePos.X * 32, tilePos.Y * 32), Color.White);
+                        //tile.parent.graphic.draw(batch, new Vector2(tilePos.X * 32, tilePos.Y * 32));
+                        //tile.draw(batch);
+                    }*/
 
-                    v_drawnTileCount += pair2.Value.Count;  // Count drawn Tiles
+                    // RESTORE THIS CODE WHEN DONE TESTING MESHING
+                    // ------------------------------------------------------------------
+                    // DRAW TILES - By Cached Tile Parent (Template)
+                    // ------------------------------------------------------------------
+
+                    // Get Template Tile's Cached Visible Map Tile List of Locations to draw to
+                    Dictionary<Tile, List<Vector2>> templateList = v_VisibleTiles[tLayer];
+
+                    // Go through each Tile Template in the Layer
+                    foreach (KeyValuePair<Tile, List<Vector2>> pair2 in templateList)
+                    {
+                        pair2.Key.graphic.draw_Tiles(batch2, pair2.Value);
+
+                        v_drawnTileCount += pair2.Value.Count;  // Count drawn Tiles
+                    }
+
+                    // ------------------------------------------------------------------
+                    // DRAW EDGES - By Cached Edge Graphics
+                    // ------------------------------------------------------------------
+
+                    Dictionary<Graphic, List<Vector2>> edgeList = v_VisibleEdges[tLayer];
+                    // Go through all Visible Tile Edges to draw
+                    foreach (KeyValuePair<Graphic, List<Vector2>> pair2 in edgeList)
+                    {
+                        // Draw ALL matching Visible Edges at once
+                        pair2.Key.draw_Tiles(batch2, pair2.Value);
+                    }
+
+                    // Loop through regions to draw tile edges and highlights
+                    foreach (Region region in regions.Values)
+                    {
+                        region.draw(batch2, tLayer);
+                    }
+                    /*foreach (Vector2 regionPos in v_regionsVisible)
+                    {
+                        Region region = regions[(Vector2i)regionPos];
+                        region.draw(batch, tLayer);
+                    }*/
                 }
 
-                // ------------------------------------------------------------------
-                // DRAW EDGES - By Cached Edge Graphics
-                // ------------------------------------------------------------------
+                batch2.End();
 
-                Dictionary<Graphic, List<Vector2>> edgeList = v_VisibleEdges[tLayer];
-                // Go through all Visible Tile Edges to draw
-                foreach (KeyValuePair<Graphic, List<Vector2>> pair2 in edgeList)
-                {
-                    // Draw ALL matching Visible Edges at once
-                    pair2.Key.draw_Tiles(batch, pair2.Value);
-                }
+                redraw = false;
+                mesh = target;
+                Core.graphics.SetRenderTarget(null);
+                GC.Collect();
+            } 
 
-                // Loop through regions to draw tile edges and highlights
-                foreach (Vector2 regionPos in v_regionsVisible)
-                {
-                    Region region = regions[regionPos];
-                    region.draw(batch, tLayer);
-                }
-            }
+            batch.Begin(transformMatrix: Camera.camera.Transform);
+            batch.Draw(mesh, Vector2.Zero, Color.White);
             batch.End();
 
         }
@@ -1072,9 +1131,14 @@ namespace BasicRPGTest_Mono.Engine
                 // Get Tile Template Dictionary matching Layer
                 tileTemplate = v_VisibleTiles[layer];
 
-                for (int X = tileViewBounds.X; X <= tileViewBounds.Right; X++)
+                /*for (int X = tileViewBounds.X; X <= tileViewBounds.Right; X++)
                 {
                     for (int Y = tileViewBounds.Y; Y <= tileViewBounds.Bottom; Y++)
+                    {*/
+
+                for (int X = 0; X <= width; X++)
+                {
+                    for (int Y = 0; Y <= height; Y++)
                     {
                         pos.X = X;
                         pos.Y = Y;
@@ -1220,7 +1284,10 @@ namespace BasicRPGTest_Mono.Engine
             DataPackManager.loadProgress = 0;
             // TILE DATA SAVING
             DataPackManager.loadStatus = $"Saving {name}: tile data...";
-            double perIteration = 1.0 / Math.Max(regions.Count, 1);
+            double perIteration;
+            if (!Directory.Exists($"save\\{world}\\maps\\{name}")) Directory.CreateDirectory($"save\\{world}\\maps\\{name}");
+            ProtoBuf.Serializer.Serialize(File.Create($"save\\{world}\\maps\\{name}\\mapdata.dat"), this);
+            /*double perIteration = 1.0 / Math.Max(regions.Count, 1);
             foreach (Region region in regions.Values)
             {
                 DataPackManager.loadProgress += perIteration;
@@ -1242,7 +1309,7 @@ namespace BasicRPGTest_Mono.Engine
             finally
             {
                 writer.Close();
-            }
+            }*/
 
             // ENTITY SAVING
             DataPackManager.loadStatus = $"Saving {name}: entities...";
@@ -1296,7 +1363,11 @@ namespace BasicRPGTest_Mono.Engine
             DataPackManager.loadProgress = 0;
             // TILE DATA SAVING
             DataPackManager.loadStatus = $"Saving {name}: tile data...";
-            double perIteration = 1.0 / Math.Max(regions.Count, 1);
+            double perIteration;
+            if (!Directory.Exists($"save\\{world}\\maps\\{name}")) Directory.CreateDirectory($"save\\{world}\\maps\\{name}");
+            ProtoBuf.Serializer.Serialize(File.Create($"save\\{world}\\maps\\{name}\\mapdata.dat"), this);
+
+            /*double perIteration = 1.0 / Math.Max(regions.Count, 1);
             YamlSection fullYaml = new YamlSection(name);
             foreach (Region region in regions.Values)
             {
@@ -1324,7 +1395,7 @@ namespace BasicRPGTest_Mono.Engine
             finally
             {
                 writer.Close();
-            }
+            }*/
 
             // ENTITY SAVING
             DataPackManager.loadStatus = $"Saving {name}: entities...";
@@ -1369,6 +1440,57 @@ namespace BasicRPGTest_Mono.Engine
             DataPackManager.loadProgress = 0;
             DataPackManager.loadStatus = "";
 
+        }
+        [OnDeserialized]
+        public void onDeserialized()
+        {
+            this.world = world;
+            this.widthInPixels = width * TileManager.dimensions;
+            this.heightInPixels = height * TileManager.dimensions;
+
+            //regions = new ConcurrentDictionary<Vector2i, Region>();
+            collidables = new ConcurrentDictionary<int, Rectangle>();
+
+            this.entities = new ConcurrentDictionary<int, Entity>();
+            this.livingEntities = new ConcurrentDictionary<int, LivingEntity>();
+            this.spawns = new ConcurrentDictionary<int, Spawn>();
+            initSpawns();
+            spawnTimer = new System.Timers.Timer(1000);
+            spawnTimer.Elapsed += trySpawn;
+            spawnTimer.Start();
+
+            regionManager = new RegionManager(this);
+            foreach (var region in regions.Values)
+            {
+                region.map = this;
+            }
+            /*Vector2 regionTruePos = new Vector2();
+            Vector2 regionPos = new Vector2();
+            for (int x = 0; x < width / 32; x++)
+            {
+                for (int y = 0; y < height / 32; y++)
+                {
+                    regionTruePos.X = x * (TileManager.dimensions * 32);
+                    regionTruePos.Y = y * (TileManager.dimensions * 32);
+                    regionPos.X = x;
+                    regionPos.Y = y;
+                    Region region = new Region(regionTruePos, regionPos, this);
+                    regions.TryAdd(new Vector2(x, y), region);
+                }
+            }*/
+
+            //if (MapManager.activeMap == this)
+            //{
+                foreach (Region region in regions.Values)
+                {
+                    foreach (Tile tile in region.tiles)
+                    {
+                        tile.update();
+                        if (tile.GlowSize > 0) lightTiles.Add(tile.tilePos, tile);
+                    }
+                }
+                Console.WriteLine("Finished loading tile edges!");
+            //}
         }
 
 
