@@ -89,7 +89,6 @@ namespace BasicRPGTest_Mono.Engine
         protected float _viewportWidth;
         private float _scale;
         private float _oldScale;
-        private Vector2 _tilePos;
 
         public Camera2D(Game game)
             : base(game)
@@ -102,6 +101,7 @@ namespace BasicRPGTest_Mono.Engine
             get { return _position; }
             set { _position = value; }
         }
+        public Vector2 TilePos { get; private set; }
         public float Rotation { get; set; }
         public Vector2 Origin { get; set; }
         public float Scale
@@ -177,8 +177,8 @@ namespace BasicRPGTest_Mono.Engine
 
             // FIXME: Fix handling of camera going outside the map bounds.
             Vector2 newPos = new Vector2(_position.X, _position.Y);
-            newPos.X += (Focus.Position.X - Position.X) * MoveSpeed * delta;
-            newPos.Y += (Focus.Position.Y - Position.Y) * MoveSpeed * delta;
+            newPos.X += (Focus.Position.X - Position.X);// * MoveSpeed * delta;
+            newPos.Y += (Focus.Position.Y - Position.Y);// * MoveSpeed * delta;
             if (newPos.X + (_viewportWidth / 2 / newScale) > CameraLimits.Width || newPos.X - (_viewportWidth / 2 / newScale) < 0) 
                 newPos.X = _position.X;
             if (newPos.Y + (_viewportHeight / 2 / newScale) > CameraLimits.Height || newPos.Y - (_viewportHeight / 2 / newScale) < 0)
@@ -190,14 +190,14 @@ namespace BasicRPGTest_Mono.Engine
             BoundingRectangle = new Rectangle(Convert.ToInt32(_position.X - (_viewportWidth / 2 / newScale)), Convert.ToInt32(_position.Y - (_viewportHeight / 2 / newScale)), Convert.ToInt32(_viewportWidth / newScale), Convert.ToInt32(_viewportHeight / newScale));
 
             Vector2 newTilePos = Util.getTilePosition(new Vector2(BoundingRectangle.Left, BoundingRectangle.Top));
-            if (newTilePos != _tilePos)
+            if (newTilePos != TilePos)
             {
                 CameraTileChange?.Invoke(this, new CameraTileChangeEventArgs() 
                  {
-                     OldPosition = _tilePos,
+                     OldPosition = TilePos,
                      NewPosition = newTilePos
                  });
-                _tilePos = newTilePos;
+                TilePos = newTilePos;
             }
 
             base.Update(gameTime);

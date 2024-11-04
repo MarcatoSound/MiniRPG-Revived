@@ -445,10 +445,12 @@ namespace BasicRPGTest_Mono.Engine
                 }
             }
 
+            Vector2 newVel = velocity;
+
 
             if (!isGettingKnockedBack)
             {
-                /*if (kstate.IsKeyDown(Keys.W))
+                if (kstate.IsKeyDown(Keys.W))
                 {
                     if (!kstate.IsKeyDown(Keys.S))
                         if (!isAttacking) ((GraphicSet)graphic).setSprite(GraphicType.Move, Direction.Up);
@@ -526,13 +528,13 @@ namespace BasicRPGTest_Mono.Engine
                             newVel = new Vector2(0, velocity.X);
                     }
                     velocity = newVel;
-                }*/
+                }
             }
 
             move();
 
-            if (!LightManager.HasLight(this) && GlowSize > 0) LightManager.AddLight(this);
-            else if (LightManager.HasLight(this) && GlowSize == 0) LightManager.RemoveLight(this);
+            if (!LightManager.HasDynamicLight(this) && GlowSize > 0) LightManager.AddDynamicLight(this);
+            else if (LightManager.HasDynamicLight(this) && GlowSize == 0) LightManager.RemoveDynamicLight(this);
 
         }
         public override void hurt(double dmg, Vector2 sourcePos)

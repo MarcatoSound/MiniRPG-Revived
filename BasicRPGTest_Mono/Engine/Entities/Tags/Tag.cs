@@ -60,9 +60,4 @@ namespace BasicRPGTest_Mono.Engine.Entities.Tags
 
     }
 
-    public class CompoundTag : Tag<T> where T: IConvertible
-    {
-
-    }
-
 }

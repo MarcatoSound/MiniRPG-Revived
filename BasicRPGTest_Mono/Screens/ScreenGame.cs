@@ -91,8 +91,6 @@ namespace BasicRPGTest_Mono
             Camera.camera.Position = player.Position;
             Camera.camera.CameraLimits = new Rectangle(0, 0, MapManager.activeMap.widthInPixels, MapManager.activeMap.heightInPixels);
 
-            EntityManager.entities[0].GetTag
-
             base.LoadContent();
 
             GC.Collect();
@@ -229,7 +227,7 @@ namespace BasicRPGTest_Mono
                 MapManager.activeMap.update_VisibleRegions(Camera.camera);
             }
 
-            LightManager.Update();
+            LightManager.UpdateDynamic();
 
             List<PopupText> popups = new List<PopupText>(Core.popupTexts);
             foreach (PopupText popup in popups)
@@ -306,7 +304,7 @@ namespace BasicRPGTest_Mono
 
             //GraphicsDevice.SetRenderTarget(null);
 
-            BlendState state = new BlendState()
+            /*BlendState state = new BlendState()
             {
                 ColorBlendFunction = BlendFunction.Add,
                 ColorSourceBlend = Blend.DestinationColor,
@@ -320,10 +318,11 @@ namespace BasicRPGTest_Mono
             //state.ColorBlendFunction = BlendFunction.Add;
             //state.ColorSourceBlend = Blend.DestinationColor;
             //state.ColorDestinationBlend = Blend.Zero;
-            if (LightManager.LightMap == null) LightManager.Update();
+            if (LightManager.LightMap is null) LightManager.Update();
             _spriteBatch.Begin(SpriteSortMode.Immediate, state);
             _spriteBatch.Draw(LightManager.LightMap, Vector2.Zero, Microsoft.Xna.Framework.Color.White);
-            _spriteBatch.End();
+            _spriteBatch.End();*/
+            LightManager.Draw();
 
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);

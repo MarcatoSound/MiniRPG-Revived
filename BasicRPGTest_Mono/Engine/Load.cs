@@ -527,7 +527,7 @@ namespace BasicRPGTest_Mono.Engine
                     // TODO: Tile biomes are NOT SAVED!! Fix this!
                     tile = new Tile(template, new Vector2(x, y), BiomeManager.getByName(biome));
 
-                    layer.setTile(tile.tilePos, tile);
+                    layer.setTile(tile.TilePosition, tile);
                     tile = null;
                 }
 

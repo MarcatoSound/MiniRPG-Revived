@@ -48,6 +48,13 @@ namespace RPGEngine
         private int breakTexture;
 
         //---------------------------------------
+        // Light Data
+        //---------------------------------------
+        public float GlowBrightness { get; set; } = 1;
+        public float GlowSize { get; set; } = 0;
+        public Color GlowColor { get; set; } = Color.White;
+
+        //---------------------------------------
         // World Data
         //---------------------------------------
 
@@ -70,24 +77,24 @@ namespace RPGEngine
             get { return TileManager.getByName(name); }
             set { name = value.name; }
         }
-        public Vector2 pos { get; set; } = new Vector2(0, 0);
-        public Vector2 tilePos { get; private set; } = new Vector2(0, 0);
+        public Vector2 Position { get; set; } = new Vector2(0, 0);
+        public Vector2 TilePosition { get; private set; } = new Vector2(0, 0);
         [ProtoMember(2)]
         public int x
         {
-            get { return (int)tilePos.X; }
+            get { return (int)TilePosition.X; }
             set
             {
-                tilePos = new Vector2(value, y);
+                TilePosition = new Vector2(value, y);
             }
         }
         [ProtoMember(3)]
         public int y
         { 
-            get { return (int)tilePos.Y; }
+            get { return (int)TilePosition.Y; }
             set 
             { 
-                tilePos = new Vector2(x, value);
+                TilePosition = new Vector2(x, value);
             }
         }
         public Vector2 region { get; set; } = new Vector2(0, 0);
@@ -172,7 +179,7 @@ namespace RPGEngine
                 graphic = new Graphic(texture);
             }
 
-            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
+            box = new Rectangle(Convert.ToInt32(Position.X), Convert.ToInt32(Position.Y), dimensions, dimensions);
         }
         public Tile(DataPack pack, YamlSection config)
         {
@@ -310,10 +317,10 @@ namespace RPGEngine
             this.isCollidable = tile.isCollidable;
             this.isInstance = true;
             this.zIndex = tile.zIndex;
-            this.tilePos = tilePos;
+            this.TilePosition = tilePos;
             this.biome = biome;
-            this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
-            this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
+            this.Position = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
+            this.drawPos = new Vector2(Position.X + (dimensions / 2), Position.Y + (dimensions / 2));
             this.GlowSize = tile.GlowSize;
             this.GlowColor = tile.GlowColor;
             this.Position = tilePos;
@@ -322,7 +329,7 @@ namespace RPGEngine
             sides = new List<bool>(new bool[8]);
             dropTable = tile.dropTable;
 
-            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
+            box = new Rectangle(Convert.ToInt32(Position.X), Convert.ToInt32(Position.Y), dimensions, dimensions);
 
             maxHealth = tile.maxHealth;
             health = maxHealth;
@@ -369,7 +376,7 @@ namespace RPGEngine
 
             Rectangle targetRect = new Rectangle(TileManager.dimensions * breakTexture, 0, TileManager.dimensions, TileManager.dimensions);
 
-            batch.Draw(spriteSet, pos, targetRect, Color.White);
+            batch.Draw(spriteSet, Position, targetRect, Color.White);
         }
         #endregion
 
@@ -392,7 +399,7 @@ namespace RPGEngine
                 isCorner = false;
                 graphic = getSideGraphic(side);
                 if (graphic == null) continue;
-                checkPos = tilePos;
+                checkPos = TilePosition;
                 switch (side)
                 {
                     case TileSide.NorthWest:
@@ -479,7 +486,7 @@ namespace RPGEngine
             }*/
 
             this.sides = sides;
-            if (GlowSize > 0) map.lightTiles.Add(tilePos, this);
+            if (GlowSize > 0) map.lightTiles.Add(TilePosition, this);
 
         }
 
@@ -526,7 +533,7 @@ namespace RPGEngine
             map.removeTile(this);
 
             // Attempt to spawn the items that drop from this tile.
-            Vector2 dropPos = new Vector2(pos.X + (TileManager.dimensions / 3), pos.Y + (TileManager.dimensions / 3));
+            Vector2 dropPos = new Vector2(Position.X + (TileManager.dimensions / 3), Position.Y + (TileManager.dimensions / 3));
             dropTable.dropItems(map, dropPos);
             /*foreach (ItemDrop drop in drops)
             {
@@ -537,12 +544,12 @@ namespace RPGEngine
 
             if (this.name == "grass")
             {
-                Tile replacement = new Tile(TileManager.getByName("dirt"), tilePos, biome);
+                Tile replacement = new Tile(TileManager.getByName("dirt"), TilePosition, biome);
                 replacement.layer = layer;
                 map.addTile(replacement);
             }
 
-            List<Tile> surroundings = Util.getSurroundingTiles(map, 1, tilePos);
+            List<Tile> surroundings = Util.getSurroundingTiles(map, 1, TilePosition);
             foreach (Tile tile in surroundings)
             {
                 if (tile == null) continue;
@@ -592,7 +599,7 @@ namespace RPGEngine
             Tile compare = (Tile)obj;
 
 
-            if (this.tilePos != compare.tilePos)
+            if (this.TilePosition != compare.TilePosition)
             {
                 //System.Diagnostics.Debug.WriteLine("TilePos is different!");
                 return false;
@@ -635,8 +642,8 @@ namespace RPGEngine
             config.setString("id", tl.parent.name);
             config.setString("biome", tl.biome.name);
             config.setString("layer", tl.layer.name);
-            config.setDouble("x", tl.tilePos.X);
-            config.setDouble("y", tl.tilePos.Y);
+            config.setDouble("x", tl.TilePosition.X);
+            config.setDouble("y", tl.TilePosition.Y);
 
             return config;
         }
@@ -655,19 +662,19 @@ namespace RPGEngine
             this.isCollidable = parent.isCollidable;
             this.isInstance = true;
             this.zIndex = parent.zIndex;
-            this.tilePos = tilePos;
+            this.TilePosition = TilePosition;
             this.biome = biome;
-            this.pos = new Vector2(tilePos.X * dimensions, tilePos.Y * dimensions);
-            this.drawPos = new Vector2(pos.X + (dimensions / 2), pos.Y + (dimensions / 2));
+            this.Position = new Vector2(TilePosition.X * dimensions, TilePosition.Y * dimensions);
+            this.drawPos = new Vector2(Position.X + (dimensions / 2), Position.Y + (dimensions / 2));
             this.GlowSize = parent.GlowSize;
             this.GlowColor = parent.GlowColor;
-            this.Position = pos;
+            this.Position = Position;
             //if (GlowStrength > 0) map.lightTiles.Add(tilePos, this);
             sideGraphics = parent.sideGraphics;
             sides = new List<bool>(new bool[8]);
             dropTable = parent.dropTable;
 
-            box = new Rectangle(Convert.ToInt32(pos.X), Convert.ToInt32(pos.Y), dimensions, dimensions);
+            box = new Rectangle(Convert.ToInt32(Position.X), Convert.ToInt32(Position.Y), dimensions, dimensions);
 
             maxHealth = parent.maxHealth;
             health = maxHealth;

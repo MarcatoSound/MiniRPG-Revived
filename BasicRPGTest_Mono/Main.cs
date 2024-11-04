@@ -80,7 +80,9 @@ namespace BasicRPGTest_Mono
                 if (args.Key == Keys.B)
                     LightManager.AddDarkness();
                 if (args.Key == Keys.N)
-                    Console.WriteLine(MapManager.activeMap.lightTiles.Count);
+                {
+                    LightManager.UpdateStatic();
+                }
 
                 if (args.Key == Keys.K)
                     GFX2DEngine.Hud.HudManager.AddElement(new HudMeter("metertest", Util.loadTexture("metertest_bg.png"), Util.loadTexture("metertest_fill.png"), 0.5F, 0.025F));

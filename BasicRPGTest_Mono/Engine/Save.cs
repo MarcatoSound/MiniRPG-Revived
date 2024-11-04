@@ -181,8 +181,8 @@ namespace BasicRPGTest_Mono.Engine
                     {
                         // Perform the check to see if this tile is the same as its old state.
                         Tile newTile;
-                        if (newLayer.getTile(tile.tilePos) == null) continue;
-                        newTile = newLayer.getTile(tile.tilePos);
+                        if (newLayer.getTile(tile.TilePosition) == null) continue;
+                        newTile = newLayer.getTile(tile.TilePosition);
                         if (tile.Equals(newTile)) continue;
                     }
 
@@ -191,8 +191,8 @@ namespace BasicRPGTest_Mono.Engine
 
                     // Save the tile data and add it to the layer json
                     JToken tileId = new JValue(tile.id);
-                    JToken tileX = new JValue(tile.tilePos.X);
-                    JToken tileY = new JValue(tile.tilePos.Y);
+                    JToken tileX = new JValue(tile.TilePosition.X);
+                    JToken tileY = new JValue(tile.TilePosition.Y);
 
                     tileData.Add("id", tileId);
                     tileData.Add("x", tileX);

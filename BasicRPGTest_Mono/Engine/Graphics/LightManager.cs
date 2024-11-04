@@ -11,37 +11,28 @@ using System.Collections.Generic;
 
 namespace BasicRPGTest_Mono.Engine.Graphics
 {
-    public class LightManager
+    public static class LightManager
     {
+        private static readonly BlendState lightBlend = new BlendState()
+        {
+            ColorBlendFunction = BlendFunction.Add,
+            ColorSourceBlend = Blend.DestinationColor,
+            ColorDestinationBlend = Blend.Zero,
+        };
+        private static readonly Vector2 lightOffset = new Vector2(-TileManager.dimensions, -TileManager.dimensions);
+
+
         private static bool initialized = false;
         private static Texture2D overlayPixel = new Texture2D(Core.graphics, 1, 1);
         public static float OverlayStrength { get; set; }
-        /*{
-            get { return (float)Overlay.A / 255; }
-            set { Overlay = new Color(Overlay.R, Overlay.G, Overlay.B, (byte)(value * 255)); }
-        }*/
-        public static Color OverlayColor
-        {
-            get 
-            {
-                return new Color(Overlay.R, Overlay.G, Overlay.B);
-            }
-            set
-            {
-                Overlay = new Color(value.R, value.G, value.B);
-            }
-        }
         private static Color Overlay { get; set; } = Color.Black;
 
         static LightManager()
         {
-            Camera.camera.CameraTileChange += (sender, args) =>
-            {
-                VisibleLights = getLightSourcesInBounds(Camera.camera.BoundingRectangle);
-            };
+            Camera.camera.CameraTileChange += (sender, args) => UpdateStatic();
         }
 
-        // DEBUG METHOD, REMOVE LATER
+        // DEBUG METHODS, REMOVE LATER
         internal static void ToggleDarkness()
         {
             if (OverlayStrength <= 0.5)
@@ -60,23 +51,30 @@ namespace BasicRPGTest_Mono.Engine.Graphics
 
 
         // STORAGE
+        public static RenderTarget2D StaticLightMap { get; private set; }
         public static RenderTarget2D LightMap { get; private set; }
-        private static List<LightSource> LightSources { get; set; } = new List<LightSource>();
-        private static List<LightSource> VisibleLights { get; set; } = new List<LightSource>();
-        public static void AddLight(LightSource source)
+        private static List<LightSource> DynamicLights { get; set; } = new List<LightSource>();
+        private static LightSource[] VisibleLights { get; set; } = Array.Empty<LightSource>();
+        internal static Vector2 LightMapPosition { get; set; }
+        public static void AddDynamicLight(LightSource source) => DynamicLights.Add(source);
+        public static void RemoveDynamicLight(LightSource source) => DynamicLights.Remove(source);
+        public static bool HasDynamicLight(LightSource source) => DynamicLights.Contains(source);
+
+
+        // FUNCTIONALITY
+        internal static void Draw()
         {
-            LightSources.Add(source);
-        }
-        public static void RemoveLight(LightSource source)
-        {
-            LightSources.Remove(source);
-        }
-        public static bool HasLight(LightSource source)
-        {
-            return LightSources.Contains(source);
+            if (StaticLightMap is null) return;
+
+            SpriteBatch batch = new SpriteBatch(Core.graphics);
+
+            batch.Begin(SpriteSortMode.Immediate, lightBlend);
+            batch.Draw(LightMap, Vector2.Zero, Color.White);
+            batch.End();
         }
 
-        internal static void Update()
+
+        internal static void UpdateStatic()
         {
             if (!initialized)
             {
@@ -84,55 +82,64 @@ namespace BasicRPGTest_Mono.Engine.Graphics
                 initialized = true;
             }
 
+            Rectangle lightbounds = new Rectangle(Camera.camera.BoundingRectangle.Left - TileManager.dimensions, Camera.camera.BoundingRectangle.Top - TileManager.dimensions, Camera.camera.BoundingRectangle.Width + TileManager.dimensions, Camera.camera.BoundingRectangle.Height + TileManager.dimensions);
+            //lightbounds.Inflate(TileManager.dimensions, TileManager.dimensions);
+            VisibleLights = getLightSourcesInBounds(lightbounds);
+
             SpriteBatch batch = new SpriteBatch(Core.graphics);
 
-            if (LightMap != null) LightMap.Dispose();
-            LightMap = new RenderTarget2D(Core.graphics, Core.graphics.Viewport.Width, Core.graphics.Viewport.Height);
-            Core.graphics.SetRenderTarget(LightMap);
+            if (StaticLightMap != null) StaticLightMap.Dispose();
+            StaticLightMap = new RenderTarget2D(Core.graphics, Core.graphics.Viewport.Width + 64, Core.graphics.Viewport.Height + 64);
+            Core.graphics.SetRenderTarget(StaticLightMap);
             Core.graphics.Clear(Color.White);
 
-            /*BlendState state = new BlendState();
-            state.AlphaSourceBlend = Blend.Zero;
-            state.ColorSourceBlend = Blend.One;
-            state.AlphaDestinationBlend = Blend.InverseSourceAlpha;
-            state.ColorDestinationBlend = Blend.InverseSourceAlpha;
-            state.AlphaSourceBlend = Blend.Zero;
-            state.ColorSourceBlend = Blend.Zero;
-            state.AlphaDestinationBlend = Blend.InverseSourceColor;
-            state.ColorDestinationBlend = Blend.InverseSourceAlpha;
-            BlendState Multiply = new BlendState()
-            {
-                AlphaSourceBlend = Blend.DestinationAlpha,
-                AlphaDestinationBlend = Blend.Zero,
-                AlphaBlendFunction = BlendFunction.Add,
-                ColorSourceBlend = Blend.DestinationColor,
-                ColorDestinationBlend = Blend.Zero,
-                ColorBlendFunction = BlendFunction.Add
-            };*/
             batch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
-            batch.Draw(overlayPixel, Vector2.Zero, null, Overlay * OverlayStrength, 0, Vector2.Zero, new Vector2(Core.graphics.Viewport.Width, Core.graphics.Viewport.Height), SpriteEffects.None, 0);
+            batch.Draw(overlayPixel, Vector2.Zero, null, Overlay * OverlayStrength, 0, Vector2.Zero, new Vector2(Core.graphics.Viewport.Width + 64, Core.graphics.Viewport.Height + 64), SpriteEffects.None, 0);
             batch.End();
             batch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: Camera.camera.Transform);
 
-            //batch.DrawRectangle(Core.graphics.Viewport.Bounds, Overlay * OverlayStrength, 10);
-
-            //List<LightSource> lightSources = getLightSourcesInBounds(Camera.camera.BoundingRectangle);
             if (OverlayStrength != 0)
             {
                 foreach (LightSource source in VisibleLights)
                 {
-                    //if (!Camera.camera.IsInViewWithBuffer(source.Position, LightSource.GlowTexture, 64)) continue;
-                    source.DrawGlow(batch, OverlayStrength);
+                    source.DrawGlow(batch, new Vector2(TileManager.dimensions, TileManager.dimensions), OverlayStrength);
                 }
             }
             batch.End();
 
-            //Util.saveTexture(target, "savedLight.png");
+            LightMapPosition = new Vector2(Camera.camera.BoundingRectangle.Left - TileManager.dimensions, Camera.camera.BoundingRectangle.Top - TileManager.dimensions);
 
             Core.graphics.SetRenderTarget(null);
         }
 
-        private static List<LightSource> getLightSourcesInBounds(Rectangle bounds)
+        internal static void UpdateDynamic()
+        {
+            SpriteBatch batch = new SpriteBatch(Core.graphics);
+
+            if (LightMap is not null) LightMap.Dispose(); // Clean up the old render target to avoid memory leaking.
+            LightMap = new RenderTarget2D(Core.graphics, Core.graphics.Viewport.Width + 64, Core.graphics.Viewport.Height + 64);
+
+            Core.graphics.SetRenderTarget(LightMap);
+            Core.graphics.Clear(Color.Transparent);
+
+            batch.Begin(SpriteSortMode.Deferred, transformMatrix: Camera.camera.Transform);
+            batch.Draw(StaticLightMap, LightMapPosition, Color.White);
+            batch.End();
+
+            batch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied, transformMatrix: Camera.camera.Transform);
+            // DYNAMIC LIGHTS - Lights that need to have their position updated every frame.
+            foreach (LightSource light in DynamicLights)
+            {
+                if (light.GlowSize <= 0) continue;
+                light.DrawGlow(batch);
+            }
+            batch.End();
+
+            Core.graphics.SetRenderTarget(null);
+        }
+
+
+        private static LightSource[] getLightSourcesInBounds(Rectangle bounds)
         {
             Vector2 tileTopLeft = Util.getTilePosition(new Vector2(bounds.Left, bounds.Top));
             Rectangle tileBounds = new Rectangle((int)tileTopLeft.X, (int)tileTopLeft.Y, bounds.Width / TileManager.dimensions, bounds.Height / TileManager.dimensions);
@@ -149,15 +156,7 @@ namespace BasicRPGTest_Mono.Engine.Graphics
                 }
             }
 
-            // ENTITY LIGHTS
-            foreach (LightSource light in LightSources)
-            {
-                if (light.GlowSize <= 0) continue;
-                //if (!Camera.camera.IsInViewWithBuffer(light.Position, LightSource.GlowTexture, 64)) continue;
-                lightSources.Add(light);
-            }
-
-            return lightSources;
+            return lightSources.ToArray();
         }
     }
 }

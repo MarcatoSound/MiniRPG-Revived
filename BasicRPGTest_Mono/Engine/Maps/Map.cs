@@ -92,7 +92,7 @@ namespace BasicRPGTest_Mono.Engine
             {
                 foreach (var tile in value)
                 {
-                    tiles.Add(tile.tilePos, tile);
+                    tiles.Add(tile.TilePosition, tile);
                 }
             }
         }
@@ -159,7 +159,7 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    regionPos = new Vector2((int)(tile.tilePos.X / 32), (int)(tile.tilePos.Y / 32));
+                    regionPos = new Vector2((int)(tile.TilePosition.X / 32), (int)(tile.TilePosition.Y / 32));
                     tile.region = regionPos;
                     tile.map = this;  // Tile remembers the Map it belongs to
                     tile.layer = layer;  // Tile remembers Map's Layer it belongs to
@@ -223,7 +223,7 @@ namespace BasicRPGTest_Mono.Engine
                     Vector2 pos = pair.Key;
                     Tile tile = pair.Value;
 
-                    regionPos = new Vector2((int)(tile.tilePos.X / 8), (int)(tile.tilePos.Y / 8));
+                    regionPos = new Vector2((int)(tile.TilePosition.X / 8), (int)(tile.TilePosition.Y / 8));
                     tile.region = regionPos;
                     tile.map = this;  // Tile remembers the Map it belongs to
                     tile.layer = layer;  // Tile remembers Map's Layer it belongs to
@@ -779,7 +779,7 @@ namespace BasicRPGTest_Mono.Engine
             if (!layer.hasTile(mTile)) { return false; }
             // Otherwise...
 
-            layer.clearTile(mTile.tilePos);
+            layer.clearTile(mTile.TilePosition);
 
             // Remove Tile from Region
             Region region = regions[mTile.region];
@@ -791,7 +791,7 @@ namespace BasicRPGTest_Mono.Engine
         public bool addTile(Tile mTile)
         {
 
-            Vector2 pos = mTile.pos;
+            Vector2 pos = mTile.Position;
             Region region;
 
 
@@ -805,10 +805,10 @@ namespace BasicRPGTest_Mono.Engine
             // Otherwise continue...
 
             // Check if Tile already exists at same Position and Layer
-            if (mTile.layer.tiles.ContainsKey(mTile.pos))
+            if (mTile.layer.tiles.ContainsKey(mTile.Position))
             {
                 // Do NOT Add Tile to Map. A Tile already exists at that Position
-                Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
+                Util.myDebug(true, "Map.cs addTile(Tile)", "Could NOT Add Tile(" + mTile.name + "). A Tile already exists at Layer(" + this.name + ") position: " + mTile.Position);
                 return false;
             }
             // Otherwise continue...
@@ -826,8 +826,8 @@ namespace BasicRPGTest_Mono.Engine
             Vector2 regionPos;
 
             // Calculate what Region Position the Tile would fall into
-            regionPos.X = (int)(mTile.tilePos.X / regionTilesWide);
-            regionPos.Y = (int)(mTile.tilePos.Y / regionTilesHigh);
+            regionPos.X = (int)(mTile.TilePosition.X / regionTilesWide);
+            regionPos.Y = (int)(mTile.TilePosition.Y / regionTilesHigh);
 
             // Get that Region
             region = regions[regionPos];
@@ -1486,7 +1486,7 @@ namespace BasicRPGTest_Mono.Engine
                     foreach (Tile tile in region.tiles)
                     {
                         tile.update();
-                        if (tile.GlowSize > 0) lightTiles.Add(tile.tilePos, tile);
+                        if (tile.GlowSize > 0) lightTiles.Add(tile.TilePosition, tile);
                     }
                 }
                 Console.WriteLine("Finished loading tile edges!");

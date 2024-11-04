@@ -47,15 +47,15 @@ namespace BasicRPGTest_Mono.Engine.Maps
         public bool addTile(Tile mTile)
         {
             // Check if Tile already exists at same Position and Layer
-            if (tiles.ContainsKey(mTile.tilePos))
+            if (tiles.ContainsKey(mTile.TilePosition))
             {
                 // Do NOT Add Tile to Map. A Tile already exists at that Position
-                Util.myDebug(true, "TileLayer.cs addTile(Tile)", "Could NOT Add Tile. A Tile already exists at Layer(" + this.name + ") position: " + mTile.pos);
+                Util.myDebug(true, "TileLayer.cs addTile(Tile)", "Could NOT Add Tile. A Tile already exists at Layer(" + this.name + ") position: " + mTile.Position);
                 return false;
             }
             // Otherwise...
 
-            tiles.TryAdd(mTile.tilePos, mTile);
+            tiles.TryAdd(mTile.TilePosition, mTile);
             //Console.WriteLine($"Tile drawpos: {mTile.drawPos}");
 
             //this.childTiles[(int)mTile.pos.X, (int)mTile.pos.Y] = mTile;

@@ -15,6 +15,13 @@ namespace BasicRPGTest_Mono.Engine
 {
     public class Entity : LightSource, ITaggable
     {
+        // ILIGHTSOURCE
+        public float GlowBrightness { get; set; } = 1;
+        public float GlowSize { get; set; } = 0.25F;
+        public Color GlowColor { get; set; } = Color.White;
+
+        // ENTITY
+        public Vector2 Position { get; set; }
         public string name { get; set; }
         public int id { get; set; }
         public int instanceId { get; set; }
@@ -74,8 +81,8 @@ namespace BasicRPGTest_Mono.Engine
 
         public virtual void update()
         {
-            if (!LightManager.HasLight(this) && GlowSize > 0) LightManager.AddLight(this);
-            else if (LightManager.HasLight(this)) LightManager.RemoveLight(this);
+            if (!LightManager.HasDynamicLight(this) && GlowSize > 0) LightManager.AddDynamicLight(this);
+            else if (LightManager.HasDynamicLight(this) && GlowSize == 0) LightManager.RemoveDynamicLight(this);
         }
         public virtual void draw(SpriteBatch batch)
         {
